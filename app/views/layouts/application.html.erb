@@ -5,10 +5,10 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= javascript_tag "var FLASH_NOTICE = '#{flash[:notice]}';" unless flash[:notice].blank? %>
-    <%= javascript_tag "var FLASH_ERROR = '#{flash[:error]}';" unless flash[:error].blank? %>
-    <%= javascript_tag "var USER_USERNAME = '#{session[:username]}';" unless session[:username].blank? %>
-    <%= javascript_tag "var AUTH_TOKEN = '#{form_authenticity_token}';" if protect_against_forgery? %>
+    <%= javascript_tag "var FLASH_NOTICE = #{JSON.generate(flash[:notice])};" unless flash[:notice].blank? %>
+    <%= javascript_tag "var FLASH_ERROR = #{JSON.generate(flash[:error])};" unless flash[:error].blank? %>
+    <%= javascript_tag "var USER_DATA = #{JSON.generate(session[:user])};" unless session[:user].nil? %>
+    
     <%= stylesheet_link_tag "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" %>
     <%= stylesheet_link_tag "https://fonts.googleapis.com/icon?family=Material+Icons" %>
 

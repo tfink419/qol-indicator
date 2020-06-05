@@ -4,7 +4,7 @@ import { Container, Typography, Toolbar, AppBar, IconButton, Menu, MenuItem } fr
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
-import FlashNotice from './FlashNotice'
+import FlashNotice from '../containers/FlashNotice'
 
 const useStyles = makeStyles((theme) => ({
   root: {

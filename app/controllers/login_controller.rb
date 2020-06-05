@@ -6,6 +6,7 @@ class LoginController < ApplicationController
   end
   
   def attempt_login
+    puts request.format
     if params[:username].present? && params[:password].present?
       found_user = User.where(:username => params[:username]).first
       if found_user
@@ -14,19 +15,24 @@ class LoginController < ApplicationController
     end
     if authorized_user
       session[:user_id] = authorized_user.id
-      session[:username] = authorized_user.username
-      session[:name] = authorized_user.name
-      flash[:notice] = "You are now logged in."
-      redirect_to(root_path)
+      render :json =>  {
+        :status => 0,
+        :user => {
+          :id => authorized_user.id,
+          :username => authorized_user.username,
+          :email => authorized_user.email,
+          :first_name => authorized_user.first_name,
+          :last_name => authorized_user.last_name,
+          :is_admin => authorized_user.is_admin
+        }
+      }
     else
-      flash.now[:error] = "Invalid username/password combination."
-      render('login')
+      render :json => {:status => 1, :error => "Invalid username/password combination."}
     end
   end
 
   def logout
     session[:user_id] = nil
-    session[:username] = nil
     flash[:notice] = "Logged Out"
     redirect_to(login_page_path)
   end
@@ -35,12 +41,19 @@ class LoginController < ApplicationController
     @user = User.new(registration_params)
     if @user.save
       session[:user_id] = @user.id
-      session[:username] = @user.username
-      session[:name] = @user.name
-      redirect_to(root_path)
+      render :json =>  {
+        :status => 0,
+        :user => {
+          :id => @user.id,
+          :username => @user.username,
+          :email => @user.email,
+          :first_name => @user.first_name,
+          :last_name => @user.last_name,
+          :is_admin => @user.is_admin
+        }
+      }
     else
-      flash[:error] = @user.errors.full_messages
-      redirect_to(register_path)
+      render :json => {:status => 1, :error => 'Registration Failed', :error_details => @user.errors.messages}
     end
   end
 
