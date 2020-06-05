@@ -1,0 +1,20 @@
+{
+  "name": "qol_indicator",
+  "private": true,
+  "dependencies": {
+    "@babel/preset-react": "^7.10.1",
+    "@material-ui/core": "^4.10.1",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.55",
+    "@rails/webpacker": "5.1.1",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "lodash": "^4.17.15",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.0"
+  }
+}
