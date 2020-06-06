@@ -12,6 +12,6 @@ export const loadState = () => {
 }
 
 export const saveState = (state) => {
-  const serializedState = JSON.stringify('redux-state');
-  localStorage.setItem(name, serializedState)
+  const serializedState = JSON.stringify(state);
+  localStorage.setItem('redux-state', serializedState)
 }

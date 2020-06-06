@@ -9,11 +9,12 @@ import App from "../components/App";
 import { saveState, loadState } from '../common'
 
 const persistedState = loadState();
-const store = createStore(rootReducer)
+const store = createStore(rootReducer, persistedState)
 
 store.subscribe(() => {
   saveState({
-    user:store.getState().user
+    user:store.getState().user,
+    messages:store.getState().messages
   })
 })
 

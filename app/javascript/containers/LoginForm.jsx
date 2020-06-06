@@ -16,7 +16,6 @@ const LoginForm = ({ userLogin, flashMessage }) => {
     event.preventDefault();
     postLogin(username, password)
     .then(response => {
-      console.log(response)
       userLogin(response.user);
       flashMessage('info', 'You have been logged in.');
       history.push('/')

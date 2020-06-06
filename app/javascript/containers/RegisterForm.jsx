@@ -27,7 +27,6 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
     event.preventDefault();
     postRegister(firstName, lastName, email, username, password, passwordConfirmation)
     .then(response => {
-      console.log(response)
       userLogin(response.user);
       flashMessage('info', 'Your account was successfully registered and you have logged in.');
       history.push('/')

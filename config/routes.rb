@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root :to => 'map#index'
   get '/', :to => 'map#index', :as => 'map_index'
-  get 'admin/index'
+  get 'admin', :to => 'admin#index'
   get 'register', :to => 'login#login', :as => 'register'
   get 'login', :to => 'login#login', :as => 'login_page'
   get 'logout', :to => 'login#logout', :as => 'logout'
