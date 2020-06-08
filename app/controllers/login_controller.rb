@@ -1,7 +1,7 @@
 class LoginController < ApplicationController
   def login
     unless session[:user_id].nil?
-      redirect_to map_index_path
+      redirect_to root_path
     end
   end
   

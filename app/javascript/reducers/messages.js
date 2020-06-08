@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 let currentMessageId = 0;
 
-const user = (state = [], action) => {
+const messages = (state = [], action) => {
   switch (action.type) {
     case 'MESSAGE_FLASH':
       if(_.isArray(action.message)) {
@@ -22,4 +22,4 @@ const user = (state = [], action) => {
   }
 }
 
-export default user
+export default messages

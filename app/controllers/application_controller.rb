@@ -12,8 +12,11 @@ class ApplicationController < ActionController::Base
 
   def admin_only
     unless session[:user_id] and User.find(session[:user_id]).admin?
-      flash[:notice] = "Admin Access Only"
-      redirect_to(map_index_path)
+      unless request.format.json?
+        flash[:error] = "Admin Access Only"
+        redirect_to(map_index_path)
+      end
+      render :json => {:status => 1, :error => 'Admin Access Only'}, :status => 403
     end
   end
 end

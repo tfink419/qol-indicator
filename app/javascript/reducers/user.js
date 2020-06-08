@@ -6,7 +6,7 @@ const user = (state = null, action) => {
         ...action.user
       }
     case 'USER_LOGOUT':
-      return {}
+      return null
     default:
       return state
   }

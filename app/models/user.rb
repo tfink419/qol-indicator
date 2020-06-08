@@ -15,6 +15,18 @@ class User < ApplicationRecord
     is_admin
   end
 
+  def public_attributes 
+    {
+      :first_name => first_name,
+      :last_name => last_name,
+      :username => username,
+      :email => email,
+      :is_admin => is_admin,
+      :updated_at => updated_at,
+      :created_at => created_at
+    }
+  end
+
   def name
     [first_name, last_name].join(' ')
   end
