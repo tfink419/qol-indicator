@@ -11,6 +11,8 @@ class User < ApplicationRecord
   validates :email, :presence => true,
     :format => URI::MailTo::EMAIL_REGEXP
 
+  scope :clean_order, lambda { |attr, dir| order("#{attr} #{dir}")}
+
   def admin?
     is_admin
   end

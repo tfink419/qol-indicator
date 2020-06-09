@@ -54,8 +54,18 @@ export const getUser = (userId) => {
   .then(handleResponse)
 }
 
-export const updateUser = (user) => {
+export const putUser = (user) => {
   return fetch('/users/'+user.id, { method:'PUT', body: JSON.stringify({user :{first_name:user.first_name, last_name:user.last_name, email:user.email, username:user.username, is_admin:user.is_admin}}), 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const postUser = (user) => {
+  return fetch('/users', { method:'POST', body: JSON.stringify({user :{first_name:user.first_name, last_name:user.last_name, email:user.email, username:user.username, password:user.password, password_confirmation: user.password_confirmation, is_admin: user.is_admin}}), 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'

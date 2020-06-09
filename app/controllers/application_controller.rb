@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = "Admin Access Only"
         redirect_to(map_index_path)
       end
-      render :json => {:status => 1, :error => 'Admin Access Only'}, :status => 403
+      render :json => {:status => 403, :error => 'Admin Access Only'}, :status => 403
     end
   end
 end

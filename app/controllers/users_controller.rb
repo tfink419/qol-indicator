@@ -11,7 +11,7 @@ class UsersController < ApplicationController
       dir = (['ASC', 'DESC'].include? params[:dir]) ? params[:dir] : 'ASC'
       render :json => { 
         :status => 0, 
-        :users => User.offset(offset).limit(limit).order("#{order} #{dir}").map { |user| user.public_attributes },
+        :users => User.offset(offset).limit(limit).clean_order(order, dir).map { |user| user.public_attributes },
         :user_count => User.count
       }
     rescue StandardError => err
@@ -23,6 +23,18 @@ class UsersController < ApplicationController
       }, :status => 500
     end
 
+  end
+
+  def create
+    @user = User.new(admin_create_user_params)
+    if @user.save
+      render :json =>  {
+        :status => 0,
+        :user => @user.public_attributes
+      }
+    else
+      render :json => {:status => 401, :error => 'Create User', :error_details => @user.errors.messages}
+    end
   end
 
   def show_current
@@ -69,15 +81,15 @@ class UsersController < ApplicationController
   def update
     begin
       user = User.find(params[:id])
-      if params[:id].to_i == session[:user_id] and ActiveRecord::Type::Boolean.new.cast(params[:user][:is_admin]) != user.is_admin
+      user.assign_attributes(update_user_params)
+      if params[:id].to_i == session[:user_id] and user.is_admin_changed?
         render :json => { 
           :status => 403, 
           :error => "Can not change your own admin status.",
           :error_details => "User attempted to change is_admin flag of thier own User model."
         }, :status => 403
       else
-        user = User.find(params[:id])
-        if user.update_attributes(update_user_params)
+        if user.save
           session[:user_id] = user.id
           render :json =>  {
             :status => 0,

@@ -7,7 +7,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle,
 
 import { flashMessage } from '../actions/messages'
 import { userLogin } from '../actions/user'
-import { getUser, putUser } from '../fetch';
+import { postUser } from '../fetch';
 
 const useStyles = makeStyles({
   cancelButton: {
@@ -15,50 +15,33 @@ const useStyles = makeStyles({
   }
 });
 
-const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, userLogin}) => {
+const CreateUserDialog = ({currentUserId, open, onClose, flashMessage, userLogin}) => {
   const blankUser = {
     first_name: '',
     last_name: '',
     email: '',
     username: '',
+    password:'',
+    password_confirmation:'',
     is_admin:false
   };
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
   let [user, setUser] = React.useState(blankUser);
-  let [originalUsername, setOriginalUsername] = React.useState('Username');
   let [userErrors, setUserErrors] = React.useState({})
-
-  const loadUser = () => {
-    if(open) {
-      setLoading(true);
-      setUser(blankUser);
-      setOriginalUsername('Username');
-      setUserErrors({});
-      
-      getUser(userId).then(response => {
-        setLoading(false);
-        setUser(response.user)
-        setOriginalUsername(response.user.username);
-      })
-    }
-  }
   
   const handleClose = () => {
     onClose(false);
   };
 
-  const handleUpdate = () => {
+  const handleCreate = () => {
     setUserErrors({});
     setLoading(true)
-    putUser(user)
+    postUser(user)
     .then(response => {
+      flashMessage('info', 'User created successfully')
       setLoading(false)
       onClose(true);
-      
-      if(userId == currentUserId) {
-        userLogin(response.user)
-      }
     })
     .catch(error => {
       setLoading(false)
@@ -77,15 +60,21 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
       }
     })
   }
+  
+  const clearForm = () => {
+    if(!open) {
+      setUser(blankUser)
+    }
+  }
 
-  React.useEffect(loadUser, [open])
+  React.useEffect(clearForm, [open])
 
   return (
     <div>
       <Dialog open={open} disableBackdropClick={true} onClose={handleClose}>
-        <DialogTitle>Update User '{originalUsername}'</DialogTitle>
+        <DialogTitle>Create New User</DialogTitle>
         <DialogContent>
-          <form onSubmit={handleUpdate}>
+          <form onSubmit={handleCreate}>
             <TextField
               value={user.first_name}
               onChange={(e) => setUser({ ...user, first_name:e.target.value })}
@@ -98,6 +87,7 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
               label="First Name"
               name="first_name"
               autoComplete="first_name"
+              margin="dense"
               autoFocus
             />
             <TextField
@@ -111,6 +101,7 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
               id="last_name"
               label="Last Name"
               name="last_name"
+              margin="dense"
             />
             <TextField
               value={user.username}
@@ -124,6 +115,7 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
               id="username"
               label="Username"
               name="username"
+              margin="dense"
             />
             <TextField
               value={user.email}
@@ -137,10 +129,42 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
               id="email"
               label="Email"
               name="email"
+              margin="dense"
+            />
+            <TextField
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password:e.target.value })}
+              error={Boolean(userErrors.password)}
+              helperText={userErrors.password}
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              margin="dense"
+            />
+            <TextField
+              value={user.password_confirmation}
+              onChange={(e) => setUser({ ...user, password_confirmation:e.target.value })}
+              error={Boolean(userErrors.passwordConfirmation)}
+              helperText={userErrors.password_confirmation}
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password_confirmation"
+              label="Confirm Password"
+              type="password"
+              id="password_confirmation"
+              margin="dense"
             />
             <FormControlLabel
               control={<Checkbox checked={user.is_admin} onChange={(e) => setUser({ ...user, is_admin:e.target.checked })} name="is_admin" />}
               label="Admin"
+              margin="dense"
             />
           </form>
           { loading && <CircularProgress className={classes.circularProgress} />}
@@ -149,8 +173,8 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
           <Button onClick={handleClose} color="primary" className={classes.cancelButton} autoFocus>
             Cancel
           </Button>
-          <Button onClick={handleUpdate} color="primary">
-            Update
+          <Button onClick={handleCreate} color="primary">
+            Create
           </Button>
         </DialogActions>
       </Dialog>
@@ -167,4 +191,4 @@ const mapDispatchToProps = {
   userLogin
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UpdateUserDialog)
+export default connect(mapStateToProps, mapDispatchToProps)(CreateUserDialog)
