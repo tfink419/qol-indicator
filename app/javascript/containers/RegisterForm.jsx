@@ -1,7 +1,9 @@
 import React from "react";
 import { connect } from 'react-redux'
-import { TextField, Checkbox, FormControlLabel, Button, Grid, Link } from '@material-ui/core'
 import { useHistory } from "react-router-dom";
+import _ from 'lodash';
+import { TextField, Checkbox, FormControlLabel, Button, Grid, Link } from '@material-ui/core'
+
 import { userLogin } from '../actions/user'
 import { flashMessage } from '../actions/messages'
 import { postRegister } from "../fetch";
@@ -10,69 +12,33 @@ const preventDefault = (event) => event.preventDefault();
 
 const RegisterForm = ({ userLogin, flashMessage }) => {
   let history = useHistory();
-  let [firstName, setFirstName] = React.useState([''])
-  let [firstNameError, setFirstNameError] = React.useState(null)
-  let [lastName, setLastName] = React.useState('')
-  let [lastNameError, setLastNameError] = React.useState(null)
-  let [email, setEmail] = React.useState('')
-  let [emailError, setEmailError] = React.useState(null)
-  let [username, setUsername] = React.useState('')
-  let [usernameError, setUsernameError] = React.useState(null)
-  let [password, setPassword] = React.useState('')
-  let [passwordError, setPasswordError] = React.useState(null)
-  let [passwordConfirmation, setPasswordConfirmation] = React.useState('')
-  let [passwordConfirmationError, setPasswordConfirmationError] = React.useState(null)
+  let [user, setUser] = React.useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    username: '',
+    password: '',
+    password_confirmation: ''
+  });
+  let [userErrors, setUserErrors] = React.useState({});
 
   const attemptRegister = (event) => {
+    setUserErrors({});
     event.preventDefault();
-    postRegister(firstName, lastName, email, username, password, passwordConfirmation)
+    postRegister(user)
     .then(response => {
       userLogin(response.user);
       flashMessage('info', 'Your account was successfully registered and you have logged in.');
       history.push('/')
-      
     })
     .catch(error => {
-      flashMessage('error', error.message);
-      //{:password_confirmation=>["doesn't match Password"], 
-      // :first_name=>["can't be blank"], :last_name=>["can't be blank"], 
-      // :email=>["is invalid"]} 
-      if(error.details) {
-        if(error.details['first_name']) {
-          setFirstNameError(error.details['first_name'].map(message => 'First Name '+message).join("\n"))
-        }
-        else {
-          setFirstNameError(null)
-        }
-        if(error.details['last_name']) {
-          setLastNameError(error.details['last_name'].map(message => 'Last Name '+message).join("\n"))
-        }
-        else {
-          setLastNameError(null)
-        }
-        if(error.details['username']) {
-          setUsernameError(error.details['username'].map(message => 'Username '+message).join("\n"))
-        }
-        else {
-          setUsernameError(null)
-        }
-        if(error.details['email']) {
-          setEmailError(error.details['email'].map(message => 'Email '+message).join("\n"))
-        }
-        else {
-          setEmailError(null)
-        }
-        if(error.details['password']) {
-          setPasswordError(error.details['password'].map(message => 'Password '+message).join("\n"))
-        }
-        else {
-          setPasswordError(null)
-        }
-        if(error.details['password_confirmation']) {
-          setPasswordConfirmationError(error.details['password_confirmation'].map(message => 'Password Confirmation '+message).join("\n"))
-        }
-        else {
-          setPasswordConfirmationError(null)
+      if(error.status == 401) 
+      {
+        flashMessage('error', error.message);
+        if(error.details) {
+          setUserErrors(_.mapValues(error.details, (messages, key) => {
+            return messages.map(message => _.startCase(key) + " " +message).join("\n")
+          }));
         }
       }
     })
@@ -81,10 +47,10 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
   return (
     <form onSubmit={attemptRegister}>
       <TextField
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-        error={Boolean(firstNameError)}
-        helperText={firstNameError}
+        value={user.first_name}
+        onChange={(e) => setUser({ ...user, first_name:e.target.value })}
+        error={Boolean(userErrors.first_name)}
+        helperText={userErrors.first_name}
         variant="outlined"
         margin="normal"
         fullWidth
@@ -95,10 +61,10 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
         autoFocus
       />
       <TextField
-        value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
-        error={Boolean(lastNameError)}
-        helperText={lastNameError}
+        value={user.last_name}
+        onChange={(e) => setUser({ ...user, last_name:e.target.value })}
+        error={Boolean(userErrors.lastName)}
+        helperText={userErrors.last_name}
         variant="outlined"
         margin="normal"
         fullWidth
@@ -107,10 +73,10 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
         name="last_name"
       />
       <TextField
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        error={Boolean(usernameError)}
-        helperText={usernameError}
+        value={user.username}
+        onChange={(e) => setUser({ ...user, username:e.target.value })}
+        error={Boolean(userErrors.username)}
+        helperText={userErrors.username}
         variant="outlined"
         margin="normal"
         required
@@ -120,10 +86,10 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
         name="username"
       />
       <TextField
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        error={Boolean(emailError)}
-        helperText={emailError}
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email:e.target.value })}
+        error={Boolean(userErrors.email)}
+        helperText={userErrors.email}
         variant="outlined"
         margin="normal"
         required
@@ -133,10 +99,10 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
         name="email"
       />
       <TextField
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        error={Boolean(passwordError)}
-        helperText={passwordError}
+        value={user.password}
+        onChange={(e) => setUser({ ...user, password:e.target.value })}
+        error={Boolean(userErrors.password)}
+        helperText={userErrors.password}
         variant="outlined"
         margin="normal"
         required
@@ -147,10 +113,10 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
         id="password"
       />
       <TextField
-        value={passwordConfirmation}
-        onChange={(e) => setPasswordConfirmation(e.target.value)}
-        error={Boolean(passwordConfirmationError)}
-        helperText={passwordConfirmationError}
+        value={user.password_confirmation}
+        onChange={(e) => setUser({ ...user, password_confirmation:e.target.value })}
+        error={Boolean(userErrors.passwordConfirmation)}
+        helperText={userErrors.password_confirmation}
         variant="outlined"
         margin="normal"
         required

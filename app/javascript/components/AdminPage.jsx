@@ -1,20 +1,19 @@
 import React from "react";
-import { Container, Typography } from '@material-ui/core'
+import { Route, Redirect } from "react-router-dom";
 
 import FlashNotice from '../containers/FlashNotice'
 import AdminBar from "../containers/AdminBar";
 import AdminNav from "../components/AdminNav";
-import { getUsers } from '../fetch'
+
+import UserTable from './UserTable'
 
 export default ({}) => {
-  React.useEffect(() => {
-    getUsers()
-  }, []);
-
   return (
   <React.Fragment>
     <AdminBar/>
     <AdminNav/>
+    <Route path={'/admin'} exact render={() => (<Redirect to="/admin/users" />) }/>
+    <Route path={'/admin/users'} component={UserTable}/>
     <FlashNotice />
   </React.Fragment>
 )};

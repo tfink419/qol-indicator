@@ -36,7 +36,6 @@ const AdminBar = ({user, userLogout}) => {
     userLogout();
     window.location.href = 'logout';
   }
-  if(!user) window.location.href = '/logout'
 
   return (
   <AppBar position="static" className={classes.appBar}>

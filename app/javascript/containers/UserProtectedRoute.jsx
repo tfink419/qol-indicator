@@ -7,7 +7,7 @@ const UserProtectedRoute = ({ component: Component, user, ...rest }) => {
     <Route {...rest} render={(props) => (
       user
         ? <Component {...props} />
-        : <Redirect to='/login' />
+        : <Redirect to='/logout' />
     )} />
   );
 }

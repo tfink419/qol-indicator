@@ -4,6 +4,7 @@ import { Drawer, CssBaseline, List, Divider,
   ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/People';
 import GroceryStoreIcon from '@material-ui/icons/LocalGroceryStore';
+import { useLocation } from 'react-router-dom'
 
 import { drawerWidth } from '../common'
 
@@ -32,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default () => {
+  const currentPath = useLocation().pathname;
   const classes = useStyles();
 
   return (
@@ -45,12 +47,12 @@ export default () => {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-          <ListItem button>
+          <ListItem selected={currentPath === '/admin/users'} button>
             <ListItemIcon><PeopleIcon /></ListItemIcon>
             <ListItemText primary={'Users'} />
           </ListItem>
 
-          <ListItem button>
+          <ListItem selected={currentPath === '/admin/grocery_stores'} button>
             <ListItemIcon><GroceryStoreIcon /></ListItemIcon>
             <ListItemText primary={'Grocery Stores'} />
           </ListItem>

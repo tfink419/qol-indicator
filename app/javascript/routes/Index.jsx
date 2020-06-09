@@ -13,8 +13,8 @@ export default (
   <Router>
     <Switch>
       <UserProtectedRoute path="/" exact component={MapPage} />
-      <LoginRoute path="/login" component={LoginPage} />
       <AdminProtectedRoute path="/admin" component={AdminPage} />
+      <LoginRoute path="/login" component={LoginPage} />
       <LoginRoute path="/register" component={RegisterPage} />
     </Switch>
   </Router>

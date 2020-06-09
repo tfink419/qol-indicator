@@ -22,7 +22,10 @@ const LoginForm = ({ userLogin, flashMessage }) => {
       
     })
     .catch(error => {
-      flashMessage('error', error.message);
+      if(error.status == 401) 
+      {
+        flashMessage('error', error.message);
+      }
     })
   }
   return (
