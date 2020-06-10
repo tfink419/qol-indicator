@@ -7,7 +7,7 @@ class UsersController < ApplicationController
       page = params[:page].to_i
       limit = params[:limit].to_i
       offset = page*limit
-      order = (User.attribute_names.include? params[:order]) ? params[:order] : 'created_at'
+      order = params[:order]
       dir = (['ASC', 'DESC'].include? params[:dir]) ? params[:dir] : 'ASC'
       render :json => { 
         :status => 0, 
@@ -90,7 +90,6 @@ class UsersController < ApplicationController
         }, :status => 403
       else
         if user.save
-          session[:user_id] = user.id
           render :json =>  {
             :status => 0,
             :message => 'Update User Successful',

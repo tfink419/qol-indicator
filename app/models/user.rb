@@ -11,7 +11,15 @@ class User < ApplicationRecord
   validates :email, :presence => true,
     :format => URI::MailTo::EMAIL_REGEXP
 
-  scope :clean_order, lambda { |attr, dir| order("#{attr} #{dir}")}
+  scope :clean_order, lambda { |attr, dir| 
+  attr = (User.attribute_names.include? attr) ? attr : 'created_at'
+  if ['first_name', 'last_name', 'email', 'username'].include? attr
+    # case insensitive sort
+    order(Arel.sql("lower(users.#{attr}) #{dir}"))
+  else
+    order("#{attr} #{dir}")
+  end
+}
 
   def admin?
     is_admin
