@@ -33,7 +33,7 @@ class UsersController < ApplicationController
         :user => @user.public_attributes
       }
     else
-      render :json => {:status => 401, :error => 'Create User', :error_details => @user.errors.messages}
+      render :json => {:status => 400, :error => 'Create User', :error_details => @user.errors.messages}, :status => 400
     end
   end
 
@@ -96,7 +96,7 @@ class UsersController < ApplicationController
             :user => user.public_attributes
           }
         else
-          render :json => {:status => 401, :error => 'Update User Failed', :error_details => user.errors.messages}, :status => 401
+          render :json => {:status => 400, :error => 'Update User Failed', :error_details => user.errors.messages}, :status => 400
         end
       end
     rescue StandardError => err

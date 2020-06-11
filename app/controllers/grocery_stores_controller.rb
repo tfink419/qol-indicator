@@ -46,7 +46,7 @@ class GroceryStoresController < ApplicationController
           :grocery_store => gstore
         }
       else
-        render :json => {:status => 401, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}
+        render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
       end
     rescue StandardError => err
       $stderr.print err
@@ -66,7 +66,8 @@ class GroceryStoresController < ApplicationController
       csv_table = CSV.parse(csv_file, headers: true)
 
       number_sucessful = 0
-      number_failed = 0
+      failed = []
+      column = 2 # Skip title
       csv_table.each do |row|
         gstore = GroceryStore.new(:name => row['name'], :address => row['address'], 
           :city => row['city'], :state => row['state'], :zip => row['zip'], :lat => row['latitude'], :long => row['longitude'])
@@ -74,14 +75,34 @@ class GroceryStoresController < ApplicationController
         if gstore.save
           number_sucessful += 1
         else
-          number_failed += 1
+          failed << column
         end
+        column += 1
       end
-      render :json => {
-        :status => 0, 
-        :message => "File uploaded and #{number_sucessful} Grocery Stores were added successfully.",
-        :errors => "#{number_failed} Grocery Stores failed to upload"
-      }
+      if number_sucessful == column-2
+        render :json => {
+          :status => 0, 
+          :message => "File uploaded and All Grocery Stores were added successfully."
+        }
+      elsif number_sucessful.to_f/(column-2) > 0.8
+        render :json => {
+          :status => 0, 
+          :message => "File uploaded and #{number_sucessful}/#{column-2} Grocery Stores were added successfully.",
+          :details => "Grocery Stores at columns #{failed} failed to upload"
+        }
+      elsif number_sucessful == 0
+        render :json => {
+          :status => 400, 
+          :message => "All Grocery Stores Failed to Upload",
+          :errors => "All"
+        }, :status => 400
+      elsif number_sucessful.to_f/(column-2) < 0.5
+        render :json => {
+          :status => 400, 
+          :message => "More than half the Grocery Stores Failed to Upload",
+          :details => "Grocery Stores at columns #{failed} failed to upload"
+        }, :status => 400
+      end
     rescue StandardError => err
       $stderr.print err
       render :json => { 
@@ -123,7 +144,7 @@ class GroceryStoresController < ApplicationController
           :grocery_store => gstore
         }
       else
-        render :json => {:status => 401, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}
+        render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
       end
     rescue StandardError => err
       $stderr.print err

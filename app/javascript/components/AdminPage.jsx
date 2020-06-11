@@ -5,8 +5,8 @@ import FlashNotice from '../containers/FlashNotice'
 import AdminBar from "../containers/AdminBar";
 import AdminNav from "../components/AdminNav";
 
-import UserTable from './UserTable'
-import GroceryStoreTable from "./GroceryStoreTable";
+import UserTable from '../containers/UserTable'
+import GroceryStoreTable from "../containers/GroceryStoreTable";
 import GroceryStoreUploadForm from "../containers/GroceryStoreUploadForm";
 
 export default ({match}) => {

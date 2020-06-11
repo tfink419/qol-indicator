@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,10 +10,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
 import { getGroceryStores, deleteGroceryStore } from '../fetch'
+import { loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage} from '../actions/admin'
 import { drawerWidth } from '../common'
-import DeleteDialog from './DeleteDialog';
-import UpdateGroceryStoreDialog from './UpdateGroceryStoreDialog';
-import CreateGroceryStoreDialog from './CreateGroceryStoreDialog';
+import DeleteDialog from '../components/DeleteDialog';
+import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
+import CreateGroceryStoreDialog from '../components/CreateGroceryStoreDialog';
 
 const useStyles = makeStyles({
   iconButton: {
@@ -39,40 +41,34 @@ const useStyles = makeStyles({
   },
 });
 
-export default function GroceryStoreTable() {
+function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage}) {
   const classes = useStyles();
+  const { loaded, rows, count, page, rowsPerPage, order, orderDir } = groceryStores;
   let history = useHistory();
-  let [orderDir, setOrderDir] = React.useState('asc');
-  let [order, setOrder] = React.useState('name');
-  let [groceryStores, setGroceryStores] = React.useState(null);
-  let [groceryStoreCount, setGroceryStoreCount] = React.useState(0);
-  let [page, setPage] = React.useState(0);
-  let [rowsPerPage, setRowsPerPage] = React.useState(10);
+
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
   let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null);
   let [anchorEl, setAnchorEl] = React.useState(null);
 
   const loadGroceryStores = () => {
-    setGroceryStores(null);
-    setGroceryStoreCount(0);
+    ;
     getGroceryStores(page, rowsPerPage, order, orderDir).then(response => {
       if(response.status == 0) {
-        setGroceryStores(response.grocery_stores)
-        setGroceryStoreCount(response.grocery_store_count)
+        loadedGroceryStores(response.grocery_stores, response.grocery_store_count)
       }
     })
   }
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    updateGroceryStoresPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
     let prevRowsPerPage = rowsPerPage;
     let newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
+    updateGroceryStoresRowsPerPage(newRowsPerPage);
     if(prevRowsPerPage != newRowsPerPage) {
-      setPage(Math.floor(prevRowsPerPage/newRowsPerPage*page));
+      updateGroceryStoresPage(Math.floor(prevRowsPerPage/newRowsPerPage*page));
     }
   };
 
@@ -91,7 +87,7 @@ export default function GroceryStoreTable() {
   }
 
   const flipOrderDir = () => {
-    setOrderDir((orderDir === 'asc') ? 'desc' : 'asc');
+    updateGroceryStoresOrderDir((orderDir === 'asc') ? 'desc' : 'asc');
   }
 
   const handleClickSort = (key) => {
@@ -101,12 +97,12 @@ export default function GroceryStoreTable() {
     else {
       // Updated Date is Flipped Visually
       if(key == 'updated_at') {
-        setOrderDir('desc');
+        updateGroceryStoresOrderDir('desc');
       }
       else {
-        setOrderDir('asc');
+        updateGroceryStoresOrderDir('asc');
       }
-      setOrder(key);
+      updateGroceryStoresOrder(key);
     }
   }
 
@@ -224,8 +220,8 @@ export default function GroceryStoreTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {groceryStores ?
-            groceryStores.map(groceryStore => (
+            {loaded ?
+            rows.map(groceryStore => (
               <TableRow key={groceryStore.id}>
                 <TableCell padding={'none'} className={classes.actionsCell}>
                   <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', groceryStore)}><EditIcon className={classes.editIcon} /></IconButton>
@@ -255,11 +251,11 @@ export default function GroceryStoreTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      {groceryStores && 
+      {loaded && 
       <TablePagination
         rowsPerPageOptions={[10, 25]}
         component="div"
-        count={groceryStoreCount}
+        count={count}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
@@ -272,3 +268,16 @@ export default function GroceryStoreTable() {
     </Paper>
   );
 }
+const mapDispatchToProps = {
+    loadedGroceryStores,
+  updateGroceryStoresOrder,
+  updateGroceryStoresOrderDir,
+  updateGroceryStoresPage,
+  updateGroceryStoresRowsPerPage
+}
+
+const mapStateToProps = state => ({
+  groceryStores: state.admin.groceryStores
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(GroceryStoreTable)

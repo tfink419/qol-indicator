@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux'
 import moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,10 +10,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
 import { getUsers } from '../fetch'
+import { loadedUsers, clearUsers, updateUsersOrderDir, updateUsersOrder, updateUsersPage, updateUsersRowsPerPage } from '../actions/admin'
 import { drawerWidth } from '../common'
-import DeleteDialog from './DeleteDialog';
-import UpdateUserDialog from './UpdateUserDialog';
-import CreateUserDialog from './CreateUserDialog';
+import DeleteDialog from '../components/DeleteDialog';
+import UpdateUserDialog from '../components/UpdateUserDialog';
+import CreateUserDialog from '../components/CreateUserDialog';
 
 import { deleteUser } from '../fetch'
 
@@ -41,38 +43,33 @@ const useStyles = makeStyles({
   },
 });
 
-export default function SimpleTable() {
+function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, updateUsersPage, updateUsersRowsPerPage}) {
   const classes = useStyles();
-  let [orderDir, setOrderDir] = React.useState('asc');
-  let [order, setOrder] = React.useState('created_at');
-  let [users, setUsers] = React.useState(null);
-  let [userCount, setUserCount] = React.useState(0);
-  let [page, setPage] = React.useState(0);
-  let [rowsPerPage, setRowsPerPage] = React.useState(10);
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
   let [selectedUser, setSelectedUser] = React.useState(null);
 
+  const { loaded, rows, count, page, rowsPerPage, order, orderDir } = users;
+
   const loadUsers = () => {
-    setUsers(null);
-    setUserCount(0);
-    getUsers(page, rowsPerPage, order, orderDir).then(response => {
-      if(response.status == 0) {
-        setUsers(response.users)
-        setUserCount(response.user_count)
-      }
-    })
+    if(!loaded) {
+      getUsers(page, rowsPerPage, order, orderDir).then(response => {
+        if(response.status == 0) {
+          loadedUsers(response.users, response.user_count)
+        }
+      })
+    }
   }
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    updateUsersPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
     let prevRowsPerPage = rowsPerPage;
     let newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
+    updateUsersRowsPerPage(newRowsPerPage);
     if(prevRowsPerPage != newRowsPerPage) {
-      setPage(Math.floor(prevRowsPerPage/newRowsPerPage*page));
+      updateUsersPage(Math.floor(prevRowsPerPage/newRowsPerPage*page));
     }
   };
 
@@ -92,7 +89,7 @@ export default function SimpleTable() {
   const oppositeDir = () => (orderDir === 'asc') ? 'desc' : 'asc';
 
   const flipOrderDir = () => {
-    setOrderDir((orderDir === 'asc') ? 'desc' : 'asc');
+    updateUsersOrderDir((orderDir === 'asc') ? 'desc' : 'asc');
   }
 
   const handleClickSort = (key) => {
@@ -102,15 +99,14 @@ export default function SimpleTable() {
     else {
       // Updated Date is Flipped Visually
       if(key == 'updated_at') {
-        setOrderDir('desc');
+        updateUsersOrderDir('desc');
       }
       else {
-        setOrderDir('asc');
+        updateUsersOrderDir('asc');
       }
-      setOrder(key);
+      updateUsersOrder(key);
     }
   }
-
 
   React.useEffect(loadUsers, [page, rowsPerPage, order, orderDir]);
 
@@ -192,8 +188,8 @@ export default function SimpleTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users ?
-            users.map((user) => (
+            {loaded ?
+            rows.map((user) => (
               <TableRow key={user.id}>
                 <TableCell padding={'none'} className={classes.actionsCell}>
                   <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', user)}><EditIcon className={classes.editIcon} /></IconButton>
@@ -222,11 +218,11 @@ export default function SimpleTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      {users && 
+      {loaded && 
       <TablePagination
         rowsPerPageOptions={[10, 25]}
         component="div"
-        count={userCount}
+        count={count}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}
@@ -239,3 +235,19 @@ export default function SimpleTable() {
     </Paper>
   );
 }
+
+const mapDispatchToProps = {
+  clearUsers,
+  loadedUsers,
+  updateUsersOrder,
+  updateUsersOrderDir,
+  updateUsersPage,
+  updateUsersRowsPerPage
+}
+
+const mapStateToProps = state => ({
+  users: state.admin.users
+})
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserTable)
