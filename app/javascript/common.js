@@ -16,5 +16,4 @@ export const saveState = (state) => {
   localStorage.setItem('redux-state', serializedState)
 }
 
-
 export const drawerWidth = 240;

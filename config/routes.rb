@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
   root :to => 'app#index'
+
+  post 'grocery_stores/upload_csv'
+  resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
 
   get 'register', :to => 'app#index', :as => 'register'

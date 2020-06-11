@@ -8,7 +8,7 @@ class UsersController < ApplicationController
       limit = params[:limit].to_i
       offset = page*limit
       order = params[:order]
-      dir = (['ASC', 'DESC'].include? params[:dir]) ? params[:dir] : 'ASC'
+      dir = params[:dir]
       render :json => { 
         :status => 0, 
         :users => User.offset(offset).limit(limit).clean_order(order, dir).map { |user| user.public_attributes },
@@ -96,7 +96,7 @@ class UsersController < ApplicationController
             :user => user.public_attributes
           }
         else
-          render :json => {:status => 401, :error => 'Update User Failed', :error_details => user.errors.messages}
+          render :json => {:status => 401, :error => 'Update User Failed', :error_details => user.errors.messages}, :status => 401
         end
       end
     rescue StandardError => err

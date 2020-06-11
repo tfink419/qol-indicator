@@ -15,7 +15,7 @@ const useStyles = makeStyles({
   }
 });
 
-const CreateUserDialog = ({currentUserId, open, onClose, flashMessage, userLogin}) => {
+const CreateUserDialog = ({open, onClose, flashMessage, userLogin}) => {
   const blankUser = {
     first_name: '',
     last_name: '',
@@ -34,7 +34,8 @@ const CreateUserDialog = ({currentUserId, open, onClose, flashMessage, userLogin
     onClose(false);
   };
 
-  const handleCreate = () => {
+  const handleCreate = (event) => {
+    event.preventDefault();
     setUserErrors({});
     setLoading(true)
     postUser(user)
@@ -70,11 +71,10 @@ const CreateUserDialog = ({currentUserId, open, onClose, flashMessage, userLogin
   React.useEffect(clearForm, [open])
 
   return (
-    <div>
-      <Dialog open={open} disableBackdropClick={true} onClose={handleClose}>
+    <Dialog open={open} disableBackdropClick={true} onClose={handleClose}>
+      <form onSubmit={handleCreate}>
         <DialogTitle>Create New User</DialogTitle>
         <DialogContent>
-          <form onSubmit={handleCreate}>
             <TextField
               value={user.first_name}
               onChange={(e) => setUser({ ...user, first_name:e.target.value })}
@@ -166,29 +166,24 @@ const CreateUserDialog = ({currentUserId, open, onClose, flashMessage, userLogin
               label="Admin"
               margin="dense"
             />
-          </form>
           { loading && <CircularProgress className={classes.circularProgress} />}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" className={classes.cancelButton} autoFocus>
             Cancel
           </Button>
-          <Button onClick={handleCreate} color="primary">
+          <Button type="submit" color="primary">
             Create
           </Button>
         </DialogActions>
-      </Dialog>
-    </div>
+      </form>
+    </Dialog>
   );
 }
-
-const mapStateToProps = (state) => ({
-  currentUserId:state.user.id
-});
 
 const mapDispatchToProps = {
   flashMessage,
   userLogin
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateUserDialog)
+export default connect(null, mapDispatchToProps)(CreateUserDialog)

@@ -1,10 +1,11 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Drawer, CssBaseline, List, Divider, 
+import { Drawer, CssBaseline, List, Divider, Collapse,
   ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/People';
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import GroceryStoreIcon from '@material-ui/icons/LocalGroceryStore';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 
 import { drawerWidth } from '../common'
 
@@ -20,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
     flexShrink: 0,
   },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
   drawerPaper: {
     width: drawerWidth,
   },
@@ -29,12 +33,13 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
-  },
+  }
 }));
 
 export default () => {
   const currentPath = useLocation().pathname;
   const classes = useStyles();
+  let history = useHistory();
 
   return (
     <div className={classes.root}>
@@ -47,15 +52,25 @@ export default () => {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-          <ListItem selected={currentPath === '/admin/users'} button>
+          <ListItem onClick={() => history.push('/admin/users')} selected={currentPath === '/admin/users'} button>
             <ListItemIcon><PeopleIcon /></ListItemIcon>
             <ListItemText primary={'Users'} />
           </ListItem>
 
-          <ListItem selected={currentPath === '/admin/grocery_stores'} button>
+          <ListItem onClick={() => history.push('/admin/grocery_stores')} selected={currentPath === '/admin/grocery_stores'} button>
             <ListItemIcon><GroceryStoreIcon /></ListItemIcon>
             <ListItemText primary={'Grocery Stores'} />
           </ListItem>
+          <Collapse in={currentPath === '/admin/grocery_stores/upload'} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItem className={classes.nested} selected={currentPath === '/admin/grocery_stores/upload'} button>
+                <ListItemIcon>
+                  <NoteAddIcon /> 
+                </ListItemIcon>
+                <ListItemText primary="Upload CSV" />
+              </ListItem>
+            </List>
+          </Collapse>
         </List>
       </Drawer>
     </div>

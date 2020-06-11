@@ -6,8 +6,6 @@ import { Button, Dialog, DialogActions, DialogContent,
 
 import { flashMessage } from '../actions/messages'
 
-import { deleteUser } from '../fetch';
-
 const useStyles = makeStyles({
   cancelButton: {
     color: 'green'
@@ -20,7 +18,7 @@ const useStyles = makeStyles({
   }
 });
 
-const DeleteUserDialog = ({open, username, userId, onClose, flashMessage}) => {
+const DeleteDialog = ({open, objectType, objectName, objectId, onClose, flashMessage, deleteAction}) => {
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
   
@@ -30,7 +28,7 @@ const DeleteUserDialog = ({open, username, userId, onClose, flashMessage}) => {
 
   const handleDelete = () => {
     setLoading(true)
-    deleteUser(userId)
+    deleteAction(objectId)
     .then(response => {
       setLoading(false)
       onClose(true);
@@ -46,10 +44,10 @@ const DeleteUserDialog = ({open, username, userId, onClose, flashMessage}) => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Delete User?</DialogTitle>
+        <DialogTitle>Delete {objectType}?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete user '{username}'?
+            Are you sure you want to delete {objectType} '{objectName}'?
           </DialogContentText>
           { loading && <CircularProgress className={classes.circularProgress} />}
         </DialogContent>
@@ -70,4 +68,4 @@ const mapDispatchToProps = {
   flashMessage
 }
 
-export default connect(null, mapDispatchToProps)(DeleteUserDialog)
+export default connect(null, mapDispatchToProps)(DeleteDialog)

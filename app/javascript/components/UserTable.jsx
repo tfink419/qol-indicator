@@ -10,9 +10,11 @@ import AddIcon from '@material-ui/icons/AddCircle';
 
 import { getUsers } from '../fetch'
 import { drawerWidth } from '../common'
-import DeleteUserDialog from './DeleteUserDialog';
+import DeleteDialog from './DeleteDialog';
 import UpdateUserDialog from './UpdateUserDialog';
 import CreateUserDialog from './CreateUserDialog';
+
+import { deleteUser } from '../fetch'
 
 const useStyles = makeStyles({
   iconButton: {
@@ -30,6 +32,9 @@ const useStyles = makeStyles({
   pushRight: {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
+  },
+  actionsCell:{
+    minWidth:'96px', // 2x icon size
   },
   topBarFlex: {
     flexGrow: 1,
@@ -84,6 +89,8 @@ export default function SimpleTable() {
     setCurrentDialogOpen(type);
   }
 
+  const oppositeDir = () => (orderDir === 'asc') ? 'desc' : 'asc';
+
   const flipOrderDir = () => {
     setOrderDir((orderDir === 'asc') ? 'desc' : 'asc');
   }
@@ -93,7 +100,13 @@ export default function SimpleTable() {
       flipOrderDir();
     }
     else {
-      setOrderDir('asc');
+      // Updated Date is Flipped Visually
+      if(key == 'updated_at') {
+        setOrderDir('desc');
+      }
+      else {
+        setOrderDir('asc');
+      }
       setOrder(key);
     }
   }
@@ -158,10 +171,10 @@ export default function SimpleTable() {
                   Email
                 </TableSortLabel>
               </TableCell>
-              <TableCell sortDirection={order === 'updated_at' ? orderDir : false}>
+              <TableCell sortDirection={order === 'updated_at' ? oppositeDir() : false}>
                 <TableSortLabel
                   active={order === 'updated_at'}
-                  direction={order === 'updated_at' ? orderDir : 'asc'}
+                  direction={order === 'updated_at' ? oppositeDir() : 'asc'}
                   onClick={() => handleClickSort('updated_at')}
                 >
                   Last Updated
@@ -182,7 +195,7 @@ export default function SimpleTable() {
             {users ?
             users.map((user) => (
               <TableRow key={user.id}>
-                <TableCell padding={'none'}>
+                <TableCell padding={'none'} className={classes.actionsCell}>
                   <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', user)}><EditIcon className={classes.editIcon} /></IconButton>
                   <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('delete', user)}>
                     <DeleteIcon className={classes.deleteIcon}/>
@@ -219,7 +232,8 @@ export default function SimpleTable() {
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />}
-      <DeleteUserDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} userId={selectedUser && selectedUser.id} username={selectedUser && selectedUser.username} />
+      <DeleteDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} objectId={selectedUser && selectedUser.id} 
+        objectName={selectedUser && selectedUser.username} objectType={'User'} deleteAction={deleteUser} />
       <UpdateUserDialog open={currentDialogOpen == 'update'} onClose={handleCloseDialogs} userId={selectedUser && selectedUser.id} />
       <CreateUserDialog open={currentDialogOpen == 'create'} onClose={handleCloseDialogs}/>
     </Paper>
