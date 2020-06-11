@@ -205,15 +205,17 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
                 <TableCell>{moment(user.created_at).calendar()}</TableCell>
               </TableRow>
             )) :
-            <TableRow>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-            </TableRow>
+            new Array(rowsPerPage).fill(1).map(() => (
+              <TableRow>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+              </TableRow>
+            ))
             }
           </TableBody>
         </Table>

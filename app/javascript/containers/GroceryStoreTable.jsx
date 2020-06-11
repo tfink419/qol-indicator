@@ -238,15 +238,18 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
                 <TableCell>{groceryStore.long}</TableCell>
               </TableRow>
             )) :
-            <TableRow>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-              <TableCell><CircularProgress /></TableCell>
-            </TableRow>
+            new Array(rowsPerPage).fill(1).map((nothing, ind) => (
+              <TableRow key={ind}>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+                <TableCell><CircularProgress /></TableCell>
+              </TableRow>
+            ))
             }
           </TableBody>
         </Table>
