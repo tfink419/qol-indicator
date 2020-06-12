@@ -13,9 +13,15 @@ class GroceryStoresController < ApplicationController
       offset = page*limit
       order = params[:order]
       dir = params[:dir]
+      search = params[:search]
+      if search.nil? or search.blank? or search.length < 3
+        gstores = GroceryStore.offset(offset).limit(limit).clean_order(order, dir)
+      else
+        gstores = GroceryStore.search(search).offset(offset).limit(limit).clean_order(order, dir)
+      end
       render :json => { 
         :status => 0, 
-        :grocery_stores => GroceryStore.offset(offset).limit(limit).clean_order(order, dir),
+        :grocery_stores => gstores,
         :grocery_store_count => GroceryStore.count
       }
     rescue StandardError => err
@@ -208,6 +214,6 @@ class GroceryStoresController < ApplicationController
   end
 
   def grocery_store_params
-    params.require(:grocery_store).permit(:name, :address, :city, :state, :zip, :lat, :long)
+    params.require(:grocery_store).permit(:name, :address, :city, :state, :zip, :lat, :long, :quality)
   end
 end

@@ -51,7 +51,7 @@ const MapContainer = ({}) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <HeatMapLayer groceryStores={groceryStores} />
-      { currentLocation.zoom > 11 && groceryStores.map(groceryStore => (
+      { currentLocation.zoom > 12 && groceryStores.map(groceryStore => (
         <React.Fragment key={groceryStore.id}>
           <Marker position={[groceryStore.lat, groceryStore.long]}>
             <Popup>

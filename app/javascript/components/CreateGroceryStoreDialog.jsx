@@ -2,16 +2,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash'
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, TextField,
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardContent, TextField, Slider,
   CircularProgress, Grid, Typography, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core/';
 
 import { flashMessage } from '../actions/messages'
 import { postGroceryStore } from '../fetch';
 import StateSelect from './StateSelect';
+import { qualityMarks } from '../common'
 
 const useStyles = makeStyles({
   cancelButton: {
     color: 'green'
+  },
+  slider: {
+    marginLeft:'5%',
+    width:'90%'
   }
 });
 
@@ -23,7 +28,8 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
     state: '',
     zip:'',
     lat:'',
-    long:''
+    long:'',
+    quality: 5
   };
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
@@ -77,7 +83,7 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
         <DialogContent>
             <TextField
               value={groceryStore.name}
-              onChange={(e) => setGroceryStore({ ...groceryStore, name:e.target.value })}
+              onChange={(e) => setGroceryStore({ ...groceryStore, quality:e.target.value })}
               error={Boolean(groceryStoreErrors.name)}
               helperText={groceryStoreErrors.name}
               variant="outlined"
@@ -89,6 +95,16 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
               autoComplete="name"
               margin="dense"
               autoFocus
+            />
+            <Slider
+              className={classes.slider}
+              value={groceryStore.quality}
+              onChange={(e, val) => setGroceryStore({ ...groceryStore, name:val })}
+              step={1}
+              min={0}
+              max={10}
+              valueLabelDisplay="auto"
+              marks={qualityMarks}
             />
             <TextField
               value={groceryStore.address}

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import { makeStyles } from '@material-ui/core/styles';
-import { Table, TableBody, TableCell, TableContainer, TablePagination, TableSortLabel, Menu, MenuItem,
+import { Table, TableBody, TableCell, TableContainer, TablePagination, TableSortLabel, Menu, MenuItem, TextField,
   TableHead, TableRow, Paper, CircularProgress, IconButton, Tooltip, Toolbar, Typography } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -46,18 +46,18 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   const { loaded, rows, count, page, rowsPerPage, order, orderDir } = groceryStores;
   let history = useHistory();
 
+  let [searchField, setSearchField] = React.useState('');
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
   let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null);
   let [anchorEl, setAnchorEl] = React.useState(null);
 
-  const loadGroceryStores = () => {
-    ;
-    getGroceryStores(page, rowsPerPage, order, orderDir).then(response => {
+  const loadGroceryStores = _.throttle(() => { // only allow once every 100 ms
+    getGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
       if(response.status == 0) {
         loadedGroceryStores(response.grocery_stores, response.grocery_store_count)
       }
     })
-  }
+  }, 100);
 
   const handleChangePage = (event, newPage) => {
     updateGroceryStoresPage(newPage);
@@ -76,6 +76,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
     setCurrentDialogOpen(null);
     setSelectedGroceryStore(null);
     if(groceryStoreChange) {
+      loadGroceryStores.cancel();
       loadGroceryStores()
     }
   }
@@ -115,7 +116,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   };
 
 
-  React.useEffect(loadGroceryStores, [page, rowsPerPage, order, orderDir]);
+  React.useEffect(loadGroceryStores, [page, rowsPerPage, order, orderDir, searchField]);
 
   const dense = (rowsPerPage == 25);
 
@@ -125,6 +126,16 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
         <Typography variant="h6" component="div" className={classes.topBarFlex}>
           Grocery Stores
         </Typography>
+        <TextField
+          value={searchField}
+          onChange={(e) => setSearchField(e.target.value)}
+          className={classes.topBarFlex}
+          margin="normal"
+          id="search-field"
+          label="Search"
+          name="search_field"
+          autoFocus
+        />
         <div>
         <Tooltip title="Create Grocery Store">
           <IconButton aria-label="create grocery store" className={classes.createUserIcon} onClick={handleCreateMenu}>
@@ -224,7 +235,9 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
             rows.map(groceryStore => (
               <TableRow key={groceryStore.id}>
                 <TableCell padding={'none'} className={classes.actionsCell}>
-                  <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', groceryStore)}><EditIcon className={classes.editIcon} /></IconButton>
+                  <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', groceryStore)}>
+                    <EditIcon className={classes.editIcon} />
+                  </IconButton>
                   <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('delete', groceryStore)}>
                     <DeleteIcon className={classes.deleteIcon}/>
                   </IconButton>

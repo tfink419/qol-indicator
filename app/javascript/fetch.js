@@ -54,9 +54,9 @@ export const getUsers = (page, rowsPerPage, sortOrder, dir) => {
   .then(handleResponse)
 }
 
-export const getGroceryStores = (page, rowsPerPage, sortOrder, dir) => {
+export const getGroceryStores = (page, rowsPerPage, sortOrder, dir, search) => {
   let url = "/grocery_stores",
-    params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase() };
+    params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase(), search };
   // Turn object into http params
   url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
 

@@ -192,7 +192,9 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
             rows.map((user) => (
               <TableRow key={user.id}>
                 <TableCell padding={'none'} className={classes.actionsCell}>
-                  <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', user)}><EditIcon className={classes.editIcon} /></IconButton>
+                  <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('update', user)}>
+                    <EditIcon className={classes.editIcon} />
+                  </IconButton>
                   <IconButton className={dense ? classes.iconButton : ''} onClick={() => handleOpenDialog('delete', user)}>
                     <DeleteIcon className={classes.deleteIcon}/>
                   </IconButton>
@@ -205,8 +207,8 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
                 <TableCell>{moment(user.created_at).calendar()}</TableCell>
               </TableRow>
             )) :
-            new Array(rowsPerPage).fill(1).map(() => (
-              <TableRow>
+            new Array(rowsPerPage).fill(1).map((nothing, ind) => (
+              <TableRow key={ind}>
                 <TableCell><CircularProgress /></TableCell>
                 <TableCell><CircularProgress /></TableCell>
                 <TableCell><CircularProgress /></TableCell>

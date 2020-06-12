@@ -17,3 +17,22 @@ export const saveState = (state) => {
 }
 
 export const drawerWidth = 240;
+
+export const qualityMarks = [
+  {
+    value: 0,
+    label: 'A few Goods',
+  },
+  {
+    value: 3,
+    label: 'Gas Station',
+  },
+  {
+    value: 6,
+    label: 'Food market',
+  },
+  {
+    value: 10,
+    label: 'Supermarket',
+  },
+];  

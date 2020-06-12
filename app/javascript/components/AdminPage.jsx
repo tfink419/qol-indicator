@@ -8,6 +8,7 @@ import AdminNav from "../components/AdminNav";
 import UserTable from '../containers/UserTable'
 import GroceryStoreTable from "../containers/GroceryStoreTable";
 import GroceryStoreUploadForm from "../containers/GroceryStoreUploadForm";
+import AdminMapContainer from "../containers/AdminMapContainer";
 
 export default ({match}) => {
   return (
@@ -18,6 +19,7 @@ export default ({match}) => {
     <Route path={`${match.path}/users`} exact component={UserTable}/>
     <Route path={`${match.path}/grocery_stores`} exact component={GroceryStoreTable}/>
     <Route path={`${match.path}/grocery_stores/upload`} exact component={GroceryStoreUploadForm}/>
+    <Route path={`${match.path}/map`} exact component={AdminMapContainer}/>
     <FlashNotice />
   </React.Fragment>
 )};
