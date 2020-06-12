@@ -14,9 +14,11 @@ class GroceryStoresController < ApplicationController
       order = params[:order]
       dir = params[:dir]
       search = params[:search]
-      if search.nil? or search.blank? or search.length < 3
+      if search.nil? or search.blank? or search.length == 1
         gstores = GroceryStore.offset(offset).limit(limit).clean_order(order, dir)
+        count = GroceryStore.count
       else
+        count = GroceryStore.search(search).count
         gstores = GroceryStore.search(search).offset(offset).limit(limit).clean_order(order, dir)
       end
       render :json => { 

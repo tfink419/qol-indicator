@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography, Toolbar, AppBar, IconButton, Menu, MenuItem } from '@material-ui/core'
+import { Typography, Toolbar, AppBar, IconButton, Menu, MenuItem, CssBaseline, Hidden } from '@material-ui/core'
 import { useHistory } from "react-router-dom";
 
 import { userLogout, userLogin } from '../actions/user'
@@ -11,6 +11,9 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+  },
+  flexGrowABit: {
+    flexGrow: 0.05,
   },
 }));
 
@@ -35,10 +38,12 @@ const TopBar = ({user, userLogout}) => {
 
   return (
   <AppBar position="static">
+    <CssBaseline />
     <Toolbar>
-      <div className={classes.root}>
-        <Typography>Welcome <strong>{user.first_name + ' ' + user.last_name}</strong></Typography>
-      </div>
+      <Typography className={classes.root}>Welcome <strong>{user.first_name + ' ' + user.last_name}</strong></Typography>
+      <Hidden mdUp><Typography className={classes.root} variant="h6">myQOLi</Typography></Hidden>
+      <Hidden smDown><Typography className={classes.flexGrowABit} variant="h6">myQOLi</Typography></Hidden>
+      <Hidden smDown><Typography className={classes.root} variant="subtitle1">My Quality of Life Index</Typography></Hidden>
       <div>
         <IconButton aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleMenu} color="inherit">
           <AccountCircle />

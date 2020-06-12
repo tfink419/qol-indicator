@@ -7,6 +7,7 @@ import { IconButton } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+import { drawerWidth } from '../common'
 import { getMapData, deleteGroceryStore } from '../fetch'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
@@ -14,7 +15,9 @@ import HeatMapLayer from './HeatMapLayer'
 
 const useStyles = makeStyles({
   map: {
-    height: '600px'
+    height: 'calc(100vh - 64px)',
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth,
   },
   editIcon: {
     color: 'green',

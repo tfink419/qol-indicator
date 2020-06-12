@@ -20,7 +20,7 @@ export const drawerWidth = 240;
 
 export const qualityMarks = [
   {
-    value: 0,
+    value: 1,
     label: 'A few Goods',
   },
   {

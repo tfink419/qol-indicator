@@ -7,7 +7,7 @@ import HeatMapLayer from './HeatMapLayer'
 
 const useStyles = makeStyles({
   map: {
-    height: '600px'
+    height: 'calc(100vh - 64px)'
   }
 });
 

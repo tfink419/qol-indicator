@@ -76,7 +76,6 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
     setCurrentDialogOpen(null);
     setSelectedGroceryStore(null);
     if(groceryStoreChange) {
-      loadGroceryStores.cancel();
       loadGroceryStores()
     }
   }
@@ -116,7 +115,10 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   };
 
 
-  React.useEffect(loadGroceryStores, [page, rowsPerPage, order, orderDir, searchField]);
+  React.useEffect(() => {
+    loadGroceryStores.cancel();
+    loadGroceryStores();
+  }, [page, rowsPerPage, order, orderDir, searchField]);
 
   const dense = (rowsPerPage == 25);
 
