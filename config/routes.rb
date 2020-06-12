@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
 
+  get 'map_data', :to => 'map_data#retrieve_map_data', :as => 'retrieve_map_data'
   get 'register', :to => 'app#index', :as => 'register'
   get 'login', :to => 'app#index', :as => 'login_page'
   get 'logout', :to => 'login#logout', :as => 'logout'

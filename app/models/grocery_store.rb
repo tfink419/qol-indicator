@@ -37,6 +37,10 @@ class GroceryStore < ApplicationRecord
     end
   }
 
+  scope :where_in_coordinate_range, lambda { |south_west, north_east| 
+    where(['lat > ? and lat < ? and long > ? and long < ?', south_west[0]-0.05, north_east[0]+0.05, south_west[1]-0.05, north_east[1]+0.05])
+  }
+
   def valid_location?
     LocationValidator::valid_location?(city, state, zip)
   end
@@ -50,4 +54,17 @@ class GroceryStore < ApplicationRecord
     true
   end
 
+  def public_attributes 
+    {
+      :id => id,
+      :name => name,
+      :address => address,
+      :city => city,
+      :state => state,
+      :zip => zip,
+      :lat => lat,
+      :long => long,
+      :quality => quality
+    }
+  end
 end

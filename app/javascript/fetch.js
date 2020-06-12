@@ -17,6 +17,8 @@ function filterUnwantedParams(obj) {
   return newObj;
 }
 
+const parseLatLng = (latLng) => `[${latLng.lat},${latLng.lng}]`
+
 
 export const postLogin = (username, password) => {
   return fetch('/login', { method:'POST', body: JSON.stringify({username, password}), 
@@ -157,6 +159,17 @@ export const deleteGroceryStore = (groceryStoreId) => {
 
   return fetch(url, {
     method: 'DELETE',
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getMapData = (southWest, northEast) => {
+  let url = `/map_data?south_west=${parseLatLng(southWest)}&north_east=${parseLatLng(northEast)}`;
+
+  return fetch(url, {
     headers: {
       'Accept': 'application/json'
   }})

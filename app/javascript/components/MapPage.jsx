@@ -3,7 +3,7 @@ import { Container, Typography } from '@material-ui/core'
 
 import FlashNotice from '../containers/FlashNotice'
 import TopBar from "../containers/TopBar";
-import { getUsers } from "../fetch";
+import MapContainer from "../containers/MapContainer"
 
 export default ({}) => {
   return (
@@ -15,6 +15,7 @@ export default ({}) => {
     <Typography variant="h6">
       My Quality of Life Indicator
     </Typography>
+    <MapContainer />
     <FlashNotice />
   </Container>
 )};
