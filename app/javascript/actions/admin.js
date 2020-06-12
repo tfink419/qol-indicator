@@ -57,3 +57,8 @@ export const updateGroceryStoresRowsPerPage = (rowsPerPage) => ({
   type:'UPDATE_GROCERY_STORES_ROWSPERPAGE',
   rowsPerPage
 })
+
+export const updateGroceryStoresSearchField = (searchField) => ({
+  type:'UPDATE_GROCERY_STORES_SEARCHFIELD',
+  searchField
+})

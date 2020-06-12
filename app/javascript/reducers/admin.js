@@ -3,7 +3,8 @@ const defaultTable = {
   order:'created_at',
   page:0,
   rowsPerPage:10,
-  loaded: false
+  loaded: false,
+  searchField:''
 };
 const admin = (state = {
   users:{...defaultTable},
@@ -59,14 +60,21 @@ const admin = (state = {
         }
       }
     case 'UPDATE_USERS_ROWSPERPAGE':
+    {
+      let {page} = state.users;
+      if(state.users.rowsPerPage != action.rowsPerPage) {
+        page = Math.floor(state.users.rowsPerPage/action.rowsPerPage*page);
+      }
       return {
         ...state,
         users: {
           ...state.users,
           rowsPerPage:action.rowsPerPage,
+          page,
           loaded: false
         }
       }
+    }
 
     case 'UPDATE_GROCERY_STORES_ORDERDIR':
       return {
@@ -96,15 +104,32 @@ const admin = (state = {
         }
       }
     case 'UPDATE_GROCERY_STORES_ROWSPERPAGE':
+    {
+      let {page} = state.groceryStores;
+      if(state.groceryStores.rowsPerPage != action.rowsPerPage) {
+        page = Math.floor(state.groceryStores.rowsPerPage/action.rowsPerPage*page);
+      }
       return {
         ...state,
         groceryStores: {
           ...state.groceryStores,
           rowsPerPage:action.rowsPerPage,
+          page,
           loaded: false
         }
       }
-
+    }
+    case 'UPDATE_GROCERY_STORES_SEARCHFIELD':
+      return {
+        ...state,
+        groceryStores: {
+          ...state.groceryStores,
+          searchField:action.searchField,
+          loaded: false,
+          page:0
+        }
+      }
+      
     case 'CLEAR_USERS':
       return {
         ...state,

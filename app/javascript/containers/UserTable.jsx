@@ -65,12 +65,8 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
   };
 
   const handleChangeRowsPerPage = (event) => {
-    let prevRowsPerPage = rowsPerPage;
     let newRowsPerPage = parseInt(event.target.value, 10);
     updateUsersRowsPerPage(newRowsPerPage);
-    if(prevRowsPerPage != newRowsPerPage) {
-      updateUsersPage(Math.floor(prevRowsPerPage/newRowsPerPage*page));
-    }
   };
 
   const handleCloseDialogs = (usersChange) => {

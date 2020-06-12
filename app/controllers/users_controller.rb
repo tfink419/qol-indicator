@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :confirm_logged_in
-  before_action :admin_only, :except => [:show_current]
+  before_action :admin_only
 
   def index
     begin
@@ -35,13 +35,6 @@ class UsersController < ApplicationController
     else
       render :json => {:status => 400, :error => 'Create User', :error_details => @user.errors.messages}, :status => 400
     end
-  end
-
-  def show_current
-    render :json => { 
-      :status => 0, 
-      :user => User.find(session[:user_id])
-    }
   end
 
   def show

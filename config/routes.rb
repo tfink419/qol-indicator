@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   post 'grocery_stores/upload_csv'
   resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
+  resources :user_self, :only => [:show, :update]
 
   get 'map_data', :to => 'map_data#retrieve_map_data', :as => 'retrieve_map_data'
   get 'register', :to => 'app#index', :as => 'register'

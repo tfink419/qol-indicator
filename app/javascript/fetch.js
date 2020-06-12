@@ -176,3 +176,23 @@ export const getMapData = (southWest, northEast) => {
   .then(response => response.json())
   .then(handleResponse)
 }
+
+export const getUserSelf = () => {
+  return fetch('/user/self', { 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const putUserSelf = (user) => {
+  return fetch('/user/self', { method:'PUT', body: JSON.stringify({user: filterUnwantedParams(user)}), 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}

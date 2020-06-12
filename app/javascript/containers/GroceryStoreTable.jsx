@@ -10,7 +10,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
 import { getGroceryStores, deleteGroceryStore } from '../fetch'
-import { loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage} from '../actions/admin'
+import { loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage, updateGroceryStoresSearchField} from '../actions/admin'
 import { drawerWidth } from '../common'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
@@ -41,12 +41,12 @@ const useStyles = makeStyles({
   },
 });
 
-function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage}) {
+function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGroceryStoresOrder, 
+  updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage, updateGroceryStoresSearchField}) {
   const classes = useStyles();
-  const { loaded, rows, count, page, rowsPerPage, order, orderDir } = groceryStores;
+  const { loaded, rows, count, page, rowsPerPage, order, orderDir, searchField } = groceryStores;
   let history = useHistory();
 
-  let [searchField, setSearchField] = React.useState('');
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
   let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null);
   let [anchorEl, setAnchorEl] = React.useState(null);
@@ -64,12 +64,8 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   };
 
   const handleChangeRowsPerPage = (event) => {
-    let prevRowsPerPage = rowsPerPage;
     let newRowsPerPage = parseInt(event.target.value, 10);
     updateGroceryStoresRowsPerPage(newRowsPerPage);
-    if(prevRowsPerPage != newRowsPerPage) {
-      updateGroceryStoresPage(Math.floor(prevRowsPerPage/newRowsPerPage*page));
-    }
   };
 
   const handleCloseDialogs = (groceryStoreChange) => {
@@ -130,7 +126,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
         </Typography>
         <TextField
           value={searchField}
-          onChange={(e) => setSearchField(e.target.value)}
+          onChange={(e) => updateGroceryStoresSearchField(e.target.value)}
           className={classes.topBarFlex}
           margin="normal"
           id="search-field"
@@ -291,7 +287,8 @@ const mapDispatchToProps = {
   updateGroceryStoresOrder,
   updateGroceryStoresOrderDir,
   updateGroceryStoresPage,
-  updateGroceryStoresRowsPerPage
+  updateGroceryStoresRowsPerPage,
+  updateGroceryStoresSearchField
 }
 
 const mapStateToProps = state => ({

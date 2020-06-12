@@ -24,7 +24,7 @@ class GroceryStoresController < ApplicationController
       render :json => { 
         :status => 0, 
         :grocery_stores => gstores,
-        :grocery_store_count => GroceryStore.count
+        :grocery_store_count => count
       }
     rescue StandardError => err
       $stderr.print err
