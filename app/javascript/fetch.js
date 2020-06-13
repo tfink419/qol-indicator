@@ -196,3 +196,13 @@ export const putUserSelf = (user) => {
   .then(response => response.json())
   .then(handleResponse)
 }
+
+export const postForgotPassword = (email) => {
+  return fetch('/forgot-password', { method:'POST', body: JSON.stringify({email}), 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}

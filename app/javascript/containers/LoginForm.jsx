@@ -6,8 +6,6 @@ import { userLogin } from '../actions/user'
 import { flashMessage } from '../actions/messages'
 import { postLogin } from "../fetch";
 
-const preventDefault = (event) => event.preventDefault();
-
 const LoginForm = ({ userLogin, flashMessage }) => {
   let history = useHistory();
   let [username, setUsername] = React.useState('')
@@ -69,12 +67,12 @@ const LoginForm = ({ userLogin, flashMessage }) => {
       </Button>
       <Grid container>
         <Grid item xs>
-          <Link href="#" onClick={preventDefault} variant="body2">
+          <Link href="/forgot-password" onClick={(e) => {e.preventDefault(); history.push('/forgot-password')}} variant="body2">
             Forgot password?
           </Link>
         </Grid>
         <Grid item>
-          <Link href="/register" variant="body2">
+          <Link href="/register" onClick={(e) => {e.preventDefault(); history.push('/register')}} variant="body2">
             Don't have an account? Sign Up
           </Link>
         </Grid>

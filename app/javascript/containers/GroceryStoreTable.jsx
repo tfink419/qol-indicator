@@ -52,11 +52,13 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   let [anchorEl, setAnchorEl] = React.useState(null);
 
   const loadGroceryStores = _.throttle(() => { // only allow once every 100 ms
-    getGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
-      if(response.status == 0) {
-        loadedGroceryStores(response.grocery_stores, response.grocery_store_count)
-      }
-    })
+    if(!loaded) {
+      getGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
+        if(response.status == 0) {
+          loadedGroceryStores(response.grocery_stores, response.grocery_store_count)
+        }
+      })
+    }
   }, 100);
 
   const handleChangePage = (event, newPage) => {
@@ -72,6 +74,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
     setCurrentDialogOpen(null);
     setSelectedGroceryStore(null);
     if(groceryStoreChange) {
+      loaded = false;
       loadGroceryStores()
     }
   }

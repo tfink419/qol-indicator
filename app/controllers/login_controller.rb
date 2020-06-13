@@ -1,3 +1,5 @@
+require 'securerandom'
+
 class LoginController < ApplicationController
   def login
     unless session[:user_id].nil?
@@ -16,10 +18,10 @@ class LoginController < ApplicationController
       session[:user_id] = authorized_user.id
       render :json =>  {
         :status => 0,
-        :user => authorized_user.public_attributes
+        :user => authorized_user
       }
     else
-      render :json => {:status => 401, :error => "Invalid username/password combination."}
+      render :json => {:status => 401, :error => "Invalid username/password combination."}, :status => 401
     end
   end
 
@@ -35,11 +37,16 @@ class LoginController < ApplicationController
       session[:user_id] = @user.id
       render :json =>  {
         :status => 0,
-        :user => @user.public_attributes
+        :user => @user
       }
     else
-      render :json => {:status => 401, :error => 'Registration Failed', :error_details => @user.errors.messages}
+      render :json => {:status => 401, :error => 'Registration Failed', :error_details => @user.errors.messages}, :status => 401
     end
+  end
+
+  def forgot_password
+    user = User.where(:email => params[:email]).first
+    render :json => {:status => 200, :error => 'Password Forgetted', :uuid => SecureRandom.uuid}
   end
 
   private

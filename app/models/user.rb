@@ -9,7 +9,10 @@ class User < ApplicationRecord
     :length => { :within => 4..25 },
     :uniqueness => true
   validates :email, :presence => true,
-    :format => URI::MailTo::EMAIL_REGEXP
+    :format => URI::MailTo::EMAIL_REGEXP,
+    :uniqueness => true
+
+  has_many :password_resets
 
   scope :clean_order, lambda { |attr, dir| 
     #ensure attr and dir are safe values to use by checking within an array of allowed values
@@ -34,10 +37,7 @@ class User < ApplicationRecord
       :first_name => first_name,
       :last_name => last_name,
       :username => username,
-      :email => email,
-      :is_admin => is_admin,
-      :updated_at => updated_at,
-      :created_at => created_at
+      :email => email
     }
   end
 

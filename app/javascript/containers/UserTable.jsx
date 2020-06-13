@@ -73,6 +73,7 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
     setCurrentDialogOpen(null);
     setSelectedUser(null);
     if(usersChange) {
+      loaded = false;
       loadUsers()
     }
   }

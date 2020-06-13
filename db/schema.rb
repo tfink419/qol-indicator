@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_10_153632) do
+ActiveRecord::Schema.define(version: 2020_06_12_234242) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,14 @@ ActiveRecord::Schema.define(version: 2020_06_10_153632) do
     t.index ["long"], name: "index_grocery_stores_on_long"
   end
 
+  create_table "password_resets", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "uuid", limit: 36
+    t.datetime "expires_at"
+    t.index ["expires_at"], name: "index_password_resets_on_expires_at"
+    t.index ["uuid"], name: "index_password_resets_on_uuid"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "first_name", limit: 50
     t.string "last_name", limit: 50
@@ -39,6 +47,7 @@ ActiveRecord::Schema.define(version: 2020_06_10_153632) do
     t.boolean "is_admin", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email"
     t.index ["username"], name: "index_users_on_username"
   end
 

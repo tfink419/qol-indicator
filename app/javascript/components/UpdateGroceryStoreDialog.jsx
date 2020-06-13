@@ -56,7 +56,7 @@ const CreateGroceryStoreDialog = ({groceryStoreId, open, onClose, flashMessage})
     onClose(false);
   };
 
-  const handleCreate = (event) => {
+  const handleUpdate = (event) => {
     event.preventDefault();
     setGroceryStoreErrors({});
     setLoading(true)
@@ -68,7 +68,7 @@ const CreateGroceryStoreDialog = ({groceryStoreId, open, onClose, flashMessage})
     })
     .catch(error => {
       setLoading(false)
-      if(error.status == 401) 
+      if(error.status == 400) 
       {
         flashMessage('error', error.message);
         if(error.details) {
@@ -88,7 +88,7 @@ const CreateGroceryStoreDialog = ({groceryStoreId, open, onClose, flashMessage})
 
   return (
     <Dialog open={open} disableBackdropClick={true} onClose={handleClose}>
-      <form onSubmit={handleCreate}>
+      <form onSubmit={handleUpdate}>
         <DialogTitle>Update Grocery Store '{originalStoreName}'</DialogTitle>
         <DialogContent>
             <TextField

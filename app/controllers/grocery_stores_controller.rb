@@ -202,7 +202,7 @@ class GroceryStoresController < ApplicationController
     uri = URI('http://www.mapquestapi.com/geocoding/v1/address')
     if zip.nil?
       location = "#{address}, #{city}, #{state}"
-    elsif city.nil? or city.blank?
+    elsif city.nil? or city.empty?
       location = "#{address}, #{zip}"
     else
       location = "#{address}, #{city}, #{state}, #{zip}"

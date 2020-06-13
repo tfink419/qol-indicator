@@ -4,7 +4,10 @@ Rails.application.routes.draw do
   post 'grocery_stores/upload_csv'
   resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
-  resources :user_self, :only => [:show, :update]
+
+  get 'user/self', :to => 'user_self#show', :as => 'show_user_self'
+  put 'user/self', :to => 'user_self#update'
+  patch 'user/self', :to => 'user_self#update', :as => 'update_user_self'
 
   get 'map_data', :to => 'map_data#retrieve_map_data', :as => 'retrieve_map_data'
   get 'register', :to => 'app#index', :as => 'register'
@@ -12,6 +15,7 @@ Rails.application.routes.draw do
   get 'logout', :to => 'login#logout', :as => 'logout'
   post 'login', :to => 'login#attempt_login', :as => 'attempt_login'
   post 'register', :to => 'login#attempt_register', :as => 'attempt_register'
+  post 'forgot-password', :to => 'login#forgot_password', :as => 'forgot_password'
   
   get '/admin/*other', :to => 'app#index'
   get '/*other', :to => 'app#index'

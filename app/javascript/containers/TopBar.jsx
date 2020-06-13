@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Toolbar, AppBar, IconButton, Menu, MenuItem, CssBaseline, Hidden } from '@material-ui/core'
 import { useHistory } from "react-router-dom";
 
-import { userLogout, userLogin } from '../actions/user'
+import { userLogout } from '../actions/user'
 
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -60,10 +60,10 @@ const TopBar = ({user, userLogout}) => {
           }}
           open={Boolean(anchorEl)} onClose={handleClose}
         >
-          <MenuItem onClick={handleClose}>Profile</MenuItem>
-          <MenuItem onClick={handleClose}>My account</MenuItem>
+          <MenuItem component="a" href="/user" onClick={(e) => { e.preventDefault(); history.push('/user')}}>Profile</MenuItem>
+          <MenuItem onClick={handleClose}>My Settings</MenuItem>
           { user.is_admin &&
-            <MenuItem component="a" href="/admin">Admin Area</MenuItem>
+            <MenuItem component="a" href="/admin" onClick={(e) => { e.preventDefault(); history.push('/admin')}}>Admin Area</MenuItem>
           }
           <MenuItem component="a" href="/logout" onClick={handleLogout}>Logout</MenuItem>
         </Menu>

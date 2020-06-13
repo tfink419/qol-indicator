@@ -115,7 +115,7 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
       <TextField
         value={user.password_confirmation}
         onChange={(e) => setUser({ ...user, password_confirmation:e.target.value })}
-        error={Boolean(userErrors.passwordConfirmation)}
+        error={Boolean(userErrors.password_confirmation)}
         helperText={userErrors.password_confirmation}
         variant="outlined"
         margin="normal"

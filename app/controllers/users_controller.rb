@@ -11,7 +11,7 @@ class UsersController < ApplicationController
       dir = params[:dir]
       render :json => { 
         :status => 0, 
-        :users => User.offset(offset).limit(limit).clean_order(order, dir).map { |user| user.public_attributes },
+        :users => User.offset(offset).limit(limit).clean_order(order, dir),
         :user_count => User.count
       }
     rescue StandardError => err
@@ -30,7 +30,7 @@ class UsersController < ApplicationController
     if @user.save
       render :json =>  {
         :status => 0,
-        :user => @user.public_attributes
+        :user => @user
       }
     else
       render :json => {:status => 400, :error => 'Create User', :error_details => @user.errors.messages}, :status => 400
@@ -86,7 +86,7 @@ class UsersController < ApplicationController
           render :json =>  {
             :status => 0,
             :message => 'Update User Successful',
-            :user => user.public_attributes
+            :user => user
           }
         else
           render :json => {:status => 400, :error => 'Update User Failed', :error_details => user.errors.messages}, :status => 400
