@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   post 'login', :to => 'login#attempt_login', :as => 'attempt_login'
   post 'register', :to => 'login#attempt_register', :as => 'attempt_register'
   post 'forgot-password', :to => 'login#forgot_password', :as => 'forgot_password'
+  post 'reset-password', :to => 'login#reset_password', :as => 'reset_password'
+  get 'reset-password-details', :to => 'login#reset_password_details', :as => 'reset_password_details'
   
   get '/admin/*other', :to => 'app#index'
   get '/*other', :to => 'app#index'

@@ -206,3 +206,23 @@ export const postForgotPassword = (email) => {
   .then(response => response.json())
   .then(handleResponse)
 }
+
+export const getResetPasswordDetails = (uuid) => {
+  return fetch('/reset-password-details?uuid='+uuid, { 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const postResetPassword = (uuid, password, password_confirmation) => {
+  return fetch('/reset-password', { method:'POST', body: JSON.stringify({uuid, password, password_confirmation}), 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}

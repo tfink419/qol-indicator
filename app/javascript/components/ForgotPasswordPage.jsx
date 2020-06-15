@@ -1,7 +1,8 @@
 import React from "react";
-import { TextField, Button, Typography, Container } from '@material-ui/core'
+import { TextField, Button, Typography, Container, Grid, Link } from '@material-ui/core'
 import { useHistory } from "react-router-dom";
 import { postForgotPassword } from "../fetch";
+import FlashNotice from '../containers/FlashNotice';
 
 export default ({ userLogin, flashMessage }) => {
   let history = useHistory();
@@ -18,7 +19,7 @@ export default ({ userLogin, flashMessage }) => {
   return (
     <Container maxWidth={"sm"}>
       {sent ?
-        <div>
+        <React.Fragment>
           <Typography>Email has been sent, please check your email for the link to reset your password. If you remember your password now, click the button below to go back to the login page</Typography>
           <Button
             component="a"
@@ -30,7 +31,7 @@ export default ({ userLogin, flashMessage }) => {
           >
             Back To Login
           </Button>
-        </div>
+        </React.Fragment>
       :
         <form onSubmit={sendEmail}>
           <Typography>
@@ -56,7 +57,18 @@ export default ({ userLogin, flashMessage }) => {
           >
             Send password reset email
           </Button>
-        </form>}
+          <Grid container>
+            <Grid item xs>
+            </Grid>
+            <Grid item>
+              <Link href="/login" onClick={(e) => {e.preventDefault(); history.push('/login')}} variant="body2">
+                Remember Password? Login
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
+      }
+      <FlashNotice />
     </Container>
   )
 }

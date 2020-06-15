@@ -13,10 +13,6 @@ const preventDefault = (event) => event.preventDefault();
 const RegisterForm = ({ userLogin, flashMessage }) => {
   let history = useHistory();
   let [user, setUser] = React.useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    username: '',
     password: '',
     password_confirmation: ''
   });

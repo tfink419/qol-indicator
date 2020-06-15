@@ -45,8 +45,43 @@ class LoginController < ApplicationController
   end
 
   def forgot_password
-    user = User.where(:email => params[:email]).first
-    render :json => {:status => 200, :error => 'Password Forgetted', :uuid => SecureRandom.uuid}
+    user = User.find_by_email(params[:email])
+    pass_reset = user.password_resets.create(:uuid => SecureRandom.uuid, :expires_at => 1.day.from_now)
+    pass_reset.save
+    PasswordResetMailer.with(uuid: pass_reset.uuid, email: user.email, username: user.username).send_reset_password.deliver_later
+    render :json => {:status => 200, :message => 'Reset Password Email Sent'}
+  end
+
+  def reset_password
+    pass_reset = PasswordReset.find_by_uuid(params[:uuid])
+    if pass_reset
+      if pass_reset.expires_at < DateTime.now
+        pass_reset.delete
+      else
+        user = pass_reset.user
+        user.password = params[:password]
+        user.password_confirmation = params[:password_confirmation]
+        if user.save
+          pass_reset.delete
+          return render :json => {:status => 200, :message => 'Password Reset'}
+        else
+          return render :json => {:status => 401, :error => 'Registration Failed', :error_details => user.errors.messages}, :status => 401
+        end
+      end
+    end
+    render :json => {:status => 401, :error => 'Invalid Reset Code'}, :status => 401
+  end
+
+  def reset_password_details
+    pass_reset = PasswordReset.find_by_uuid(params[:uuid])
+    if pass_reset
+      if pass_reset.expires_at < DateTime.now
+        pass_reset.delete
+      else
+        return render :json => {:status => 200, :username => pass_reset.user.username}
+      end
+    end
+    render :json => {:status => 404, :error => 'Invalid Reset Code'}, :status => 404
   end
 
   private

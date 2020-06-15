@@ -8,6 +8,7 @@ import UserProtectedRoute from "../containers/UserProtectedRoute";
 import LoginRoute from "../containers/LoginRoute";
 import AdminProtectedRoute from "../containers/AdminProtectedRoute";
 import ForgotPasswordPage from "../components/ForgotPasswordPage";
+import ResetPasswordPage from "../components/ResetPasswordPage";
 
 
 export default (
@@ -17,6 +18,7 @@ export default (
       <LoginRoute path="/login" component={LoginPage} />
       <LoginRoute path="/register" component={RegisterPage} />
       <LoginRoute path="/forgot-password" component={ForgotPasswordPage} />
+      <LoginRoute path="/reset-password" component={ResetPasswordPage} />
       <UserProtectedRoute path="/" component={MapPage} />
     </Switch>
   </Router>
