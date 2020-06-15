@@ -12,7 +12,6 @@ export default ({match}) => {
   const handleCloseDialog = () => {
     history.push(match.path)
   }
-  console.log(match)
   return (
   <Container maxWidth="lg">
     <TopBar />

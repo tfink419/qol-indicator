@@ -65,7 +65,6 @@ const UpdateUserSelfDialog = ({onClose, flashMessage, userLogin}) => {
       if(error.status == 401) 
       {
         flashMessage('error', error.message);
-        console.log(error.details)
         if(error.details) {
           setUserErrors(_.mapValues(error.details, (messages, key) => {
             return messages.map(message => _.startCase(key) + " " +message).join("\n")

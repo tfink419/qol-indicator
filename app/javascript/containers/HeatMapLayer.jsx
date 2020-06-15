@@ -10,6 +10,7 @@ const defaultCfg = {
   // if scaleRadius is false it will be the constant radius used in pixels
   "radius": 0.01,
   "maxOpacity": .7,
+  "minOpacity": .4,
   // scales the radius based on map zoom
   "scaleRadius": true,
   // if set to false the heatmap uses the global maximum for colorization
@@ -18,7 +19,16 @@ const defaultCfg = {
   "useLocalExtrema": false,
   latField: 'lat',
   lngField: 'long',
-  valueField: 'quality'
+  valueField: 'quality',
+  defaultColor: 'red',
+  gradient: {
+    // enter n keys between 0 and 1 here
+    // for gradient color customization
+    '0.2': 'red',
+    '.5': 'yellow',
+    '.75': 'blue',
+    '.9': 'green'
+  }
 };
 
 const HeatmapLayer = ({groceryStores, config}) => {

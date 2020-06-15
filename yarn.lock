@@ -2077,7 +2077,7 @@ color-string@^1.5.2:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
 
-color@^3.0.0:
+color@^3.0.0, color@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/color/-/color-3.1.2.tgz#68148e7f85d41ad7649c5fa8c8106f098d229e10"
   integrity sha512-vXTJhHebByxZn3lDvDJYw4lR5+uB3vuoHsuYA5AKuxRVn5wzzIfQKGLBmgdVRHKTJYeK5rvJcHnrd0Li49CFpg==
@@ -3555,10 +3555,18 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-heatmap.js@*, heatmap.js@^2.0.5:
+"heatmap.js@git+https://github.com/tfink419/heatmap.js.git":
   version "2.0.5"
-  resolved "https://registry.yarnpkg.com/heatmap.js/-/heatmap.js-2.0.5.tgz#466d3b86513f5d49112a49d25700ab2730149153"
-  integrity sha1-Rm07hlE/XUkRKknSVwCrJzAUkVM=
+  uid c869f161fec063419a7894d72084efc530bc678d
+  resolved "git+https://github.com/tfink419/heatmap.js.git#c869f161fec063419a7894d72084efc530bc678d"
+  dependencies:
+    color "^3.1.2"
+
+"heatmap.js@https://github.com/tfink419/heatmap.js.git":
+  version "2.0.5"
+  resolved "https://github.com/tfink419/heatmap.js.git#c869f161fec063419a7894d72084efc530bc678d"
+  dependencies:
+    color "^3.1.2"
 
 hex-color-regex@^1.1.0:
   version "1.1.0"
@@ -4382,12 +4390,11 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-leaflet-heatmap@^1.0.0:
+"leaflet-heatmap@https://github.com/tfink419/leaflet-heatmap.git":
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/leaflet-heatmap/-/leaflet-heatmap-1.0.0.tgz#83cc04249d39ed91526aeaa7d7669bdaa86d6b1f"
-  integrity sha1-g8wEJJ057ZFSauqn12ab2qhtax8=
+  resolved "https://github.com/tfink419/leaflet-heatmap.git#1358054b4d4000f3bd771c680de8e5070847a88d"
   dependencies:
-    heatmap.js "*"
+    heatmap.js "git+https://github.com/tfink419/heatmap.js.git"
     leaflet "*"
 
 leaflet@*, leaflet@^1.6.0:
