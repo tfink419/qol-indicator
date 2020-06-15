@@ -7,7 +7,7 @@ const UserProtectedRoute = ({ component: Component, user, ...rest }) => {
     <Route {...rest} render={(props) => (
       user
         ? <Component {...props} />
-        : <Redirect to='/logout' />
+        : <React.Fragment>{ (window.location.href = '/logout') && '' }</React.Fragment>
     )} />
   );
 }
