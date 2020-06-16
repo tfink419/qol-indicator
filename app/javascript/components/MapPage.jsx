@@ -1,11 +1,12 @@
 import React from "react";
 import { Container, Typography } from '@material-ui/core'
-import { Route, useHistory } from "react-router-dom";
+import { Route, useHistory, Switch } from "react-router-dom";
 
 import FlashNotice from '../containers/FlashNotice'
 import TopBar from "../containers/TopBar";
 import MapContainer from "../containers/MapContainer"
 import UpdateUserSelfDialog from "./UpdateUserSelfDialog";
+import UpdateMapPreferencesDialog from "./UpdateMapPreferencesDialog";
 
 export default ({match}) => {
   let history = useHistory();
@@ -17,6 +18,9 @@ export default ({match}) => {
     <TopBar />
     <MapContainer />
     <FlashNotice />
-    <Route path={`${match.path}user`} exact component={() => (<UpdateUserSelfDialog onClose={handleCloseDialog}/> )}/>
+    <Switch>
+      <Route path={`/user`} exact component={() => (<UpdateUserSelfDialog onClose={handleCloseDialog}/> )}/>
+      <Route path={`/map/preferences`} exact component={() => (<UpdateMapPreferencesDialog onClose={handleCloseDialog}/> )}/>
+    </Switch>
   </Container>
 )};

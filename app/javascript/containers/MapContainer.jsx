@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import { getMapData } from '../fetch'
 import HeatMapLayer from './HeatMapLayer'
+import { getMapPreferences } from '../fetch'
+import { updateMapPreferences } from "../actions/map-preferences";
 
 const useStyles = makeStyles({
   map: {
@@ -29,7 +31,7 @@ const startLocation = {
   zoom:13
 }
 
-const MapContainer = ({}) => {
+const MapContainer = ({mapPreferences, updateMapPreferences}) => {
   const classes = useStyles();
   let [groceryStores, setGroceryStores] = React.useState([])
   let [currentLocation, setCurrentLocation] = React.useState([])
@@ -43,14 +45,30 @@ const MapContainer = ({}) => {
       setGroceryStores(response.grocery_stores)
     })
   }
+
+  const loadMapPreferences = () => {
+    if(!mapPreferences.loaded) {
+      getMapPreferences().then(response => {
+        updateMapPreferences(response.map_preferences)
+      })
+    }
+  }
+
   const startPosition = [startLocation.lat, startLocation.long]
+
+  React.useEffect(loadMapPreferences, [mapPreferences]);
+
+  let heatmapLayerConfig = { 
+    radius: 0.005 * mapPreferences.preferences.transit_type
+  }
+
   return (
     <Map center={startPosition} zoom={startLocation.zoom} className={classes.map} onMoveEnd={handleMapMove} whenReady={handleMapMove}>
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <HeatMapLayer groceryStores={groceryStores} />
+      <HeatMapLayer groceryStores={groceryStores} config={heatmapLayerConfig}/>
       { currentLocation.zoom > 12 && groceryStores.map(groceryStore => (
         <React.Fragment key={groceryStore.id}>
           <Marker position={[groceryStore.lat, groceryStore.long]}>
@@ -65,5 +83,13 @@ const MapContainer = ({}) => {
     </Map>
 )};
 
+const mapStateToProps = state => ({
+  mapPreferences: state.mapPreferences
+})
 
-export default connect()(MapContainer)
+const mapDispatchToProps = {
+  updateMapPreferences
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapContainer)

@@ -24,7 +24,7 @@ const defaultCfg = {
   gradient: {
     // enter n keys between 0 and 1 here
     // for gradient color customization
-    '0.2': 'red',
+    '0.1': 'red',
     '.5': 'yellow',
     '.75': 'blue',
     '.9': 'green'
@@ -35,19 +35,18 @@ const HeatmapLayer = ({groceryStores, config}) => {
   let leafletContext = useLeaflet();
   const [heatmapLayer, setHeatmapLayer] = React.useState(null);
   const data = { min:0, max:10, data:groceryStores || []};
+
   
   React.useEffect(() => {
-    const loadLayer = () => {
-      if(heatmapLayer) {
-        leafletContext.layerContainer.removeLayer(heatmapLayer)
-      }
-      const hml = new HeatmapOverlay({ ...defaultCfg, ...config});
-      hml.setData(data);
-    
-      leafletContext.layerContainer.addLayer(hml)
-      setHeatmapLayer(hml);
+    console.log({ ...defaultCfg, ...config})
+    if(heatmapLayer) {
+      leafletContext.layerContainer.removeLayer(heatmapLayer)
     }
-    loadLayer();
+    const hml = new HeatmapOverlay({ ...defaultCfg, ...config});
+    hml.setData(data);
+  
+    leafletContext.layerContainer.addLayer(hml)
+    setHeatmapLayer(hml);
   },[groceryStores, config])
 
   return (<div id='heatmap-layer-react'></div>)

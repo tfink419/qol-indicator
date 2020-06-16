@@ -13,6 +13,7 @@ class User < ApplicationRecord
     :uniqueness => true
 
   has_many :password_resets
+  has_one :map_preferences
 
   scope :clean_order, lambda { |attr, dir| 
     #ensure attr and dir are safe values to use by checking within an array of allowed values

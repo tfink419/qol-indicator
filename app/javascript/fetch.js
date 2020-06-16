@@ -226,3 +226,23 @@ export const postResetPassword = (uuid, password, password_confirmation) => {
   .then(response => response.json())
   .then(handleResponse)
 }
+
+export const getMapPreferences = () => {
+  return fetch('/map_preferences', { 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const putMapPreferences = (user) => {
+  return fetch('/map_preferences', { method:'PUT', body: JSON.stringify({map_preferences: filterUnwantedParams(user)}), 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}

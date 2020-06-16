@@ -1,0 +1,2 @@
+module MapPreferencesHelper
+end

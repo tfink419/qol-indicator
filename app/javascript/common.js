@@ -36,3 +36,7 @@ export const qualityMarks = [
     label: 'Supermarket',
   },
 ];  
+
+export const defaultPreferences = {
+  transit_type:2
+};

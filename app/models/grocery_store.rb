@@ -15,7 +15,7 @@ class GroceryStore < ApplicationRecord
   validates :long, :presence => true, :inclusion => -180..180
   validates :zip, :inclusion => { :in => [*0..99999, nil], :message => 'is not a valid zip code.' }
 
-  validates :quality, :inclusion => 1..10
+  validates :quality, :inclusion => 0..10
 
   before_validation do
     self.address = self.address.strip.titleize

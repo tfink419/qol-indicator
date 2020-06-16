@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
 
+
+  get 'map_preferences', :to => 'map_preferences#show', :as => 'show_map_preferences'
+  put 'map_preferences', :to => 'map_preferences#update'
+  patch 'map_preferences', :to => 'map_preferences#update', :as => 'update_map_preferences'
   get 'user/self', :to => 'user_self#show', :as => 'show_user_self'
   put 'user/self', :to => 'user_self#update'
   patch 'user/self', :to => 'user_self#update', :as => 'update_user_self'

@@ -61,7 +61,7 @@ const TopBar = ({user, userLogout}) => {
           open={Boolean(anchorEl)} onClose={handleClose}
         >
           <MenuItem component="a" href="/user" onClick={(e) => { e.preventDefault(); history.push('/user')}}>Profile</MenuItem>
-          <MenuItem onClick={handleClose}>My Settings</MenuItem>
+          <MenuItem component="a" href="/map/preferences" onClick={(e) => { e.preventDefault(); history.push('/map/preferences')}}>Preferences</MenuItem>
           { user.is_admin &&
             <MenuItem component="a" href="/admin" onClick={(e) => { e.preventDefault(); history.push('/admin')}}>Admin Area</MenuItem>
           }
