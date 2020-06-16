@@ -20,6 +20,10 @@ const transitTypeMarks = [
   {
     value: 8,
     label: 'Car',
+  },
+  {
+    value: 10,
+    label: 'Fly?',
   }
 ];  
 

@@ -59,7 +59,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
   React.useEffect(loadMapPreferences, [mapPreferences]);
 
   let heatmapLayerConfig = { 
-    radius: 0.005 * mapPreferences.preferences.transit_type
+    radius: 0.006 * Math.pow(1.3,mapPreferences.preferences.transit_type)
   }
 
   return (

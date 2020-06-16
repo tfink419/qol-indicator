@@ -50,8 +50,8 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
 
   const { loaded, rows, count, page, rowsPerPage, order, orderDir } = users;
 
-  const loadUsers = () => {
-    if(!loaded) {
+  const loadUsers = (force) => {
+    if(!loaded || force) {
       getUsers(page, rowsPerPage, order, orderDir).then(response => {
         if(response.status == 0) {
           loadedUsers(response.users, response.user_count)
@@ -73,8 +73,7 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
     setCurrentDialogOpen(null);
     setSelectedUser(null);
     if(usersChange) {
-      loaded = false;
-      loadUsers()
+      loadUsers(true)
     }
   }
 

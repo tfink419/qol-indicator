@@ -69,6 +69,7 @@ class GroceryStoresController < ApplicationController
   def upload_csv
     begin
       csv_file = params[:csv_file].read
+      default_quality = params[:default_quality].to_i
       end_of_line = csv_file.index("\n")
       csv_file[0..end_of_line] = csv_file[0..end_of_line].downcase
       csv_table = CSV.parse(csv_file, headers: true)
@@ -77,7 +78,8 @@ class GroceryStoresController < ApplicationController
       failed = []
       column = 2 # Skip title
       csv_table.each do |row|
-        gstore = GroceryStore.new(:name => row['name'], :address => row['address'], 
+        quality = row['quality'] ? row['quality'].to_i : default_quality
+        gstore = GroceryStore.new(:name => row['name'], :address => row['address'], :quality => quality,
           :city => row['city'], :state => row['state'], :zip => row['zip'], :lat => row['latitude'], :long => row['longitude'])
         attempt_geocode_if_needed(gstore)
         if gstore.save
@@ -144,7 +146,6 @@ class GroceryStoresController < ApplicationController
     begin
       gstore = GroceryStore.find(params[:id])
       gstore.assign_attributes(grocery_store_params)
-      pp gstore
       attempt_geocode_if_needed(gstore)
       if gstore.save
         render :json =>  {
@@ -170,7 +171,6 @@ class GroceryStoresController < ApplicationController
     unless gstore.valid?
       if gstore.only_coordinates_invalid?
         geoCoded = geocode(gstore.address, gstore.city, gstore.state, gstore.zip)
-        pp geoCoded
         parse_geocode(gstore, geoCoded)
       end
     end

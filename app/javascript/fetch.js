@@ -111,9 +111,10 @@ export const deleteUser = (userId) => {
   .then(handleResponse)
 }
 
-export const postGroceryStoreUploadCsv = (file) => {
+export const postGroceryStoreUploadCsv = (file, quality) => {
   const formData = new FormData();
   formData.append('csv_file', file);
+  formData.append('default_quality', quality);
   return fetch('/grocery_stores/upload_csv', { method:'POST', body: formData, 
     headers: {
       'Accept': 'application/json'

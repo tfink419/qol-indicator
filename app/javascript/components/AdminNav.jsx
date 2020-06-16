@@ -62,9 +62,9 @@ export default () => {
             <ListItemIcon><GroceryStoreIcon /></ListItemIcon>
             <ListItemText primary={'Grocery Stores'} />
           </ListItem>
-          <Collapse in={currentPath === '/admin/grocery_stores/upload'} timeout="auto" unmountOnExit>
+          <Collapse in={currentPath.indexOf('/admin/grocery_stores') === 0} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              <ListItem className={classes.nested} selected={currentPath === '/admin/grocery_stores/upload'} button>
+              <ListItem className={classes.nested} onClick={() => history.push('/admin/grocery_stores/upload')} selected={currentPath === '/admin/grocery_stores/upload'} button>
                 <ListItemIcon>
                   <NoteAddIcon /> 
                 </ListItemIcon>
