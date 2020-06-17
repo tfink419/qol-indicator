@@ -83,7 +83,7 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
         <DialogContent>
             <TextField
               value={groceryStore.name}
-              onChange={(e) => setGroceryStore({ ...groceryStore, quality:e.target.value })}
+              onChange={(e) => setGroceryStore({ ...groceryStore, name:e.target.value })}
               error={Boolean(groceryStoreErrors.name)}
               helperText={groceryStoreErrors.name}
               variant="outlined"
@@ -99,7 +99,7 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
             <Slider
               className={classes.slider}
               value={groceryStore.quality}
-              onChange={(e, val) => setGroceryStore({ ...groceryStore, name:val })}
+              onChange={(e, val) => setGroceryStore({ ...groceryStore, quality:val })}
               step={1}
               min={0}
               max={10}

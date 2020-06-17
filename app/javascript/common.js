@@ -21,7 +21,7 @@ export const drawerWidth = 240;
 export const qualityMarks = [
   {
     value: 1,
-    label: 'A few Goods',
+    label: 'Some Goods     '.replace(/ /g, "\u00a0"),
   },
   {
     value: 3,

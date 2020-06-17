@@ -1,5 +1,13 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery unless: -> { request.format.json? }
+  rescue_from StandardError do |err|
+    $stderr.print err
+    render :json => { 
+      :status => 500,
+      :error => 'Unknown error occured',
+      :error_details => err
+    }, :status => 500
+  end
   
   private
 

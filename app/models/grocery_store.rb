@@ -37,8 +37,8 @@ class GroceryStore < ApplicationRecord
     end
   }
   scope :search, lambda { |query| 
-    search_query = "%#{query}%"
-    where(['lower(grocery_stores.name) LIKE lower(?) or lower(grocery_stores.address) LIKE lower(?)', search_query, search_query])
+    search_query = "%#{query.gsub(/[^\w ]/,'')}%"
+    where(['grocery_stores.name ILIKE ? or grocery_stores.address ILIKE ?', search_query, search_query])
   }
 
   scope :where_in_coordinate_range, lambda { |south_west, north_east| 

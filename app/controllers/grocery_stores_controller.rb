@@ -7,34 +7,24 @@ class GroceryStoresController < ApplicationController
   before_action :admin_only
 
   def index
-    begin
-      page = params[:page].to_i
-      limit = params[:limit].to_i
-      offset = page*limit
-      order = params[:order]
-      dir = params[:dir]
-      search = params[:search]
-      if search.nil? or search.blank? or search.length == 1
-        gstores = GroceryStore.offset(offset).limit(limit).clean_order(order, dir)
-        count = GroceryStore.count
-      else
-        count = GroceryStore.search(search).count
-        gstores = GroceryStore.search(search).offset(offset).limit(limit).clean_order(order, dir)
-      end
-      render :json => { 
-        :status => 0, 
-        :grocery_stores => gstores,
-        :grocery_store_count => count
-      }
-    rescue StandardError => err
-      $stderr.print err
-      render :json => { 
-        :status => 500,
-        :error => 'Unknown error occured',
-        :error_details => err
-      }, :status => 500
+    page = params[:page].to_i
+    limit = params[:limit].to_i
+    offset = page*limit
+    order = params[:order]
+    dir = params[:dir]
+    search = params[:search]
+    if search.nil? or search.blank? or search.length == 1
+      gstores = GroceryStore.offset(offset).limit(limit).clean_order(order, dir)
+      count = GroceryStore.count
+    else
+      count = GroceryStore.search(search).count
+      gstores = GroceryStore.search(search).offset(offset).limit(limit).clean_order(order, dir)
     end
-
+    render :json => { 
+      :status => 0, 
+      :grocery_stores => gstores,
+      :grocery_store_count => count
+    }
   end
 
   def show
@@ -45,123 +35,87 @@ class GroceryStoresController < ApplicationController
   end
 
   def create
-    begin
-      gstore = GroceryStore.new(grocery_store_params)
-      attempt_geocode_if_needed(gstore)
-      if gstore.save
-        render :json =>  {
-          :status => 0,
-          :grocery_store => gstore
-        }
-      else
-        render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
-      end
-    rescue StandardError => err
-      $stderr.print err
-      render :json => { 
-        :status => 500,
-        :error => 'Unknown error occured',
-        :error_details => err
-      }, :status => 500
+    gstore = GroceryStore.new(grocery_store_params)
+    attempt_geocode_if_needed(gstore)
+    if gstore.save
+      render :json =>  {
+        :status => 0,
+        :grocery_store => gstore
+      }
+    else
+      render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
     end
   end
 
   def upload_csv
-    begin
-      csv_file = params[:csv_file].read
-      default_quality = params[:default_quality].to_i
-      end_of_line = csv_file.index("\n")
-      csv_file[0..end_of_line] = csv_file[0..end_of_line].downcase
-      csv_table = CSV.parse(csv_file, headers: true)
+    csv_file = params[:csv_file].read
+    default_quality = params[:default_quality].to_i
+    end_of_line = csv_file.index("\n")
+    csv_file[0..end_of_line] = csv_file[0..end_of_line].downcase
+    csv_table = CSV.parse(csv_file, headers: true)
 
-      number_sucessful = 0
-      failed = []
-      column = 2 # Skip title
-      csv_table.each do |row|
-        quality = row['quality'] ? row['quality'].to_i : default_quality
-        gstore = GroceryStore.new(:name => row['name'], :address => row['address'], :quality => quality,
-          :city => row['city'], :state => row['state'], :zip => row['zip'], :lat => row['latitude'], :long => row['longitude'])
-        attempt_geocode_if_needed(gstore)
-        if gstore.save
-          number_sucessful += 1
-        else
-          failed << column
-        end
-        column += 1
+    number_sucessful = 0
+    failed = []
+    column = 2 # Skip title
+    csv_table.each do |row|
+      quality = row['quality'] ? row['quality'].to_i : default_quality
+      gstore = GroceryStore.new(:name => row['name'], :address => row['address'], :quality => quality,
+        :city => row['city'], :state => row['state'], :zip => row['zip'], :lat => row['latitude'], :long => row['longitude'])
+      attempt_geocode_if_needed(gstore)
+      if gstore.save
+        number_sucessful += 1
+      else
+        failed << column
       end
-      if number_sucessful == column-2
-        render :json => {
-          :status => 0, 
-          :message => "File uploaded and All Grocery Stores were added successfully."
-        }
-      elsif number_sucessful.to_f/(column-2) > 0.8
-        render :json => {
-          :status => 0, 
-          :message => "File uploaded and #{number_sucessful}/#{column-2} Grocery Stores were added successfully.",
-          :details => "Grocery Stores at columns #{failed} failed to upload"
-        }
-      elsif number_sucessful == 0
-        render :json => {
-          :status => 400, 
-          :message => "All Grocery Stores Failed to Upload",
-          :errors => "All"
-        }, :status => 400
-      elsif number_sucessful.to_f/(column-2) < 0.5
-        render :json => {
-          :status => 400, 
-          :message => "More than half the Grocery Stores Failed to Upload",
-          :details => "Grocery Stores at columns #{failed} failed to upload"
-        }, :status => 400
-      end
-    rescue StandardError => err
-      $stderr.print err
-      render :json => { 
-        :status => 500,
-        :error => 'Unknown error occured',
-        :error_details => err
-      }, :status => 500
+      column += 1
+    end
+    if number_sucessful == column-2
+      render :json => {
+        :status => 0, 
+        :message => "File uploaded and All Grocery Stores were added successfully."
+      }
+    elsif number_sucessful.to_f/(column-2) > 0.8
+      render :json => {
+        :status => 0, 
+        :message => "File uploaded and #{number_sucessful}/#{column-2} Grocery Stores were added successfully.",
+        :details => "Grocery Stores at columns #{failed} failed to upload"
+      }
+    elsif number_sucessful == 0
+      render :json => {
+        :status => 400, 
+        :message => "All Grocery Stores Failed to Upload",
+        :errors => "All"
+      }, :status => 400
+    elsif number_sucessful.to_f/(column-2) < 0.5
+      render :json => {
+        :status => 400, 
+        :message => "More than half the Grocery Stores Failed to Upload",
+        :details => "Grocery Stores at columns #{failed} failed to upload"
+      }, :status => 400
     end
   end
 
   def destroy
-    begin
-      gstore = GroceryStore.find(params[:id])
-      gstore.delete
+    gstore = GroceryStore.find(params[:id])
+    gstore.delete
 
-      render :json => { 
-        :status => 0, 
-        :message => "Grocery Store '#{gstore.name} at #{gstore.address}' successfully deleted."
-      }
-    rescue StandardError => err
-      $stderr.print err
-      render :json => { 
-        :status => 500,
-        :error => 'Unknown error occured',
-        :error_details => err
-      }, :status => 500
-    end
+    render :json => { 
+      :status => 0, 
+      :message => "Grocery Store '#{gstore.name} at #{gstore.address}' successfully deleted."
+    }
   end
 
   def update
-    begin
-      gstore = GroceryStore.find(params[:id])
-      gstore.assign_attributes(grocery_store_params)
-      attempt_geocode_if_needed(gstore)
-      if gstore.save
-        render :json =>  {
-          :status => 0,
-          :grocery_store => gstore
-        }
-      else
-        render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
-      end
-    rescue StandardError => err
-      $stderr.print err
-      render :json => { 
-        :status => 500,
-        :error => 'Unknown error occured',
-        :error_details => err
-      }, :status => 500
+    gstore = GroceryStore.find(params[:id])
+    gstore.assign_attributes(grocery_store_params)
+    attempt_geocode_if_needed(gstore)
+    if gstore.save
+      render :json =>  {
+        :status => 0,
+        :grocery_store => gstore
+      }
+    else
+      render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
     end
   end
 

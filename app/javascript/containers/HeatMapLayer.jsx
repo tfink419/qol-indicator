@@ -24,8 +24,8 @@ const defaultCfg = {
   gradient: {
     // enter n keys between 0 and 1 here
     // for gradient color customization
-    '0.1': 'red',
-    '.5': 'yellow',
+    '0.25': 'red',
+    '.4': 'yellow',
     '.75': 'blue',
     '.9': 'green'
   }
