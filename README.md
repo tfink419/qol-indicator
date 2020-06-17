@@ -1,24 +1,16 @@
-# README
+# myQOLi
+## My Quality of Life Indicator
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### About
+This site shows you the quality of life in a given area
 
-Things you may want to cover:
+### Why
+This site was created as a demo for Snapdocs inc. It is based on a need that I had wanted from when researching to live in Denver, moving all the way from Florida and only knowing 2 people in the area. It's difficult to know how your life will be in an area without doing a lot of research and being aware of the factors that you would consider important.
 
-* Ruby version
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### Future Goals
+- Incorporate other types of quality indicators (e.g. access to transit)
+- Use google maps or other, higher quality map and geocode API
+- It's own domain and ad's 🤔
+- Understand what helpers are and use them if needed
+- Tests would be good
