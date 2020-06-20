@@ -11,6 +11,10 @@ This site was created as a demo for Snapdocs inc. It is based on a need that I h
 ### Future Goals
 - Incorporate other types of quality indicators (e.g. access to transit)
 - Use google maps or other, higher quality map and geocode API
+- Use isochrone instead of heatmap
+  - Save API calls
+  - Merge and difference isochrone polygons
+  - Decide how to handle quality of stores for isochrone (maybe a more advanced calculation converts isochrone data into quality maps, then inverts the quality data into heatmaps of quality points at regular intervals)
 - It's own domain and ad's 🤔
 - Understand what helpers are and use them if needed
 - Tests would be good
