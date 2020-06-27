@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box } from '@material-ui/core'
 
 import { flashMessage } from '../actions/messages'
-import { loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage } from '../actions/admin'
+import { setBuildHeatmapStatusReloadIntervalId, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage } from '../actions/admin'
 import { getBuildHeatmapStatuses, getBuildHeatmapStatus, postBuildHeatmap } from '../fetch'
 import { drawerWidth } from '../common'
 
@@ -23,10 +23,9 @@ const useStyles = makeStyles({
   }
 });
 
-const BuildHeatmapPage = ({ buildHeatmapStatuses, flashMessage, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
+const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapStatuses, flashMessage, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
   const classes = useStyles();
-  const { page, rowsPerPage, rows, current, loaded } = buildHeatmapStatuses;
-  let [intervalId, setIntervalId] = React.useState(null);
+  const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildHeatmapStatuses;
 
   const handleBuildHeatmap = (event) => {
     event.preventDefault();
@@ -62,21 +61,28 @@ const BuildHeatmapPage = ({ buildHeatmapStatuses, flashMessage, loadedBuildHeatm
     })
   }
   
+  const clearHeatMapReloadInterval = () => {
+    clearInterval(reloadIntervalId);
+    setBuildHeatmapStatusReloadIntervalId(null);
+  }
+  
   React.useEffect(loadBuildHeatmapStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
-    return () => {
-      clearInterval(intervalId);
-      setIntervalId(null);
+    if(current && current.state == 'complete') {
+      clearHeatMapReloadInterval();
     }
-  }, [])
-  React.useEffect(() => {
-    if(!intervalId && current) {
-      setIntervalId(setInterval(reloadCurrentBuildHeatmapStatus, 5000))
+    if(!reloadIntervalId && current) {
+      setBuildHeatmapStatusReloadIntervalId(setInterval(reloadCurrentBuildHeatmapStatus, 5000))
     }
-    else if(intervalId && !current) {
-      clearInterval(intervalId);
-      setIntervalId(null);
+    else if(reloadIntervalId && !current) {
+      clearInterval(reloadIntervalId);
+      setBuildHeatmapStatusReloadIntervalId(null);
     }
+    // return () => {
+    //   console.log('2should get here eventually')
+    //   clearInterval(intervalId);
+    //   setIntervalId(null);
+    // }
   }, [current]);
   
   return (
@@ -125,6 +131,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   flashMessage,
+  setBuildHeatmapStatusReloadIntervalId,
   loadedBuildHeatmapStatuses,
   loadedCurrentBuildHeatmapStatus,
   updateBuildHeatmapStatusesPage,

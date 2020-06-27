@@ -3,7 +3,7 @@ import { Route, Redirect } from "react-router-dom";
 
 import FlashNotice from '../containers/FlashNotice'
 import AdminBar from "../containers/AdminBar";
-import AdminNav from "../components/AdminNav";
+import AdminNav from "../containers/AdminNav";
 
 import UserTable from '../containers/UserTable'
 import GroceryStoreTable from "../containers/GroceryStoreTable";

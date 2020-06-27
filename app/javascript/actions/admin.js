@@ -22,6 +22,11 @@ export const loadedCurrentBuildHeatmapStatus = (currentBuildHeatmapStatus) => ({
   currentBuildHeatmapStatus
 })
 
+export const setBuildHeatmapStatusReloadIntervalId = (reloadIntervalId) => ({
+  type: 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID',
+  reloadIntervalId
+})
+
 export const clearUsers = () => ({
   type: 'CLEAR_USERS'
 })

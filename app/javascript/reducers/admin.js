@@ -165,23 +165,31 @@ const admin = (state = {
           loaded: false
         }
       }
-    case 'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE':
-    {
-      let {page} = state.buildHeatmapStatuses;
-      if(state.buildHeatmapStatuses.rowsPerPage != action.rowsPerPage) {
-        page = Math.floor(state.buildHeatmapStatuses.rowsPerPage/action.rowsPerPage*page);
-      }
+      case 'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE':
+        {
+          let {page} = state.buildHeatmapStatuses;
+          if(state.buildHeatmapStatuses.rowsPerPage != action.rowsPerPage) {
+            page = Math.floor(state.buildHeatmapStatuses.rowsPerPage/action.rowsPerPage*page);
+          }
+          return {
+            ...state,
+            buildHeatmapStatuses: {
+              ...state.buildHeatmapStatuses,
+              rowsPerPage:action.rowsPerPage,
+              page,
+              loaded: false
+            }
+          }
+        }
+        
+    case 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID':
       return {
         ...state,
         buildHeatmapStatuses: {
           ...state.buildHeatmapStatuses,
-          rowsPerPage:action.rowsPerPage,
-          page,
-          loaded: false
+          reloadIntervalId: action.reloadIntervalId
         }
       }
-    }
-    
     case 'CSV_PROCESSING':
       return {
         ...state,
