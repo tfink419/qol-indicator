@@ -20,7 +20,7 @@ class BuildHeatmapController < ApplicationController
     newest = BuildHeatmapStatus.order(created_at:'DESC').first
     render json: {
       status: 0,
-      build_heatmap_statuses: { all:build_statuses, current:newest.error.nil? ? newest : nil },
+      build_heatmap_statuses: { all:build_statuses, current:(newest.error.nil? && newest.state != 'complete') ? newest : nil },
       build_heatmap_status_count: build_heatmap_status_count
     }
   end

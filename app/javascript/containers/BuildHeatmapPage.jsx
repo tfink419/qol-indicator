@@ -8,6 +8,14 @@ import { loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuil
 import { getBuildHeatmapStatuses, getBuildHeatmapStatus, postBuildHeatmap } from '../fetch'
 import { drawerWidth } from '../common'
 
+const STATE_MAP = {
+  'initialized': 'Job Sent to Resque',
+  'received': 'Job Received Received By Resque',
+  'isochrones': 'Checking/Fetching Isochrone Polygons',
+  'heatmap-points': 'Building Heatmap Points',
+  'complete': 'Completed'
+}
+
 const useStyles = makeStyles({
   pushRight: {
     width: `calc(100% - ${drawerWidth}px)`,
@@ -81,7 +89,7 @@ const BuildHeatmapPage = ({ buildHeatmapStatuses, flashMessage, loadedBuildHeatm
             Currently Building Heatmap
           </Typography>
           <Typography variant="subtitle1">
-            {current.state}
+            Current State: <strong>{STATE_MAP[current.state]}</strong>
           </Typography>
           <Box display="flex" alignItems="center">
             <Box width="100%" mr={1}>
