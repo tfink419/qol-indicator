@@ -9,6 +9,7 @@ import UserTable from '../containers/UserTable'
 import GroceryStoreTable from "../containers/GroceryStoreTable";
 import GroceryStoreUploadForm from "../containers/GroceryStoreUploadForm";
 import AdminMapContainer from "../containers/AdminMapContainer";
+import BuildHeatmapPage from "../containers/BuildHeatmapPage";
 
 export default ({match}) => {
   return (
@@ -20,6 +21,7 @@ export default ({match}) => {
     <Route path={`${match.path}/grocery_stores`} exact component={GroceryStoreTable}/>
     <Route path={`${match.path}/grocery_stores/upload`} exact component={GroceryStoreUploadForm}/>
     <Route path={`${match.path}/map`} exact component={AdminMapContainer}/>
+    <Route path={`${match.path}/build-heatmap`} exact component={BuildHeatmapPage}/>
     <FlashNotice />
   </React.Fragment>
 )};

@@ -10,10 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_15_231659) do
+ActiveRecord::Schema.define(version: 2020_06_27_175438) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "build_heatmap_statuses", force: :cascade do |t|
+    t.float "percent"
+    t.string "state"
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "grocery_stores", force: :cascade do |t|
     t.string "name", limit: 100
@@ -28,6 +36,34 @@ ActiveRecord::Schema.define(version: 2020_06_15_231659) do
     t.datetime "updated_at", null: false
     t.index ["lat"], name: "index_grocery_stores_on_lat"
     t.index ["long"], name: "index_grocery_stores_on_long"
+  end
+
+  create_table "heatmap_points", force: :cascade do |t|
+    t.integer "transit_type"
+    t.integer "precision"
+    t.float "lat"
+    t.float "long"
+    t.float "quality"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lat"], name: "index_heatmap_points_on_lat"
+    t.index ["long"], name: "index_heatmap_points_on_long"
+    t.index ["precision", "lat"], name: "index_heatmap_points_on_precision_and_lat"
+    t.index ["precision", "long"], name: "index_heatmap_points_on_precision_and_long"
+    t.index ["transit_type", "quality", "precision", "lat"], name: "index_heatmap_points_on_type_and_lat"
+    t.index ["transit_type", "quality", "precision", "long"], name: "index_heatmap_points_on_type_and_long"
+  end
+
+  create_table "isochrone_polygons", force: :cascade do |t|
+    t.string "isochronable_type"
+    t.bigint "isochronable_id"
+    t.string "travel_type"
+    t.integer "distance"
+    t.text "polygon", array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["isochronable_id", "travel_type"], name: "index_iso_polys_on_travel_type_and_belongs_id"
+    t.index ["isochronable_type", "isochronable_id"], name: "index_iso_polys_on_poly_assoc"
   end
 
   create_table "map_preferences", force: :cascade do |t|

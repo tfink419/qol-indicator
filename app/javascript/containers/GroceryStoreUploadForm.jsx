@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Paper, Input, Button, CircularProgress, Slider } from '@material-ui/core'
 
 import { flashMessage } from '../actions/messages'
-import { fileDone, fileProcessing } from '../actions/file'
+import { csvDone, csvProcessing } from '../actions/admin'
 import { postGroceryStoreUploadCsv } from '../fetch'
 import { drawerWidth, qualityMarks } from '../common'
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 
 const preventDefault = (event) => event.preventDefault();
 
-const GroceryStoreUploadForm = ({ file, fileProcessing, fileDone, flashMessage }) => {
+const GroceryStoreUploadForm = ({ file, csvProcessing, csvDone, flashMessage }) => {
   const classes = useStyles();
 
   let [selectedFile, setSelectedFile] = React.useState(null);
@@ -35,10 +35,10 @@ const GroceryStoreUploadForm = ({ file, fileProcessing, fileDone, flashMessage }
 
   const handleFileSubmit = (event) => {
     event.preventDefault();
-    fileProcessing('Grocery Store CSV', selectedFile.name);
+    csvProcessing('Grocery Store CSV', selectedFile.name);
     postGroceryStoreUploadCsv(selectedFile, quality)
     .then((response) => {
-      fileDone()
+      csvDone()
       flashMessage('info', response.message);
     })
     .catch(error => {
@@ -92,13 +92,13 @@ const GroceryStoreUploadForm = ({ file, fileProcessing, fileDone, flashMessage }
 }
 
 const mapStateToProps = state => ({
-  file: state.file
+  file: state.admin.file
 })
 
 const mapDispatchToProps = {
   flashMessage,
-  fileProcessing,
-  fileDone
+  csvProcessing,
+  csvDone
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(GroceryStoreUploadForm)

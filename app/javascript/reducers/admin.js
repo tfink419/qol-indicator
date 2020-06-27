@@ -8,7 +8,13 @@ const defaultTable = {
 };
 const admin = (state = {
   users:{...defaultTable},
-  groceryStores:{...defaultTable}
+  groceryStores:{...defaultTable},
+  csvUpload: {},
+  buildHeatmapStatuses: {
+    page:0,
+    rowsPerPage:10,
+    loaded: false
+  }
 }, action) => {
   switch (action.type) {
     case 'LOADED_USERS':
@@ -28,6 +34,26 @@ const admin = (state = {
           ...state.groceryStores,
           rows:action.groceryStores,
           count:action.count,
+          loaded: true
+        }
+      }
+    case 'LOADED_BUILD_HEATMAP_STATUSES':
+      return {
+        ...state,
+        buildHeatmapStatuses:{ 
+          ...state.buildHeatmapStatuses,
+          rows:action.buildHeatmapStatuses,
+          count:action.count,
+          current:action.currentBuildHeatmapStatus,
+          loaded: true
+        }
+      }
+    case 'LOADED_CURRENT_BUILD_HEATMAP_STATUS':
+      return {
+        ...state,
+        buildHeatmapStatuses:{ 
+          ...state.buildHeatmapStatuses,
+          current:action.currentBuildHeatmapStatus,
           loaded: true
         }
       }
@@ -129,6 +155,46 @@ const admin = (state = {
           page:0
         }
       }
+
+    case 'UPDATE_BUILD_HEATMAP_STATUSES_PAGE':
+      return {
+        ...state,
+        buildHeatmapStatuses: {
+          ...state.buildHeatmapStatuses,
+          page:action.page,
+          loaded: false
+        }
+      }
+    case 'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE':
+    {
+      let {page} = state.buildHeatmapStatuses;
+      if(state.buildHeatmapStatuses.rowsPerPage != action.rowsPerPage) {
+        page = Math.floor(state.buildHeatmapStatuses.rowsPerPage/action.rowsPerPage*page);
+      }
+      return {
+        ...state,
+        buildHeatmapStatuses: {
+          ...state.buildHeatmapStatuses,
+          rowsPerPage:action.rowsPerPage,
+          page,
+          loaded: false
+        }
+      }
+    }
+    
+    case 'CSV_PROCESSING':
+      return {
+        ...state,
+        csvUpload: {
+          type: action.fileType,
+          name: action.fileName
+        }
+      }
+    case 'CSV_DONE':
+      return {
+        ...state,
+        csvUpload: {}
+      }
       
     case 'CLEAR_USERS':
       return {
@@ -143,7 +209,8 @@ const admin = (state = {
     case 'USER_LOGOUT':
       return {
         users:{...defaultTable},
-        groceryStores:{...defaultTable}
+        groceryStores:{...defaultTable},
+        csvUpload: {}
       }
     default:
       return state

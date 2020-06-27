@@ -12,6 +12,7 @@
     "leaflet": "^1.6.0",
     "leaflet-heatmap": "https://github.com/tfink419/leaflet-heatmap.git",
     "lodash": "^4.17.15",
+    "mapbox-gl": "^1.11.0",
     "moment": "^2.26.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",

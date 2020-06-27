@@ -167,8 +167,8 @@ export const deleteGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const getMapData = (southWest, northEast) => {
-  let url = `/map_data?south_west=${parseLatLng(southWest)}&north_east=${parseLatLng(northEast)}`;
+export const getMapData = (southWest, northEast, zoom) => {
+  let url = `/map_data?south_west=${parseLatLng(southWest)}&north_east=${parseLatLng(northEast)}&zoom=${zoom}`;
 
   return fetch(url, {
     headers: {
@@ -242,6 +242,39 @@ export const putMapPreferences = (user) => {
   return fetch('/map_preferences', { method:'PUT', body: JSON.stringify({map_preferences: filterUnwantedParams(user)}), 
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getBuildHeatmapStatuses = (page, rowsPerPage) => {
+  let url = "/build_heatmap/status",
+    params = { limit: rowsPerPage, page };
+  url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+  return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getBuildHeatmapStatus = (id) => {
+  return fetch("/build_heatmap/status/"+id, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const postBuildHeatmap = (user) => {
+  return fetch('/build_heatmap', {
+    method:'POST', 
+    headers: {
       'Accept': 'application/json'
   }})
   .then(response => response.json())

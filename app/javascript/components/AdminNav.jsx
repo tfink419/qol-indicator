@@ -5,6 +5,7 @@ import { Drawer, CssBaseline, List, Divider, Collapse,
 import PeopleIcon from '@material-ui/icons/People';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import MapIcon from '@material-ui/icons/Map';
+import BuildIcon from '@material-ui/icons/Build';
 import GroceryStoreIcon from '@material-ui/icons/LocalGroceryStore';
 import { useLocation, useHistory } from 'react-router-dom'
 
@@ -75,6 +76,10 @@ export default () => {
           <ListItem onClick={() => history.push('/admin/map')} selected={currentPath === '/admin/map'} button>
             <ListItemIcon><MapIcon /></ListItemIcon>
             <ListItemText primary={'Administrate Map'} />
+          </ListItem>
+          <ListItem onClick={() => history.push('/admin/build-heatmap')} selected={currentPath === '/admin/build-heatmap'} button>
+            <ListItemIcon><BuildIcon /></ListItemIcon>
+            <ListItemText primary={'Build Heatmap'} />
           </ListItem>
         </List>
       </Drawer>

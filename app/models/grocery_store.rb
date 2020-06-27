@@ -17,6 +17,8 @@ class GroceryStore < ApplicationRecord
 
   validates :quality, :inclusion => 0..10
 
+  has_many :isochrone_polygons, as: :isochronable
+
   before_validation do
     self.address = self.address.strip.titleize
     self.city = self.city.strip.titleize
@@ -28,7 +30,7 @@ class GroceryStore < ApplicationRecord
     #ensure attr and dir are safe values to use by checking within an array of allowed values
     attr = (GroceryStore.attribute_names.include? attr) ? attr : 'created_at'
     dir.upcase!
-    dir = (['ASC', 'DESC'].include? dir) ? dir : 'ASC'
+    dir = (%w(ASC DESC).include? dir) ? dir : 'ASC'
     if ['name'].include? attr
       # case insensitive sort
       order(Arel.sql("lower(grocery_stores.#{attr}) #{dir}"))
@@ -42,7 +44,16 @@ class GroceryStore < ApplicationRecord
   }
 
   scope :where_in_coordinate_range, lambda { |south_west, north_east| 
-    where(['lat > ? and lat < ? and long > ? and long < ?', south_west[0]-0.05, north_east[0]+0.05, south_west[1]-0.05, north_east[1]+0.05])
+    extra = ((north_east[0] - south_west[0])*0.1).round(2)
+    where(['lat > ? and lat < ? and long > ? and long < ?', south_west[0]-extra, north_east[0]+extra, south_west[1]-extra, north_east[1]+extra])
+  }
+
+  scope :all_near_point, lambda { |lat, long, transit_type|
+    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.02*transit_type, lat+0.02*transit_type, long-0.02*transit_type, long+0.02*transit_type])
+  }
+
+  scope :all_near_point_wide, lambda { |lat, long|
+    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.2, lat+0.2, long-0.2, long+0.2])
   }
 
   def valid_location?

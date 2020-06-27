@@ -10,6 +10,18 @@ export const loadedGroceryStores = (groceryStores, count) => ({
   count
 })
 
+export const loadedBuildHeatmapStatuses = (buildHeatmapStatuses, count, currentBuildHeatmapStatus) => ({
+  type: 'LOADED_BUILD_HEATMAP_STATUSES',
+  buildHeatmapStatuses,
+  count,
+  currentBuildHeatmapStatus
+})
+
+export const loadedCurrentBuildHeatmapStatus = (currentBuildHeatmapStatus) => ({
+  type: 'LOADED_CURRENT_BUILD_HEATMAP_STATUS',
+  currentBuildHeatmapStatus
+})
+
 export const clearUsers = () => ({
   type: 'CLEAR_USERS'
 })
@@ -61,4 +73,24 @@ export const updateGroceryStoresRowsPerPage = (rowsPerPage) => ({
 export const updateGroceryStoresSearchField = (searchField) => ({
   type:'UPDATE_GROCERY_STORES_SEARCHFIELD',
   searchField
+})
+
+export const updateBuildHeatmapStatusesPage = (page) => ({
+  type:'UPDATE_BUILD_HEATMAP_STATUSES_PAGE',
+  page
+})
+
+export const updateBuildHeatmapStatusesRowsPerPage = (rowsPerPage) => ({
+  type:'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE',
+  rowsPerPage
+})
+
+export const csvProcessing = (fileType, fileName) => ({
+  type: 'CSV_PROCESSING',
+  fileType,
+  fileName
+})
+
+export const csvDone = () => ({
+  type: 'CSV_DONE'
 })
