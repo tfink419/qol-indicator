@@ -1,5 +1,7 @@
 const UNWANTED_PARAMETERS = ['id', 'created_at', 'updated_at']
 
+const paramify = (params) => '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+
 function handleResponse(response) {
   if(response.status != 0 && response.status != 200) {
     throw {
@@ -44,7 +46,7 @@ export const getUsers = (page, rowsPerPage, sortOrder, dir) => {
   let url = "/users",
     params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase() };
   // Turn object into http params
-  url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+  url += paramify(params)
 
   return fetch(url, {
     headers: {
@@ -58,7 +60,7 @@ export const getGroceryStores = (page, rowsPerPage, sortOrder, dir, search) => {
   let url = "/grocery_stores",
     params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase(), search };
   // Turn object into http params
-  url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+  url += paramify(params)
 
   return fetch(url, {
     headers: {
@@ -167,8 +169,14 @@ export const deleteGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const getMapData = (southWest, northEast, zoom) => {
-  let url = `/map_data?south_west=${parseLatLng(southWest)}&north_east=${parseLatLng(northEast)}&zoom=${zoom}`;
+export const getMapData = (southWest, northEast, zoom, transit_type) => {
+  let url = "/map_data",
+    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom};
+  if(transit_type) {
+    params.transit_type = transit_type;
+  }
+  // Turn object into http params
+  url += paramify(params)
 
   return fetch(url, {
     headers: {
@@ -251,7 +259,7 @@ export const putMapPreferences = (user) => {
 export const getBuildHeatmapStatuses = (page, rowsPerPage) => {
   let url = "/build_heatmap/status",
     params = { limit: rowsPerPage, page };
-  url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+  url += paramify(params)
   return fetch(url, {
     method:'GET', 
     headers: {
