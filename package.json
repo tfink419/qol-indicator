@@ -8,7 +8,6 @@
     "@material-ui/lab": "^4.0.0-alpha.55",
     "@rails/webpacker": "5.1.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "heatmap.js": "https://github.com/tfink419/heatmap.js.git",
     "leaflet": "^1.6.0",
     "leaflet-heatmap": "https://github.com/tfink419/leaflet-heatmap.git",
     "lodash": "^4.17.15",

@@ -3642,14 +3642,7 @@ hash.js@^1.0.0, hash.js@^1.0.3:
 
 "heatmap.js@git+https://github.com/tfink419/heatmap.js.git":
   version "2.0.5"
-  uid c869f161fec063419a7894d72084efc530bc678d
   resolved "git+https://github.com/tfink419/heatmap.js.git#c869f161fec063419a7894d72084efc530bc678d"
-  dependencies:
-    color "^3.1.2"
-
-"heatmap.js@https://github.com/tfink419/heatmap.js.git":
-  version "2.0.5"
-  resolved "https://github.com/tfink419/heatmap.js.git#c869f161fec063419a7894d72084efc530bc678d"
   dependencies:
     color "^3.1.2"
 
