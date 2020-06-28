@@ -80,6 +80,8 @@ test:
 #
 production:
   <<: *default
-  database: qol_indicator_production
-  username: qol_indicator
-  password: <%= ENV['QOL_INDICATOR_DATABASE_PASSWORD'] %>
+  database: <%= ENV['RDS_DB_NAME'] %>
+  username: <%= ENV['RDS_USERNAME'] %>
+  password: <%= ENV['RDS_PASSWORD'] %>
+  host: <%= ENV['RDS_HOSTNAME'] %>
+  port:  <%= ENV['RDS_PORT'] %>
