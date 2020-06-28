@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 
 const preventDefault = (event) => event.preventDefault();
 
-const GroceryStoreUploadForm = ({ file, csvProcessing, csvDone, flashMessage }) => {
+const GroceryStoreUploadForm = ({ csvUpload, csvProcessing, csvDone, flashMessage }) => {
   const classes = useStyles();
 
   let [selectedFile, setSelectedFile] = React.useState(null);
@@ -53,10 +53,10 @@ const GroceryStoreUploadForm = ({ file, csvProcessing, csvDone, flashMessage }) 
   return (
     <Paper className={classes.pushRight}>
       <Typography variant="h3">Upload CSV</Typography>
-      {file.type ?
+      {csvUpload.type ?
         <React.Fragment>
           <Typography variant="h5">
-            Currently awaiting {file.type} file '{file.name}'
+            Currently awaiting {csvUpload.type} file '{csvUpload.name}'
           </Typography>
           <CircularProgress />
         </React.Fragment>
@@ -92,7 +92,7 @@ const GroceryStoreUploadForm = ({ file, csvProcessing, csvDone, flashMessage }) 
 }
 
 const mapStateToProps = state => ({
-  file: state.admin.file
+  csvUpload: state.admin.csvUpload
 })
 
 const mapDispatchToProps = {
