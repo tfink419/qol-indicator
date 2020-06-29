@@ -62,8 +62,8 @@ ActiveRecord::Schema.define(version: 2020_06_29_181141) do
     t.index ["precision", "lat"], name: "index_heatmap_points_on_precision_and_lat"
     t.index ["precision", "long"], name: "index_heatmap_points_on_precision_and_long"
     t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long"
-    t.index ["transit_type", "quality", "precision", "lat"], name: "index_heatmap_points_on_type_and_lat"
-    t.index ["transit_type", "quality", "precision", "long"], name: "index_heatmap_points_on_type_and_long"
+    t.index ["transit_type", "precision", "lat"], name: "index_heatmap_points_on_type_and_lat"
+    t.index ["transit_type", "precision", "long"], name: "index_heatmap_points_on_type_and_long"
   end
 
   create_table "isochrone_polygons", force: :cascade do |t|
