@@ -16,6 +16,7 @@ class BuildHeatmapJob < ApplicationJob
     current = nil
     south_west = nil
     north_east = nil
+    current_transit_type = nil
     lat = nil
     long = nil
     build_status.update!(percent:percent, state:state)
@@ -30,8 +31,8 @@ class BuildHeatmapJob < ApplicationJob
           isochrones = []
           (1..9).each do |transit_type|
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-            found_isochrones = gstore.isochrone_polygons.where(travel_type:travel_type, distance:distance).count
-            if found_isochrones == 0
+            no_isochrones = gstore.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
+            if no_isochrones
               isochrone = Mapbox::Isochrone.isochrone(travel_type, "#{gstore[:long]},#{gstore[:lat]}", {contours_minutes: [distance], generalize: 25, polygons:true})
               isochrones << {travel_type:travel_type, distance:distance, polygon:isochrone[0]['features'][0]['geometry']['coordinates'][0]}
             end
@@ -44,29 +45,29 @@ class BuildHeatmapJob < ApplicationJob
 
         HeatmapPoint.delete_all
 
-        south_west = [abs_floor(GroceryStore.minimum(:lat)-0.2), abs_floor(GroceryStore.minimum(:long))-0.2]
-        north_east = [abs_ceil(GroceryStore.maximum(:lat)+0.2), abs_ceil(GroceryStore.maximum(:long)+0.2)]
+        south_west = [abs_floor(GroceryStore.minimum(:lat)-0.3), abs_floor(GroceryStore.minimum(:long))-0.3]
+        north_east = [abs_ceil(GroceryStore.maximum(:lat)+0.3), abs_ceil(GroceryStore.maximum(:long)+0.3)]
 
         c = Clipper::Clipper.new
         lat = south_west[0]
         state = 'heatmap-points'
         while lat < north_east[0]
-          long = south_west[1]
-          new_heatmaps = []
           isochrones = []
-          while long < north_east[1]
-            if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
-              gstore_ids = GroceryStore.select(:id).all_near_point_wide(lat, long).map(&:id)
-              isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
-              .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
-              .where(isochronable_id:gstore_ids, isochronable_type:'GroceryStore')
-            end
-            unless gstore_ids.blank?
-              (1..9).each do |transit_type|
-                travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
+          (1..9).each do |transit_type|
+            long = south_west[1]
+            new_heatmaps = []
+            current_transit_type = transit_type
+            travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
+            while long < north_east[1]
+              if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
+                gstore_ids = GroceryStore.select(:id).all_near_point_wide(lat, long, transit_type).map(&:id)
+                isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
+                .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
+                .where(isochronable_id:gstore_ids, isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)
+              end
+              unless gstore_ids.blank?
                 qualities = []
                 isochrones.each do |isochrone|
-                  next unless isochrone.travel_type == travel_type && isochrone.distance == distance
                   if c.pt_in_polygon(long, lat, isochrone.get_polygon_floats)
                     qualities << isochrone.quality
                   end
@@ -77,10 +78,10 @@ class BuildHeatmapJob < ApplicationJob
                   new_heatmaps << {lat: lat, long: long, quality: quality, transit_type:transit_type}
                 end
               end
+              long = (long+STEP).round(3)
             end
-            long = (long+STEP).round(3)
+            HeatmapPoint.create(new_heatmaps)
           end
-          HeatmapPoint.create(new_heatmaps)
           lat = (lat+STEP).round(3)
         end
         build_status.update!(percent:100, state:'complete')
@@ -95,7 +96,7 @@ class BuildHeatmapJob < ApplicationJob
         if state == 'isochrones'
           percent = (100.0*current/gstore_count).round(2)
         elsif state == 'heatmap-points'
-          percent = calc_heatmap_point_percent(lat, long, south_west, north_east)
+          percent = calc_heatmap_point_percent(current_transit_type, lat, long, south_west, north_east)
         end
         build_status.update!(percent:percent, state:state)
         sleep(5)
@@ -106,8 +107,8 @@ class BuildHeatmapJob < ApplicationJob
 
   private
 
-  def calc_heatmap_point_percent(lat, long, south_west, north_east)
-    lat_percent_per_step = STEP / (north_east[0]-south_west[0]+STEP)
+  def calc_heatmap_point_percent(current_transit_type, lat, long, south_west, north_east)
+    lat_percent_per_step = (STEP / (north_east[0]-south_west[0]+STEP))*current_transit_type/9
     (((lat-south_west[0])/(north_east[0]-south_west[0]+STEP) + (long-south_west[1])/(north_east[1]-south_west[1]+STEP)*lat_percent_per_step)*100).round(3)
   end
 
@@ -121,10 +122,10 @@ class BuildHeatmapJob < ApplicationJob
   end
   
   def abs_ceil(num)
-    num >= 0 ? num.ceil(3) : num.floor(3)
+    num >= 0 ? num.ceil(1) : num.floor(1)
   end
   
   def abs_floor(num)
-    num >= 0 ? num.floor(3) : num.ceil(3)
+    num >= 0 ? num.floor(1) : num.ceil(1)
   end
 end

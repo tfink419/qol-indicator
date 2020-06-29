@@ -52,8 +52,9 @@ class GroceryStore < ApplicationRecord
     where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.02*transit_type, lat+0.02*transit_type, long-0.02*transit_type, long+0.02*transit_type])
   }
 
-  scope :all_near_point_wide, lambda { |lat, long|
-    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.2, lat+0.2, long-0.2, long+0.3])
+  scope :all_near_point_wide, lambda { |lat, long, transit_type|
+    extra_length = 0.03+transit_type*0.03
+    where(['lat > ? and lat < ? and long > ? and long < ?', lat-extra_length, lat+extra_length, long-extra_length, long+extra_length+0.1])
   }
 
   def valid_location?
