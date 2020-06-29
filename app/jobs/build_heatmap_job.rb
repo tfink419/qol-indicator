@@ -40,8 +40,8 @@ class BuildHeatmapJob < ApplicationJob
 
       HeatmapPoint.delete_all
 
-      south_west = [abs_floor(GroceryStore.minimum(:lat)), abs_floor(GroceryStore.minimum(:long))]
-      north_east = [abs_ceil(GroceryStore.maximum(:lat)), abs_ceil(GroceryStore.maximum(:long))]
+      south_west = [abs_floor(GroceryStore.minimum(:lat)-0.2), abs_floor(GroceryStore.minimum(:long))-0.2]
+      north_east = [abs_ceil(GroceryStore.maximum(:lat)+0.2), abs_ceil(GroceryStore.maximum(:long)+0.2)]
 
       last_time = nil
       c = Clipper::Clipper.new
