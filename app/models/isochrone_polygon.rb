@@ -1,7 +1,7 @@
 class IsochronePolygon < ApplicationRecord
   validates :distance, :presence => true, uniqueness: { scope: %i[travel_type isochronable_id]}
   validates :travel_type, :presence => true
-  validates :polygon, :presence => true
+  validates :polygon, exclusion: { in: [nil]}
 
 
   def as_mapbox_poly
