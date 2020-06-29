@@ -52,7 +52,7 @@ class BuildHeatmapJob < ApplicationJob
         while long < north_east[1]
           if last_time.nil? || Time.now>last_time+5
             last_time = Time.now
-            build_status.update!(percent:(calc_heatmap_point_percent(lat, long, south_west, north_east)).round(2), state:'heatmap-points')
+            build_status.update!(percent:(calc_heatmap_point_percent(lat, long, south_west, north_east)), state:'heatmap-points')
           end
 
           if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches

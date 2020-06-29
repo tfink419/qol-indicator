@@ -10,7 +10,7 @@ import { drawerWidth } from '../common'
 
 const STATE_MAP = {
   'initialized': 'Job Sent to Resque',
-  'received': 'Job Received Received By Resque',
+  'received': 'Job Received By Resque',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'heatmap-points': 'Building Heatmap Points',
   'complete': 'Completed'
@@ -23,17 +23,17 @@ const useStyles = makeStyles({
   }
 });
 
-const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapStatuses, flashMessage, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
+const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapStatuses, flashMessage, 
+loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
   const classes = useStyles();
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildHeatmapStatuses;
 
   const handleBuildHeatmap = (event) => {
     event.preventDefault();
-    buildingHeatmap();
     postBuildHeatmap()
     .then((response) => {
-      buildHeatmapDone()
       flashMessage('info', response.message);
+      loadBuildHeatmapStatuses();
     })
     .catch(error => {
       if(error.status == 400 || error.status == 403) 
@@ -61,7 +61,7 @@ const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapS
     })
   }
   
-  const clearHeatMapReloadInterval = () => {
+  const clearStatusReloadInterval = () => {
     clearInterval(reloadIntervalId);
     setBuildHeatmapStatusReloadIntervalId(null);
   }
@@ -69,7 +69,7 @@ const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapS
   React.useEffect(loadBuildHeatmapStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
     if(current && current.state == 'complete') {
-      clearHeatMapReloadInterval();
+      clearStatusReloadInterval();
     }
     if(!reloadIntervalId && current) {
       setBuildHeatmapStatusReloadIntervalId(setInterval(reloadCurrentBuildHeatmapStatus, 5000))

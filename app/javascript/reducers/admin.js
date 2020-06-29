@@ -14,6 +14,11 @@ const admin = (state = {
     page:0,
     rowsPerPage:10,
     loaded: false
+  },
+  uploadCsvStatuses: {
+    page:0,
+    rowsPerPage:10,
+    loaded: false
   }
 }, action) => {
   switch (action.type) {
@@ -37,6 +42,14 @@ const admin = (state = {
           loaded: true
         }
       }
+    case 'UPDATED_GROCERY_STORES':
+      return {
+        ...state,
+        groceryStores:{ 
+          ...state.groceryStores,
+          loaded: false
+        }
+      }
     case 'LOADED_BUILD_HEATMAP_STATUSES':
       return {
         ...state,
@@ -58,6 +71,26 @@ const admin = (state = {
         }
       }
 
+    case 'LOADED_UPLOAD_CSV_STATUSES':
+      return {
+        ...state,
+        uploadCsvStatuses:{ 
+          ...state.uploadCsvStatuses,
+          rows:action.uploadCsvStatuses,
+          count:action.count,
+          current:action.currentUploadCsvStatus,
+          loaded: true
+        }
+      }
+    case 'LOADED_CURRENT_UPLOAD_CSV_STATUS':
+      return {
+        ...state,
+        uploadCsvStatuses:{ 
+          ...state.uploadCsvStatuses,
+          current:action.currentUploadCsvStatus,
+          loaded: true
+        }
+      }
     case 'UPDATE_USERS_ORDERDIR':
       return {
         ...state,
@@ -165,23 +198,49 @@ const admin = (state = {
           loaded: false
         }
       }
-      case 'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE':
-        {
-          let {page} = state.buildHeatmapStatuses;
-          if(state.buildHeatmapStatuses.rowsPerPage != action.rowsPerPage) {
-            page = Math.floor(state.buildHeatmapStatuses.rowsPerPage/action.rowsPerPage*page);
-          }
-          return {
-            ...state,
-            buildHeatmapStatuses: {
-              ...state.buildHeatmapStatuses,
-              rowsPerPage:action.rowsPerPage,
-              page,
-              loaded: false
-            }
+    case 'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE':
+      {
+        let {page} = state.buildHeatmapStatuses;
+        if(state.buildHeatmapStatuses.rowsPerPage != action.rowsPerPage) {
+          page = Math.floor(state.buildHeatmapStatuses.rowsPerPage/action.rowsPerPage*page);
+        }
+        return {
+          ...state,
+          buildHeatmapStatuses: {
+            ...state.buildHeatmapStatuses,
+            rowsPerPage:action.rowsPerPage,
+            page,
+            loaded: false
           }
         }
-        
+      }
+
+
+    case 'UPDATE_UPLOAD_CSV_STATUSES_PAGE':
+      return {
+        ...state,
+        uploadCsvStatuses: {
+          ...state.uploadCsvStatuses,
+          page:action.page,
+          loaded: false
+        }
+      }
+    case 'UPDATE_UPLOAD_CSV_STATUSES_ROWSPERPAGE':
+      {
+        let {page} = state.uploadCsvStatuses;
+        if(state.uploadCsvStatuses.rowsPerPage != action.rowsPerPage) {
+          page = Math.floor(state.uploadCsvStatuses.rowsPerPage/action.rowsPerPage*page);
+        }
+        return {
+          ...state,
+          uploadCsvStatuses: {
+            ...state.uploadCsvStatuses,
+            rowsPerPage:action.rowsPerPage,
+            page,
+            loaded: false
+          }
+        }
+      }
     case 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID':
       return {
         ...state,

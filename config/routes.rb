@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   
   # Admin routes
   post 'grocery_stores/upload_csv'
+  get 'grocery_stores/upload_csv/status', :to => 'grocery_stores#upload_csv_status_index'
+  get 'grocery_stores/upload_csv/status/:id', :to => 'grocery_stores#upload_csv_status_show'
   resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
   get 'build_heatmap', :to => 'build_heatmap#build', :as => 'build_heatmap'
