@@ -49,7 +49,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, flashMessage })
     postGroceryStoreUploadCsv(selectedFile, quality)
     .then((response) => {
       flashMessage('info', response.message);
-      loadUploadCsvStatuses()
+      loadUploadCsvStatuses(true)
     })
     .catch(error => {
       if(error.status == 400 || error.status == 403) 
@@ -59,8 +59,8 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, flashMessage })
     })
   }
 
-  const loadUploadCsvStatuses = () => {
-    if(!loaded) {
+  const loadUploadCsvStatuses = (force) => {
+    if(!loaded || force) {
       getGroceryStoreUploadCsvStatuses(page, rowsPerPage).then(response => {
         if(response.status == 0) {
           loadedUploadCsvStatuses(response.upload_csv_statuses.all, response.upload_csv_status_count, response.upload_csv_statuses.current)
@@ -86,6 +86,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, flashMessage })
   React.useEffect(() => {
     if(current && current.state == 'complete') {
       clearStatusReloadInterval();
+      loadedCurrentUploadCsvStatus(null)
     }
     if(!reloadIntervalId && current) {
       setUploadCsvStatusReloadIntervalId(setInterval(reloadCurrentUploadCsvStatus, 5000))

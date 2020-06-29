@@ -33,7 +33,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
     postBuildHeatmap()
     .then((response) => {
       flashMessage('info', response.message);
-      loadBuildHeatmapStatuses();
+      loadBuildHeatmapStatuses(true);
     })
     .catch(error => {
       if(error.status == 400 || error.status == 403) 
@@ -43,8 +43,8 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
     })
   }
 
-  const loadBuildHeatmapStatuses = () => {
-    if(!loaded) {
+  const loadBuildHeatmapStatuses = (force) => {
+    if(!loaded || force) {
       getBuildHeatmapStatuses(page, rowsPerPage).then(response => {
         if(response.status == 0) {
           loadedBuildHeatmapStatuses(response.build_heatmap_statuses.all, response.build_heatmap_status_count, response.build_heatmap_statuses.current)
@@ -70,6 +70,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
   React.useEffect(() => {
     if(current && current.state == 'complete') {
       clearStatusReloadInterval();
+      loadedCurrentBuildHeatmapStatus(null);
     }
     if(!reloadIntervalId && current) {
       setBuildHeatmapStatusReloadIntervalId(setInterval(reloadCurrentBuildHeatmapStatus, 5000))

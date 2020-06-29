@@ -20,7 +20,7 @@ class GroceryStoreUploadJob < ApplicationJob
       csv_table.each do |row|
         if last_time.nil? || Time.now>last_time+5
           last_time = Time.now
-          job_status.update!(percent:((column-1)/(csv_table.length-1)).round(2), state:'processing')
+          job_status.update!(percent:((column-1)/(csv_table.length-1)*100).round(2), state:'processing')
         end
         quality = row['quality'] ? row['quality'].to_i : default_quality
         gstore = GroceryStore.new(:name => row['name'], :address => row['address'], :quality => quality,
