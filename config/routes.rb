@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   get 'grocery_stores/upload_csv/status/:id', :to => 'grocery_stores#upload_csv_status_show'
   resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
   resources :users, :only => [:index, :create, :show, :update, :destroy]
-  get 'build_heatmap', :to => 'build_heatmap#build', :as => 'build_heatmap'
+  post 'build_heatmap', :to => 'build_heatmap#build', :as => 'build_heatmap'
   get 'build_heatmap/status', :to => 'build_heatmap#status_index', :as => 'build_heatmap_status_index'
   get 'build_heatmap/status/:id', :to => 'build_heatmap#status_show', :as => 'build_heatmap_status_show'
   
