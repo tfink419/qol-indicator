@@ -68,7 +68,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
   
   React.useEffect(loadBuildHeatmapStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
-    if(current && current.state == 'complete') {
+    if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
       loadedCurrentBuildHeatmapStatus(null);
     }

@@ -8,7 +8,7 @@ class Geocode
       unless place.valid?
         if place.only_coordinates_invalid?
           geocoded = geocode(place.address, place.city, place.state, place.zip)
-          parse_geocode(place, geocoded)
+          parse_geocode(place, geocoded) if geocoded
         end
       end
     end
@@ -22,7 +22,12 @@ class Geocode
         location = "#{address}, #{city}, #{state}, #{zip}"
       end
       response = Mapbox::Geocoder.geocode_forward(location, { country:'US', types:['address']})
-      return response[0]["features"][0]
+      response[0]["features"][0]
+    rescue StandardError => err
+      pp 'It should get rescued here'
+      $stderr.print err
+      $stderr.print err.backtrace
+      nil
     end
 
     private

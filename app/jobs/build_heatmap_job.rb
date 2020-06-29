@@ -19,7 +19,7 @@ class BuildHeatmapJob < ApplicationJob
         current += 1
         if last_time.nil? || Time.now>last_time+5
           last_time = Time.now
-          build_status.update!(percent:(current/gstore_count*100).round(2), state:'isochrones')
+          build_status.update!(percent:(100.0*current/gstore_count).round(2), state:'isochrones')
         end
 
         isochrones = []
