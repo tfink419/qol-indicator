@@ -96,7 +96,7 @@ class GroceryStoresController < ApplicationController
   def upload_csv_status_show
     render json: {
       status: 0,
-      build_heatmap_status: GroceryStoreUploadStatus.find(params[:id])
+      upload_csv_status: GroceryStoreUploadStatus.find(params[:id])
     }
   end
 

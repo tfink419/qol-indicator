@@ -249,6 +249,14 @@ const admin = (state = {
           reloadIntervalId: action.reloadIntervalId
         }
       }
+    case 'SET_UPLOAD_CSV_STATUS_RELOAD_INTERVAL_ID':
+      return {
+        ...state,
+        uploadCsvStatuses: {
+          ...state.uploadCsvStatuses,
+          reloadIntervalId: action.reloadIntervalId
+        }
+      }
     case 'CSV_PROCESSING':
       return {
         ...state,
