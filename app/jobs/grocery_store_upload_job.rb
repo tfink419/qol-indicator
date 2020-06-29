@@ -61,6 +61,7 @@ class GroceryStoreUploadJob < ApplicationJob
     }
     while job_thread.alive?
       begin
+        GC.start
         if state == 'processing'
           percent = (100.0*(column-1)/(table_length-1)).round(2)
           job_status.update!(percent:percent, state:state)

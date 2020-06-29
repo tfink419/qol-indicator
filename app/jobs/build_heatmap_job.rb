@@ -91,6 +91,7 @@ class BuildHeatmapJob < ApplicationJob
 
     while build_thread.alive?
       begin
+        GC.start
         if state == 'isochrones'
           percent = (100.0*current/gstore_count).round(2)
         elsif state == 'heatmap-points'
