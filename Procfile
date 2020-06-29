@@ -1,2 +1,2 @@
 web: bundle exec rails server -p $PORT
-resque: bundle exec rake resque:work
+resque: QUEUE=build_heatmap,grocery_store_upload bundle exec rake resque:work
