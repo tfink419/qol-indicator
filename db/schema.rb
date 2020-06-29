@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_28_221654) do
+ActiveRecord::Schema.define(version: 2020_06_29_181141) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 2020_06_28_221654) do
     t.index ["long"], name: "index_heatmap_points_on_long"
     t.index ["precision", "lat"], name: "index_heatmap_points_on_precision_and_lat"
     t.index ["precision", "long"], name: "index_heatmap_points_on_precision_and_long"
+    t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long"
     t.index ["transit_type", "quality", "precision", "lat"], name: "index_heatmap_points_on_type_and_lat"
     t.index ["transit_type", "quality", "precision", "long"], name: "index_heatmap_points_on_type_and_long"
   end
