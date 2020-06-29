@@ -53,7 +53,7 @@ class GroceryStore < ApplicationRecord
   }
 
   scope :all_near_point_wide, lambda { |lat, long|
-    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.2, lat+0.2, long-0.2, long+0.2])
+    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.2, lat+0.2, long-0.2, long+0.3])
   }
 
   def valid_location?
