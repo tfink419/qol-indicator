@@ -22,3 +22,6 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+### How to compile assets for production
+`RAILS_ENV=development bundle exec rails assets:precompile`

@@ -18,6 +18,7 @@ class BuildHeatmapJob < ApplicationJob
       GroceryStore.find_each do |gstore|
         current += 1
         if last_time.nil? || Time.now>last_time+5
+          GC.start
           last_time = Time.now
           build_status.update!(percent:(100.0*current/gstore_count).round(2), state:'isochrones')
         end
@@ -51,6 +52,7 @@ class BuildHeatmapJob < ApplicationJob
         isochrones = []
         while long < north_east[1]
           if last_time.nil? || Time.now>last_time+5
+            GC.start
             last_time = Time.now
             build_status.update!(percent:(calc_heatmap_point_percent(lat, long, south_west, north_east)), state:'heatmap-points')
           end

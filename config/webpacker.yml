@@ -51,6 +51,7 @@ default: &default
 development:
   <<: *default
   compile: true
+  public_output_path: packs-dev
 
   # Reference: https://webpack.js.org/configuration/dev-server/
   dev_server:
@@ -85,6 +86,7 @@ production:
 
   # Production depends on precompilation of packs prior to booting for performance.
   compile: false
+  public_output_path: packs
 
   # Extract and emit a css file
   extract_css: true

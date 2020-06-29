@@ -59,7 +59,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
   const hasLoaded = React.useRef(false)
   const mapPreferencesRef = React.useRef(mapPreferences)
 
-  const loadMapData = _.debounce(() => {
+  const loadMapData = React.useRef(_.throttle(() => {
     // Lots of Refs used here because of closure issue with event being handled by mapbox
     if(!map.current) {
       return;
@@ -148,7 +148,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
       map.current.getSource('quality-heat').setData(buildHeatMapData(response.heatmap_points));
       hasLoaded.current = true;
     })
-  }, 500);
+  }, 500)).current;
 
   const handleMapMove = (event) => {
     setCurrentLocation({
@@ -168,19 +168,17 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
     });
     map.current.on('move', handleMapMove);
     map.current.on('moveend', () => {
-      loadMapData.cancel();
       loadMapData();
     });
     loadMapData();
   },[])
   
-  const onUpdateMapPreferences = _.debounce(() => { // Doesnt seem to work
+  const onUpdateMapPreferences = () => {
     if(mapPreferences.preferences.transit_type != mapPreferencesRef.current.preferences.transit_type) {
       mapPreferencesRef.current = mapPreferences;
-      loadMapData.cancel();
       loadMapData()
     }
-  }, 1000)
+  }
   
   const loadMapPreferences = () => {
     if(!mapPreferences.loaded) {
@@ -188,7 +186,6 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
         updateMapPreferences(response.map_preferences)
       })
     }
-    onUpdateMapPreferences.cancel();
     onUpdateMapPreferences();
   }
 
