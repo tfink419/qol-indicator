@@ -84,7 +84,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, flashMessage })
   
   React.useEffect(loadUploadCsvStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
-    if(current && current.state == 'complete') {
+    if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
       loadedCurrentUploadCsvStatus(null)
     }
