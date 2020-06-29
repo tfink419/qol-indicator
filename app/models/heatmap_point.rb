@@ -1,4 +1,5 @@
 class HeatmapPoint < ApplicationRecord
+  validates_with HeatmapPointValidator
   validates :transit_type, :presence => true
   validates :lat, :presence => true
   validates :long, :presence => true
