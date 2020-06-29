@@ -12,7 +12,12 @@ Rails.application.routes.draw do
   get 'build_heatmap', :to => 'build_heatmap#build', :as => 'build_heatmap'
   get 'build_heatmap/status', :to => 'build_heatmap#status_index', :as => 'build_heatmap_status_index'
   get 'build_heatmap/status/:id', :to => 'build_heatmap#status_show', :as => 'build_heatmap_status_show'
-  if Rails.env == "development"
+  
+  resque_web_constraint = lambda do |request|
+    request.session[:user_id] and User.find(request.session[:user_id]).admin?
+  end
+  
+  constraints resque_web_constraint do
     mount Resque::Server.new, at: "/resque"
   end
 
