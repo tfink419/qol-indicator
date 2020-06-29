@@ -51,7 +51,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null);
   let [anchorEl, setAnchorEl] = React.useState(null);
 
-  const loadGroceryStores = _.throttle((force) => { // only allow once every 100 ms
+  const loadGroceryStores = _.debounce((force) => { // only allow once every 100 ms
     if(!loaded || force) {
       getGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
         if(response.status == 0) {
