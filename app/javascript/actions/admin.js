@@ -10,6 +10,10 @@ export const loadedGroceryStores = (groceryStores, count) => ({
   count
 })
 
+export const updatedGroceryStores = () => ({
+  type: 'UPDATED_GROCERY_STORES'
+})
+
 export const loadedBuildHeatmapStatuses = (buildHeatmapStatuses, count, currentBuildHeatmapStatus) => ({
   type: 'LOADED_BUILD_HEATMAP_STATUSES',
   buildHeatmapStatuses,
@@ -17,13 +21,30 @@ export const loadedBuildHeatmapStatuses = (buildHeatmapStatuses, count, currentB
   currentBuildHeatmapStatus
 })
 
+export const loadedUploadCsvStatuses = (uploadCsvStatuses, count, currentUploadCsvStatus) => ({
+  type: 'LOADED_UPLOAD_CSV_STATUSES',
+  uploadCsvStatuses,
+  count,
+  currentUploadCsvStatus
+})
+
 export const loadedCurrentBuildHeatmapStatus = (currentBuildHeatmapStatus) => ({
   type: 'LOADED_CURRENT_BUILD_HEATMAP_STATUS',
   currentBuildHeatmapStatus
 })
 
+export const loadedCurrentUploadCsvStatus = (currentUploadCsvStatus) => ({
+  type: 'LOADED_CURRENT_UPLOAD_CSV_STATUS',
+  currentUploadCsvStatus
+})
+
 export const setBuildHeatmapStatusReloadIntervalId = (reloadIntervalId) => ({
   type: 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID',
+  reloadIntervalId
+})
+
+export const setUploadCsvStatusReloadIntervalId = (reloadIntervalId) => ({
+  type: 'SET_UPLOAD_CSV_STATUS_RELOAD_INTERVAL_ID',
   reloadIntervalId
 })
 
@@ -87,6 +108,16 @@ export const updateBuildHeatmapStatusesPage = (page) => ({
 
 export const updateBuildHeatmapStatusesRowsPerPage = (rowsPerPage) => ({
   type:'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE',
+  rowsPerPage
+})
+
+export const updateUploadCsvStatusesPage = (page) => ({
+  type:'UPDATE_UPLOAD_CSV_STATUSES_PAGE',
+  page
+})
+
+export const updateUploadCsvStatusesRowsPerPage = (rowsPerPage) => ({
+  type:'UPDATE_UPLOAD_CSV_STATUSES_ROWSPERPAGE',
   rowsPerPage
 })
 

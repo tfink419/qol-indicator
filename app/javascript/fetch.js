@@ -116,6 +116,7 @@ export const deleteUser = (userId) => {
 export const postGroceryStoreUploadCsv = (file, quality) => {
   const formData = new FormData();
   formData.append('csv_file', file);
+  formData.append('filename', file.name);
   formData.append('default_quality', quality);
   return fetch('/grocery_stores/upload_csv', { method:'POST', body: formData, 
     headers: {
@@ -261,6 +262,29 @@ export const getBuildHeatmapStatuses = (page, rowsPerPage) => {
     params = { limit: rowsPerPage, page };
   url += paramify(params)
   return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getGroceryStoreUploadCsvStatuses = (page, rowsPerPage) => {
+  let url = "/grocery_stores/upload_csv/status",
+    params = { limit: rowsPerPage, page };
+  url += paramify(params)
+  return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getGroceryStoreUploadCsvStatus = (id) => {
+  return fetch("/grocery_stores/upload_csv/status/"+id, {
     method:'GET', 
     headers: {
       'Accept': 'application/json'
