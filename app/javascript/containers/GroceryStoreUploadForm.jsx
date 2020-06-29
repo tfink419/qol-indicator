@@ -5,7 +5,7 @@ import { Typography, Paper, Input, Button, CircularProgress, Slider, Box, Linear
 
 import { flashMessage } from '../actions/messages'
 import { setUploadCsvStatusReloadIntervalId, loadedUploadCsvStatuses, loadedCurrentUploadCsvStatus, 
-  updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage } from '../actions/admin'
+  updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
 import { postGroceryStoreUploadCsv, getGroceryStoreUploadCsvStatuses, getGroceryStoreUploadCsvStatus } from '../fetch'
 import { drawerWidth, qualityMarks } from '../common'
 
@@ -33,7 +33,7 @@ const useStyles = makeStyles({
 const preventDefault = (event) => event.preventDefault();
 
 const GroceryStoreUploadForm = ({ uploadCsvStatuses, setUploadCsvStatusReloadIntervalId, loadedUploadCsvStatuses, loadedCurrentUploadCsvStatus, 
-updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, flashMessage }) => {
+updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryStores, flashMessage }) => {
   const classes = useStyles();
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = uploadCsvStatuses;
 
@@ -87,6 +87,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, flashMessage })
     if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
       loadedCurrentUploadCsvStatus(null)
+      updatedGroceryStores();
     }
     if(!reloadIntervalId && current) {
       setUploadCsvStatusReloadIntervalId(setInterval(reloadCurrentUploadCsvStatus, 5000))
@@ -167,7 +168,8 @@ const mapDispatchToProps = {
   loadedUploadCsvStatuses,
   loadedCurrentUploadCsvStatus,
   updateUploadCsvStatusesPage,
-  updateUploadCsvStatusesRowsPerPage
+  updateUploadCsvStatusesRowsPerPage,
+  updatedGroceryStores
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(GroceryStoreUploadForm)
