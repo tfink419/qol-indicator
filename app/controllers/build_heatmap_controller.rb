@@ -4,7 +4,7 @@ class BuildHeatmapController < ApplicationController
 
   def build
     build_status = BuildHeatmapStatus.create(state:'initialized', percent:100)
-    BuildHeatmapJob.perform_later(build_status, false)
+    BuildHeatmapJob.perform_later(build_status)
     render json: {
       status: 0,
       message: 'Heatmap Build Job Initialized',
