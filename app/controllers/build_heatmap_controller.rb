@@ -4,7 +4,7 @@ class BuildHeatmapController < ApplicationController
 
   def build
     build_status = BuildHeatmapStatus.create(state:'initialized', percent:100)
-    BuildHeatmapJob.perform_later(build_status)
+    BuildHeatmapJob.perform_later(build_status, false)
     render json: {
       status: 0,
       message: 'Heatmap Build Job Initialized',
@@ -19,9 +19,11 @@ class BuildHeatmapController < ApplicationController
     build_statuses = BuildHeatmapStatus.offset(offset).limit(limit).order(created_at:'DESC')
     build_heatmap_status_count = BuildHeatmapStatus.count
     newest = BuildHeatmapStatus.order(created_at:'DESC').first
+    current = nil
+    current = newest if newest && !newest.complete?
     render json: {
       status: 0,
-      build_heatmap_statuses: { all:build_statuses, current:(newest && newest.error.nil? && newest.state != 'complete') ? newest : nil },
+      build_heatmap_statuses: { all:build_statuses, current:current},
       build_heatmap_status_count: build_heatmap_status_count
     }
   end
