@@ -9,7 +9,7 @@ class BuildHeatmapJob < ApplicationJob
   STEP = 0.001
   LOG_EXP = 1.7
 
-  def perform(build_status)
+  def perform(build_status, job_retry)
     state = 'received'
     percent = 100
     gstore_count = nil
@@ -43,12 +43,17 @@ class BuildHeatmapJob < ApplicationJob
           gstore.isochrone_polygons.create(isochrones)
         end
 
-        HeatmapPoint.delete_all
-
         south_west = [abs_floor(GroceryStore.minimum(:lat)-0.3), abs_floor(GroceryStore.minimum(:long))-0.3]
         north_east = [abs_ceil(GroceryStore.maximum(:lat)+0.3), abs_ceil(GroceryStore.maximum(:long)+0.3)]
-
         lat = south_west[0]
+
+
+        if job_retry
+          lat = HeatmapPoint.maximum(:lat)
+        else
+          HeatmapPoint.delete_all
+        end
+        
         state = 'heatmap-points'
         while lat < north_east[0]
           isochrones = []
