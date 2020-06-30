@@ -1,5 +1,5 @@
-require 'clipper'
 require 'mapbox-sdk'
+require 'geokit'
 
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
@@ -48,7 +48,6 @@ class BuildHeatmapJob < ApplicationJob
         south_west = [abs_floor(GroceryStore.minimum(:lat)-0.3), abs_floor(GroceryStore.minimum(:long))-0.3]
         north_east = [abs_ceil(GroceryStore.maximum(:lat)+0.3), abs_ceil(GroceryStore.maximum(:long)+0.3)]
 
-        c = Clipper::Clipper.new
         lat = south_west[0]
         state = 'heatmap-points'
         while lat < north_east[0]
@@ -59,6 +58,7 @@ class BuildHeatmapJob < ApplicationJob
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             while long < north_east[1]
+              lat_lng = Geokit::LatLng.new(lat, long)
               if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
                 gstore_ids = GroceryStore.select(:id).all_near_point_wide(lat, long, transit_type).map(&:id)
                 isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
@@ -68,7 +68,7 @@ class BuildHeatmapJob < ApplicationJob
               unless gstore_ids.blank?
                 qualities = []
                 isochrones.each do |isochrone|
-                  if c.pt_in_polygon(long, lat, isochrone.get_polygon_floats)
+                  if isochrone.get_geokit_polygon.contains? lat_lng
                     qualities << isochrone.quality
                   end
                 end
@@ -108,8 +108,8 @@ class BuildHeatmapJob < ApplicationJob
   private
 
   def calc_heatmap_point_percent(current_transit_type, lat, long, south_west, north_east)
-    lat_percent_per_step = (STEP / (north_east[0]-south_west[0]+STEP))*current_transit_type/9
-    (((lat-south_west[0])/(north_east[0]-south_west[0]+STEP) + (long-south_west[1])/(north_east[1]-south_west[1]+STEP)*lat_percent_per_step)*100).round(3)
+    lat_percent_per_step = (STEP / (north_east[0]-south_west[0]+STEP))
+    (((lat-south_west[0])/(north_east[0]-south_west[0]+STEP) + (long-south_west[1])/(north_east[1]-south_west[1]+STEP)*lat_percent_per_step/9+(current_transit_type-1)*lat_percent_per_step/9)*100).round(3)
   end
 
   def log_exp_sum(values)

@@ -1,8 +1,9 @@
+require 'geokit'
+
 class IsochronePolygon < ApplicationRecord
   validates :distance, :presence => true, uniqueness: { scope: %i[travel_type isochronable_id]}
   validates :travel_type, :presence => true
   validates :polygon, exclusion: { in: [nil]}
-
 
   def as_mapbox_poly
     [{
@@ -16,6 +17,13 @@ class IsochronePolygon < ApplicationRecord
         }}],
       "type":"FeatureCollection"
     }, {}]
+  end
+
+  def get_geokit_polygon
+    unless geokit_polygon
+      geokit_polygon = Geokit::Polygon.new(polygon.map { |coord| Geokit::LatLng.new(coord[1], coord[0]) })
+    end
+    geokit_polygon
   end
 
   def get_polygon_floats
@@ -45,6 +53,8 @@ class IsochronePolygon < ApplicationRecord
   end
 
   private
+
+  attribute :geokit_polygon, :default => nil
 
   def string_path_to_float(path)
     path.map { |coord| coord.map(&:to_f)}
