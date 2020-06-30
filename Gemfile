@@ -65,7 +65,7 @@ gem 'mapbox-sdk', '~> 2.3.0'
 # gem 'ruby_clipper', '~> 6.2.1'
 gem 'httplog'
 
-gem 'resque'
-# gem 'sidekiq', '~> 6.1.0'
+# gem 'resque'
+gem 'sidekiq', '~> 6.1.0'
 
 gem 'geokit', '~> 1.13.1'
