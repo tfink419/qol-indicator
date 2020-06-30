@@ -65,6 +65,30 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
     clearInterval(reloadIntervalId);
     setBuildHeatmapStatusReloadIntervalId(null);
   }
+
+  const calcEta = () => {
+    let estimatedEta = Math.round(((Date.now()-new Date(current.created_at))*(100/current.percent))/1000);
+    let etaString = [];
+    let currentCalc = estimatedEta%60;
+    if(currentCalc != 0) {
+      etaString = [currentCalc + " second"+(currentCalc>1 ? "s" : "")].concat(etaString)
+    }
+    estimatedEta = Math.floor(estimatedEta/60);
+    currentCalc = estimatedEta%60;
+    if(currentCalc != 0) {
+      etaString = [currentCalc + " minute"+(currentCalc>1 ? "s" : "")].concat(etaString);
+    }
+    estimatedEta = Math.floor(estimatedEta/60);
+    currentCalc = estimatedEta%24;
+    if(currentCalc != 0) {
+      etaString = [currentCalc + " hour"+(currentCalc>1 ? "s" : "")].concat(etaString);
+    }
+    estimatedEta = Math.floor(estimatedEta/24);
+    if(estimatedEta != 0) {
+      etaString = [estimatedEta + " day"+(estimatedEta>1 ? "s" : "")].concat(etaString);
+    }
+    return etaString.join(' ');
+  }
   
   React.useEffect(loadBuildHeatmapStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
@@ -97,6 +121,9 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
           </Typography>
           <Typography variant="subtitle1">
             Current State: <strong>{STATE_MAP[current.state]}</strong>
+          </Typography>
+          <Typography variant="subtitle2">
+            ETA: <strong>{calcEta()}</strong>
           </Typography>
           <Box display="flex" alignItems="center">
             <Box width="100%" mr={1}>
