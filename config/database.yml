@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: qol_indicator_production
-  username: qol_indicator
-  password: <%= ENV['QOL_INDICATOR_DATABASE_PASSWORD'] %>
+  url: <%= ENV['HEROKU_POSTGRESQL_GOLD_URL'] %>

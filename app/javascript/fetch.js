@@ -1,5 +1,7 @@
 const UNWANTED_PARAMETERS = ['id', 'created_at', 'updated_at']
 
+const paramify = (params) => '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+
 function handleResponse(response) {
   if(response.status != 0 && response.status != 200) {
     throw {
@@ -44,7 +46,7 @@ export const getUsers = (page, rowsPerPage, sortOrder, dir) => {
   let url = "/users",
     params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase() };
   // Turn object into http params
-  url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+  url += paramify(params)
 
   return fetch(url, {
     headers: {
@@ -58,7 +60,7 @@ export const getGroceryStores = (page, rowsPerPage, sortOrder, dir, search) => {
   let url = "/grocery_stores",
     params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase(), search };
   // Turn object into http params
-  url += '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+  url += paramify(params)
 
   return fetch(url, {
     headers: {
@@ -114,6 +116,7 @@ export const deleteUser = (userId) => {
 export const postGroceryStoreUploadCsv = (file, quality) => {
   const formData = new FormData();
   formData.append('csv_file', file);
+  formData.append('filename', file.name);
   formData.append('default_quality', quality);
   return fetch('/grocery_stores/upload_csv', { method:'POST', body: formData, 
     headers: {
@@ -167,8 +170,14 @@ export const deleteGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const getMapData = (southWest, northEast) => {
-  let url = `/map_data?south_west=${parseLatLng(southWest)}&north_east=${parseLatLng(northEast)}`;
+export const getMapData = (southWest, northEast, zoom, transit_type) => {
+  let url = "/map_data",
+    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom};
+  if(transit_type) {
+    params.transit_type = transit_type;
+  }
+  // Turn object into http params
+  url += paramify(params)
 
   return fetch(url, {
     headers: {
@@ -242,6 +251,62 @@ export const putMapPreferences = (user) => {
   return fetch('/map_preferences', { method:'PUT', body: JSON.stringify({map_preferences: filterUnwantedParams(user)}), 
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getBuildHeatmapStatuses = (page, rowsPerPage) => {
+  let url = "/build_heatmap/status",
+    params = { limit: rowsPerPage, page };
+  url += paramify(params)
+  return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getGroceryStoreUploadCsvStatuses = (page, rowsPerPage) => {
+  let url = "/grocery_stores/upload_csv/status",
+    params = { limit: rowsPerPage, page };
+  url += paramify(params)
+  return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getGroceryStoreUploadCsvStatus = (id) => {
+  return fetch("/grocery_stores/upload_csv/status/"+id, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getBuildHeatmapStatus = (id) => {
+  return fetch("/build_heatmap/status/"+id, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const postBuildHeatmap = (user) => {
+  return fetch('/build_heatmap', {
+    method:'POST', 
+    headers: {
       'Accept': 'application/json'
   }})
   .then(response => response.json())

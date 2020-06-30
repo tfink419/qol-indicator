@@ -8,6 +8,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import { drawerWidth } from '../common'
+import { updatedGroceryStores } from '../actions/admin'
 import { getMapData, deleteGroceryStore } from '../fetch'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
@@ -45,7 +46,7 @@ const startLocation = {
   zoom:13
 }
 
-const AdminMapContainer = ({}) => {
+const AdminMapContainer = ({updatedGroceryStores}) => {
   const classes = useStyles();
   let [groceryStores, setGroceryStores] = React.useState([])
   let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null)
@@ -74,6 +75,7 @@ const AdminMapContainer = ({}) => {
     setSelectedGroceryStore(null);
     if(groceryStoreChange) {
       loadMapData();
+      updatedGroceryStores();
     }
   }
 
@@ -113,4 +115,8 @@ const AdminMapContainer = ({}) => {
 )};
 
 
-export default connect()(AdminMapContainer)
+const mapDispatchToProps = {
+  updatedGroceryStores
+}
+
+export default connect(null, mapDispatchToProps)(AdminMapContainer)
