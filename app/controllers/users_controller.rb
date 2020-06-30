@@ -18,6 +18,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(admin_create_user_params)
     if @user.save
+      @user.create_map_preferences
       render :json =>  {
         :status => 0,
         :user => @user

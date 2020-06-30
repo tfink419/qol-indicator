@@ -51,7 +51,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null);
   let [anchorEl, setAnchorEl] = React.useState(null);
 
-  const loadGroceryStores = _.throttle((force) => { // only allow once every 100 ms
+  const loadGroceryStores = React.useRef(_.throttle((loaded, page, rowsPerPage, order, orderDir, searchField, force) => { // only allow once every 100 ms
     if(!loaded || force) {
       getGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
         if(response.status == 0) {
@@ -59,7 +59,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
         }
       })
     }
-  }, 100);
+  }, 100)).current;
 
   const handleChangePage = (event, newPage) => {
     updateGroceryStoresPage(newPage);
@@ -74,7 +74,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
     setCurrentDialogOpen(null);
     setSelectedGroceryStore(null);
     if(groceryStoreChange) {
-      loadGroceryStores(true)
+      loadGroceryStores(loaded, page, rowsPerPage, order, orderDir, searchField, true)
     }
   }
 
@@ -114,8 +114,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
 
 
   React.useEffect(() => {
-    loadGroceryStores.cancel();
-    loadGroceryStores();
+    loadGroceryStores(loaded, page, rowsPerPage, order, orderDir, searchField);
   }, [page, rowsPerPage, order, orderDir, searchField]);
 
   const dense = (rowsPerPage == 25);

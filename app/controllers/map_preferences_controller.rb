@@ -3,10 +3,7 @@ class MapPreferencesController < ApplicationController
   def show
     user = User.find(session[:user_id])
     map_preferences = user.map_preferences
-    unless map_preferences
-      map_preferences = MapPreferences.create(user: user)
-      map_preferences.save
-    end
+    user.create_map_preferences unless map_preferences
     render :json => { 
       :status => 0, 
       :map_preferences => map_preferences.public_attributes
@@ -16,10 +13,7 @@ class MapPreferencesController < ApplicationController
   def update
     user = User.find(session[:user_id])
     map_preferences = user.map_preferences
-    unless map_preferences
-      map_preferences = MapPreferences.create(user: user)
-      map_preferences.save
-    end
+    user.create_map_preferences unless map_preferences
     if map_preferences.update_attributes(map_preference_params)
       render :json =>  {
         :status => 0,
