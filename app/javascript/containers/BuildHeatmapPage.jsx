@@ -9,8 +9,8 @@ import { getBuildHeatmapStatuses, getBuildHeatmapStatus, postBuildHeatmap } from
 import { drawerWidth } from '../common'
 
 const STATE_MAP = {
-  'initialized': 'Job Sent to Resque',
-  'received': 'Job Received By Resque',
+  'initialized': 'Job Sent to Sidekiq',
+  'received': 'Job Received By Sidekiq',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'heatmap-points': 'Building Heatmap Points',
   'complete': 'Completed'
