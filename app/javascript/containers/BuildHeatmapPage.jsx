@@ -67,7 +67,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
   }
 
   const calcEta = () => {
-    let estimatedEta = Math.round(((Date.now()-new Date(current.created_at))*(100/current.percent))/1000);
+    let estimatedEta = Math.round(((Date.now()-new Date(current.created_at))*((100-current.percent)/current.percent))/1000);
     let etaString = [];
     let currentCalc = estimatedEta%60;
     if(currentCalc != 0) {
