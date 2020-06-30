@@ -9,7 +9,7 @@ class BuildHeatmapJob < ApplicationJob
   STEP = 0.001
   LOG_EXP = 1.7
 
-  def perform(build_status, job_retry)
+  def perform(build_status, job_retry=false)
     state = 'received'
     percent = 100
     gstore_count = nil
