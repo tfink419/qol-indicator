@@ -10,6 +10,44 @@ export const loadedGroceryStores = (groceryStores, count) => ({
   count
 })
 
+export const updatedGroceryStores = () => ({
+  type: 'UPDATED_GROCERY_STORES'
+})
+
+export const loadedBuildHeatmapStatuses = (buildHeatmapStatuses, count, currentBuildHeatmapStatus) => ({
+  type: 'LOADED_BUILD_HEATMAP_STATUSES',
+  buildHeatmapStatuses,
+  count,
+  currentBuildHeatmapStatus
+})
+
+export const loadedUploadCsvStatuses = (uploadCsvStatuses, count, currentUploadCsvStatus) => ({
+  type: 'LOADED_UPLOAD_CSV_STATUSES',
+  uploadCsvStatuses,
+  count,
+  currentUploadCsvStatus
+})
+
+export const loadedCurrentBuildHeatmapStatus = (currentBuildHeatmapStatus) => ({
+  type: 'LOADED_CURRENT_BUILD_HEATMAP_STATUS',
+  currentBuildHeatmapStatus
+})
+
+export const loadedCurrentUploadCsvStatus = (currentUploadCsvStatus) => ({
+  type: 'LOADED_CURRENT_UPLOAD_CSV_STATUS',
+  currentUploadCsvStatus
+})
+
+export const setBuildHeatmapStatusReloadIntervalId = (reloadIntervalId) => ({
+  type: 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID',
+  reloadIntervalId
+})
+
+export const setUploadCsvStatusReloadIntervalId = (reloadIntervalId) => ({
+  type: 'SET_UPLOAD_CSV_STATUS_RELOAD_INTERVAL_ID',
+  reloadIntervalId
+})
+
 export const clearUsers = () => ({
   type: 'CLEAR_USERS'
 })
@@ -61,4 +99,34 @@ export const updateGroceryStoresRowsPerPage = (rowsPerPage) => ({
 export const updateGroceryStoresSearchField = (searchField) => ({
   type:'UPDATE_GROCERY_STORES_SEARCHFIELD',
   searchField
+})
+
+export const updateBuildHeatmapStatusesPage = (page) => ({
+  type:'UPDATE_BUILD_HEATMAP_STATUSES_PAGE',
+  page
+})
+
+export const updateBuildHeatmapStatusesRowsPerPage = (rowsPerPage) => ({
+  type:'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE',
+  rowsPerPage
+})
+
+export const updateUploadCsvStatusesPage = (page) => ({
+  type:'UPDATE_UPLOAD_CSV_STATUSES_PAGE',
+  page
+})
+
+export const updateUploadCsvStatusesRowsPerPage = (rowsPerPage) => ({
+  type:'UPDATE_UPLOAD_CSV_STATUSES_ROWSPERPAGE',
+  rowsPerPage
+})
+
+export const csvProcessing = (fileType, fileName) => ({
+  type: 'CSV_PROCESSING',
+  fileType,
+  fileName
+})
+
+export const csvDone = () => ({
+  type: 'CSV_DONE'
 })

@@ -1,7 +1,3 @@
-require 'csv'
-require 'net/http'
-require 'json'
-
 class GroceryStoresController < ApplicationController
   before_action :confirm_logged_in
   before_action :admin_only
@@ -36,7 +32,7 @@ class GroceryStoresController < ApplicationController
 
   def create
     gstore = GroceryStore.new(grocery_store_params)
-    attempt_geocode_if_needed(gstore)
+    Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
       render :json =>  {
         :status => 0,
@@ -44,54 +40,6 @@ class GroceryStoresController < ApplicationController
       }
     else
       render :json => {:status => 400, :error => 'Error Creating Grocery Store', :error_details => gstore.errors.messages}, :status => 400
-    end
-  end
-
-  def upload_csv
-    csv_file = params[:csv_file].read
-    default_quality = params[:default_quality].to_i
-    end_of_line = csv_file.index("\n")
-    csv_file[0..end_of_line] = csv_file[0..end_of_line].downcase
-    csv_table = CSV.parse(csv_file, headers: true)
-
-    number_sucessful = 0
-    failed = []
-    column = 2 # Skip title
-    csv_table.each do |row|
-      quality = row['quality'] ? row['quality'].to_i : default_quality
-      gstore = GroceryStore.new(:name => row['name'], :address => row['address'], :quality => quality,
-        :city => row['city'], :state => row['state'], :zip => row['zip'], :lat => row['latitude'], :long => row['longitude'])
-      attempt_geocode_if_needed(gstore)
-      if gstore.save
-        number_sucessful += 1
-      else
-        failed << column
-      end
-      column += 1
-    end
-    if number_sucessful == column-2
-      render :json => {
-        :status => 0, 
-        :message => "File uploaded and All Grocery Stores were added successfully."
-      }
-    elsif number_sucessful.to_f/(column-2) > 0.8
-      render :json => {
-        :status => 0, 
-        :message => "File uploaded and #{number_sucessful}/#{column-2} Grocery Stores were added successfully.",
-        :details => "Grocery Stores at columns #{failed} failed to upload"
-      }
-    elsif number_sucessful == 0
-      render :json => {
-        :status => 400, 
-        :message => "All Grocery Stores Failed to Upload",
-        :errors => "All"
-      }, :status => 400
-    elsif number_sucessful.to_f/(column-2) < 0.5
-      render :json => {
-        :status => 400, 
-        :message => "More than half the Grocery Stores Failed to Upload",
-        :details => "Grocery Stores at columns #{failed} failed to upload"
-      }, :status => 400
     end
   end
 
@@ -108,7 +56,7 @@ class GroceryStoresController < ApplicationController
   def update
     gstore = GroceryStore.find(params[:id])
     gstore.assign_attributes(grocery_store_params)
-    attempt_geocode_if_needed(gstore)
+    Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
       render :json =>  {
         :status => 0,
@@ -119,55 +67,40 @@ class GroceryStoresController < ApplicationController
     end
   end
 
+  def upload_csv
+    csv_file = params[:csv_file].read
+    default_quality = params[:default_quality] ? params[:default_quality].to_i : 5
+    job_status = GroceryStoreUploadStatus.create(state:'initialized', percent:100, filename:params[:filename])
+    GroceryStoreUploadJob.perform_later(job_status, csv_file, default_quality)
+    render json: {
+      status: 0,
+      message: 'Upload Csv Job Initialized',
+      grocery_store_upload_status: job_status
+    }
+  end
+
+  def upload_csv_status_index
+    page = params[:page].to_i
+    limit = params[:limit].to_i
+    offset = page*limit
+    job_statuses = GroceryStoreUploadStatus.offset(offset).limit(limit).order(created_at:'DESC')
+    upload_csv_status_count = GroceryStoreUploadStatus.count
+    newest = GroceryStoreUploadStatus.order(created_at:'DESC').first
+    render json: {
+      status: 0,
+      upload_csv_statuses: { all:job_statuses, current:(newest && newest.error.nil? && newest.state != 'complete') ? newest : nil },
+      upload_csv_status_count: upload_csv_status_count
+    }
+  end
+
+  def upload_csv_status_show
+    render json: {
+      status: 0,
+      upload_csv_status: GroceryStoreUploadStatus.find(params[:id])
+    }
+  end
+
   private
-
-  def attempt_geocode_if_needed(gstore)
-    unless gstore.valid?
-      if gstore.only_coordinates_invalid?
-        geoCoded = geocode(gstore.address, gstore.city, gstore.state, gstore.zip)
-        parse_geocode(gstore, geoCoded)
-      end
-    end
-  end
-
-  def parse_geocode(gstore, geoCoded)
-    geoCoded = admin_area_decode(geoCoded)
-    gstore.lat = geoCoded['latLng']['lat']
-    gstore.long = geoCoded['latLng']['lng']
-    if gstore.zip.nil?
-      gstore.zip = geoCoded['postalCode']
-    elsif gstore.city.nil? or gstore.city.empty?
-      gstore.city = geoCoded['city']
-      gstore.state = geoCoded['state']
-    end
-  end
-
-  def admin_area_decode(location) 
-    location[location['adminArea1Type'].downcase] = location['adminArea1'] if location['adminArea1']
-    location[location['adminArea2Type'].downcase] = location['adminArea2'] if location['adminArea2']
-    location[location['adminArea3Type'].downcase] = location['adminArea3'] if location['adminArea3']
-    location[location['adminArea4Type'].downcase] = location['adminArea4'] if location['adminArea4']
-    location[location['adminArea5Type'].downcase] = location['adminArea5'] if location['adminArea5']
-    location[location['adminArea6Type'].downcase] = location['adminArea6'] if location['adminArea6']
-    location
-  end
-
-  def geocode(address, city, state, zip)
-    uri = URI('http://www.mapquestapi.com/geocoding/v1/address')
-    if zip.nil?
-      location = "#{address}, #{city}, #{state}"
-    elsif city.nil? or city.empty?
-      location = "#{address}, #{zip}"
-    else
-      location = "#{address}, #{city}, #{state}, #{zip}"
-    end
-    uri.query = URI.encode_www_form({ :key => ENV["MAPQUEST_KEY"], :location => location})
-    response = JSON.parse(Net::HTTP.get(uri))
-    if response['info']['statuscode'].to_i == 0
-      return response['results'][0]['locations'][0]\
-    end
-    nil
-  end
 
   def grocery_store_params
     params.require(:grocery_store).permit(:name, :address, :city, :state, :zip, :lat, :long, :quality)

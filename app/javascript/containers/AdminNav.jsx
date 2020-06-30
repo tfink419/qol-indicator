@@ -1,14 +1,16 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Drawer, CssBaseline, List, Divider, Collapse,
-  ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+  ListItem, ListItemIcon, ListItemText, CircularProgress, ListItemSecondaryAction } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/People';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import MapIcon from '@material-ui/icons/Map';
+import BuildIcon from '@material-ui/icons/Build';
 import GroceryStoreIcon from '@material-ui/icons/LocalGroceryStore';
 import { useLocation, useHistory } from 'react-router-dom'
 
 import { drawerWidth } from '../common'
+import { connect } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,8 +39,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default () => {
+const AdminNav = ({buildHeatmapStatuses}) => {
   const currentPath = useLocation().pathname;
+  const currentBuildHeatmapStatus = buildHeatmapStatuses.current;
   const classes = useStyles();
   let history = useHistory();
 
@@ -76,8 +79,24 @@ export default () => {
             <ListItemIcon><MapIcon /></ListItemIcon>
             <ListItemText primary={'Administrate Map'} />
           </ListItem>
+          <ListItem onClick={() => history.push('/admin/build-heatmap')} selected={currentPath === '/admin/build-heatmap'} button>
+            <ListItemIcon><BuildIcon /></ListItemIcon>
+            <ListItemText primary={'Build Heatmap'} />
+            <ListItemSecondaryAction>
+              { currentBuildHeatmapStatus 
+                && <CircularProgress size={25}/>
+              }
+            </ListItemSecondaryAction>
+          </ListItem>
         </List>
       </Drawer>
     </div>
   );
 }
+
+const mapStateToProps = state => ({
+  buildHeatmapStatuses: state.admin.buildHeatmapStatuses
+})
+
+
+export default connect(mapStateToProps)(AdminNav)
