@@ -24,6 +24,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
     job_retry ||= build_status.created_at < 15.minutes.ago
     build_status.update!(percent:percent, state:state)
     pp "Segment #{segment}"
+    pp "Is #{job_retry ? "Not " : ""}A Retry"
     build_thread = Thread.new {
       begin
         Signal.trap('INT') { throw SystemExit }
