@@ -3,6 +3,66 @@ require 'mapbox-sdk'
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
 class Geocode
+  STATE_MAP = {
+    nil => "",
+    "" => "",
+    "AK" => "Alaska",
+    "AL" => "Alabama",
+    "AR" => "Arkansas",
+    "AS" => "American Samoa",
+    "AZ" => "Arizona",
+    "CA" => "California",
+    "CO" => "Colorado",
+    "CT" => "Connecticut",
+    "DC" => "District of Columbia",
+    "DE" => "Delaware",
+    "FL" => "Florida",
+    "GA" => "Georgia",
+    "GU" => "Guam",
+    "HI" => "Hawaii",
+    "IA" => "Iowa",
+    "ID" => "Idaho",
+    "IL" => "Illinois",
+    "IN" => "Indiana",
+    "KS" => "Kansas",
+    "KY" => "Kentucky",
+    "LA" => "Louisiana",
+    "MA" => "Massachusetts",
+    "MD" => "Maryland",
+    "ME" => "Maine",
+    "MI" => "Michigan",
+    "MN" => "Minnesota",
+    "MO" => "Missouri",
+    "MS" => "Mississippi",
+    "MT" => "Montana",
+    "NC" => "North Carolina",
+    "ND" => "North Dakota",
+    "NE" => "Nebraska",
+    "NH" => "New Hampshire",
+    "NJ" => "New Jersey",
+    "NM" => "New Mexico",
+    "NV" => "Nevada",
+    "NY" => "New York",
+    "OH" => "Ohio",
+    "OK" => "Oklahoma",
+    "OR" => "Oregon",
+    "PA" => "Pennsylvania",
+    "PR" => "Puerto Rico",
+    "RI" => "Rhode Island",
+    "SC" => "South Carolina",
+    "SD" => "South Dakota",
+    "TN" => "Tennessee",
+    "TX" => "Texas",
+    "UT" => "Utah",
+    "VA" => "Virginia",
+    "VI" => "Virgin Islands",
+    "VT" => "Vermont",
+    "WA" => "Washington",
+    "WI" => "Wisconsin",
+    "WV" => "West Virginia",
+    "WY" => "Wyoming" 
+  }
+  
   class << Geocode
     def attempt_geocode_if_needed(place)
       unless place.valid?
@@ -15,11 +75,11 @@ class Geocode
 
     def geocode(address, city, state, zip)
       if zip.nil?
-        location = "#{address}, #{city}, #{state}"
+        location = "#{address}, #{city}, #{STATE_MAP[state]}"
       elsif city.nil? or city.empty?
         location = "#{address}, #{zip}"
       else
-        location = "#{address}, #{city}, #{state}, #{zip}"
+        location = "#{address}, #{city}, #{STATE_MAP[state]}, #{zip}"
       end
       response = Mapbox::Geocoder.geocode_forward(location, { country:'US', types:['address']})
       response[0]["features"][0]
@@ -46,6 +106,7 @@ class Geocode
 
     def parse_geocode(place, geocoded)
       parse_context(geocoded)
+      return if geocoded['relevance'] < 0.75 # Bad geocode
       place.lat = geocoded['center'][1]
       place.long = geocoded['center'][0]
       if place.zip.nil?
