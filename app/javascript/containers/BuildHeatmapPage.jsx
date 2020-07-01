@@ -11,6 +11,7 @@ import { drawerWidth } from '../common'
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',
   'received': 'Job Received By Sidekiq',
+  'branching': 'Branching Into Parellel Sidekiq\'s',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'heatmap-points': 'Building Heatmap Points',
   'complete': 'Completed'
