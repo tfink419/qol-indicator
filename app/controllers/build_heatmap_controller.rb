@@ -18,7 +18,7 @@ class BuildHeatmapController < ApplicationController
     offset = page*limit
     build_statuses = BuildHeatmapStatus.offset(offset).limit(limit).order(created_at:'DESC')
     build_heatmap_status_count = BuildHeatmapStatus.count
-    newest = BuildHeatmapStatus.order(created_at:'DESC').first
+    newest = BuildHeatmapStatus.last
     current = nil
     current = newest if newest && !newest.complete?
     render json: {
