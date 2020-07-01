@@ -2,6 +2,7 @@ require 'geokit'
 
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
+  sidekiq_options retry: 0
 
   STEP_PRECISION=3
   STEP=(0.1**STEP_PRECISION).round(STEP_PRECISION) # 0.001
