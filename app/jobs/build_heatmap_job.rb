@@ -4,10 +4,13 @@ class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
   sidekiq_options retry: 0
 
-  NUM_SEGMENTS=8
+  NUM_SEGMENTS=(ENV['NUM_HEATMAP_THREADS'] || 8).to_i
 
   def perform(build_status, job_retry=false)
     begin
+      Signal.trap('INT') { throw SystemExit }
+      Signal.trap('TERM') { throw SystemExit }
+      job_retry ||= build_status.created_at < 15.minutes.ago
       build_status.update!(state:'received', percent:100)
 
       unless job_retry
@@ -25,7 +28,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.all?(&:atleast_isochrones_state?)
         sleep(5)
-        build_status.update!(percent:build_status.build_heatmap_segment_statuses.count(&:atleast_isochrones_state?)*100/NUM_SEGMENTS)
+        build_status.update!(percent:build_status.build_heatmap_segment_statuses.count(&:atleast_isochrones_state?)*100/NUM_SEGMENTS, updated_at:Time.now)
       end
 
       return if error_found(build_status)
@@ -34,7 +37,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.reload.all?(&:atleast_isochrones_complete_state?)
         sleep(5)
-        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
+        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3), updated_at:Time.now)
       end
 
       return if error_found(build_status)
@@ -43,11 +46,11 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.all? { |segment_status| segment_status.error ||  segment_status.state == 'complete' } 
         sleep(5)
-        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
+        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3), updated_at:Time.now)
       end
       return if error_found(build_status)
       build_status.update!(percent:100, state:'complete')
-    rescue StandardError => err
+    rescue => err
       build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
     end
   end

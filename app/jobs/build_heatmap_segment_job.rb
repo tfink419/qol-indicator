@@ -9,6 +9,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
   LOG_EXP = 1.7
 
   def perform(build_status, job_retry)
+    Signal.trap('INT') { throw SystemExit }
+    Signal.trap('TERM') { throw SystemExit }
     segment = build_status.segment
     state = 'received'
     percent = 100
@@ -19,9 +21,13 @@ class BuildHeatmapSegmentJob < ApplicationJob
     current_transit_type = nil
     lat = nil
     long = nil
+    job_retry ||= build_status.created_at < 15.minutes.ago
     build_status.update!(percent:percent, state:state)
+    pp "Segment #{segment}"
     build_thread = Thread.new {
       begin
+        Signal.trap('INT') { throw SystemExit }
+        Signal.trap('TERM') { throw SystemExit }
         pp 'Starting Thread...'
         gstore_count = segment_part = (GroceryStore.count/BuildHeatmapJob::NUM_SEGMENTS).floor(1)
         segment_low = (segment-1)*segment_part
@@ -109,7 +115,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
           lat = (lat+STEP).round(STEP_PRECISION)
         end
         build_status.update!(percent:100, state:'complete')
-      rescue StandardError => err
+      rescue => err
         build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
       end
     }
@@ -122,9 +128,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
         elsif state == 'heatmap-points'
           percent = calc_heatmap_point_percent(current_transit_type, lat, long, south_west, north_east)
         end
-        build_status.update!(percent:percent, state:state)
+        build_status.update!(percent:percent, state:state, updated_at:Time.now)
         sleep(5)
-        pp 'Checking State...'
       rescue
       end
     end
