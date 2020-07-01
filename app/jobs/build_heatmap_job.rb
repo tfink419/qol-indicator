@@ -1,6 +1,3 @@
-require 'mapbox-sdk'
-require 'geokit'
-
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
 class BuildHeatmapJob < ApplicationJob
@@ -37,7 +34,6 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.reload.all?(&:atleast_isochrones_complete_state?)
         sleep(5)
-        build_status.reload
         build_status.update!(state:'ioschrones', percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
       end
 
@@ -45,9 +41,8 @@ class BuildHeatmapJob < ApplicationJob
 
       build_status.update!(state:'heatmap-points', percent:0)
 
-      until build_status.build_heatmap_segment_statuses.all? { |segment_status| segment_status.error ||  segment_status.state == 'complete' } 
+      until build_status.reload.build_heatmap_segment_statuses.all? { |segment_status| segment_status.error ||  segment_status.state == 'complete' } 
         sleep(5)
-        build_status.build_heatmap_segment_statuses.reload
         build_status.update!(state:'heatmap-points', percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
       end
       return if error_found(build_status)
