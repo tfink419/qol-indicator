@@ -1,4 +1,4 @@
-require 'resque/server'
+require 'sidekiq/web'
 
 Rails.application.routes.draw do
   root :to => 'app#index'
@@ -13,12 +13,12 @@ Rails.application.routes.draw do
   get 'build_heatmap/status', :to => 'build_heatmap#status_index', :as => 'build_heatmap_status_index'
   get 'build_heatmap/status/:id', :to => 'build_heatmap#status_show', :as => 'build_heatmap_status_show'
   
-  resque_web_constraint = lambda do |request|
+  sidekiq_web_constraint = lambda do |request|
     request.session[:user_id] and User.find(request.session[:user_id]).admin?
   end
   
-  constraints resque_web_constraint do
-    mount Resque::Server => '/resque'
+  constraints sidekiq_web_constraint do
+    mount Sidekiq::Web => '/sidekiq'
   end
 
   # User routes
