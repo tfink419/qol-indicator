@@ -4,7 +4,7 @@ class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
   sidekiq_options retry: 0
 
-  NUM_SEGMENTS=10
+  NUM_SEGMENTS=8
 
   def perform(build_status, job_retry=false)
     begin
@@ -25,7 +25,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.all?(&:atleast_isochrones_state?)
         sleep(5)
-        build_status.build_heatmap_segment_statuses.reload
+        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
       end
 
       return if error_found(build_status)
@@ -34,7 +34,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.reload.all?(&:atleast_isochrones_complete_state?)
         sleep(5)
-        build_status.update!(state:'ioschrones', percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
+        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
       end
 
       return if error_found(build_status)
@@ -43,7 +43,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.all? { |segment_status| segment_status.error ||  segment_status.state == 'complete' } 
         sleep(5)
-        build_status.update!(state:'heatmap-points', percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
+        build_status.update!(percent:(build_status.build_heatmap_segment_statuses.sum { |segment_status| segment_status.percent/NUM_SEGMENTS }).round(3))
       end
       return if error_found(build_status)
       build_status.update!(percent:100, state:'complete')

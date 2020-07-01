@@ -8,5 +8,3 @@ worker6: bundle exec sidekiq
 worker7: bundle exec sidekiq
 worker8: bundle exec sidekiq
 worker9: bundle exec sidekiq
-worker10: bundle exec sidekiq
-worker11: bundle exec sidekiq
