@@ -25,7 +25,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.all?(&:atleast_isochrones_state?)
         sleep(5)
-        build_status.update!(percent:build_status.build_heatmap_segment_statuses.count(&:atleast_isochrones_state?)*100/NUM_SEGMENTS
+        build_status.update!(percent:build_status.build_heatmap_segment_statuses.count(&:atleast_isochrones_state?)*100/NUM_SEGMENTS)
       end
 
       return if error_found(build_status)
