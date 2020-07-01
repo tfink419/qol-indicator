@@ -7,7 +7,7 @@ class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
   sidekiq_options retry: 0
 
-  NUM_SEGMENTS=4
+  NUM_SEGMENTS=10
 
   def perform(build_status, job_retry=false)
     begin
