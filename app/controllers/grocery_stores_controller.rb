@@ -85,7 +85,7 @@ class GroceryStoresController < ApplicationController
     offset = page*limit
     job_statuses = GroceryStoreUploadStatus.offset(offset).limit(limit).order(created_at:'DESC')
     upload_csv_status_count = GroceryStoreUploadStatus.count
-    newest = GroceryStoreUploadStatus.order(created_at:'DESC').first
+    newest = GroceryStoreUploadStatus.last
     render json: {
       status: 0,
       upload_csv_statuses: { all:job_statuses, current:(newest && newest.error.nil? && newest.state != 'complete') ? newest : nil },
