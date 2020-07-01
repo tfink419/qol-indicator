@@ -22,6 +22,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
     build_status.update!(percent:percent, state:state)
     build_thread = Thread.new {
       begin
+        pp 'Starting Thread...'
         gstore_count = segment_part = (GroceryStore.count/BuildHeatmapJob::NUM_SEGMENTS).floor(1)
         segment_low = (segment-1)*segment_part
         segment_low += 1 unless segment == 1
@@ -29,6 +30,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         
         current = 0
         state = 'isochrones'
+        pp 'Isochrones State...'
         GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
           current += 1
           
@@ -51,7 +53,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         state = 'isochrones-complete'
         percent = 100
         build_status.update!(state:state, percent:percent);
-        sleep(5) until build_status.build_heatmap_status.reload.state == 'heatmap-points'
+        sleep(5) until build_status.reload.build_heatmap_status.state == 'heatmap-points'
 
         south_end = abs_floor(GroceryStore.minimum(:lat)-0.3)
         north_end = abs_ceil(GroceryStore.maximum(:lat)+0.3)
@@ -70,6 +72,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
           lat = HeatmapPoint.where(['lat <= ? AND lat >= ?', segment_high, segment_low]).maximum(:lat) || lat
         end
 
+        pp 'Heatmap Points'
         state = 'heatmap-points'
         while lat < north_east[0]
           isochrones = []
@@ -121,6 +124,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         end
         build_status.update!(percent:percent, state:state)
         sleep(5)
+        pp 'Checking State...'
       rescue
       end
     end
