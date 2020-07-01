@@ -1,4 +1,7 @@
 require 'geokit'
+require 'mapbox'
+
+Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
