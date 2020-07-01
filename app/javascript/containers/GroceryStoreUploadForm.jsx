@@ -10,8 +10,8 @@ import { postGroceryStoreUploadCsv, getGroceryStoreUploadCsvStatuses, getGrocery
 import { drawerWidth, qualityMarks } from '../common'
 
 const STATE_MAP = {
-  'initialized': 'Job Sent to Sidekiq',
-  'received': 'Job Received By Sidekiq',
+  'initialized': 'Job Sent to Resque',
+  'received': 'Job Received By Resque',
   'parsing-csv': 'Parsing CSV File',
   'processing': 'Processing Grocery Stores',
   'complete': 'Completed'

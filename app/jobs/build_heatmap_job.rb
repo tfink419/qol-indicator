@@ -2,7 +2,6 @@ Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
 class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
-  sidekiq_options retry: 0
 
   NUM_SEGMENTS=10
 
