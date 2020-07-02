@@ -1,3 +1,4 @@
+import _ from 'lodash'
 const UNWANTED_PARAMETERS = ['id', 'created_at', 'updated_at']
 
 const paramify = (params) => '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
@@ -19,7 +20,7 @@ function filterUnwantedParams(obj) {
   return newObj;
 }
 
-const parseLatLng = (latLng) => `[${latLng.lat},${latLng.lng}]`
+const parseLatLng = (latLng) => `[${_.round(latLng.lat,3)},${_.round(latLng.lng,3)}]`
 
 
 export const postLogin = (username, password) => {
