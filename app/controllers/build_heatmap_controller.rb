@@ -3,7 +3,7 @@ class BuildHeatmapController < ApplicationController
   before_action :admin_only
 
   def build
-    build_status = BuildHeatmapStatus.create(state:'initialized', percent:100)
+    build_status = BuildHeatmapStatus.create(state:'initialized', percent:100, rebuild:params[:rebuild])
     BuildHeatmapJob.perform_later(build_status)
     render json: {
       status: 0,
@@ -31,7 +31,7 @@ class BuildHeatmapController < ApplicationController
   def status_show
     render json: {
       status: 0,
-      build_heatmap_status: BuildHeatmapStatus.find(params[:id])
+      build_heatmap_status: BuildHeatmapStatus.find(params[:id]).as_json(:include => :build_heatmap_segment_statuses)
     }
   end
 end

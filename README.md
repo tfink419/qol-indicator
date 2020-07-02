@@ -20,4 +20,4 @@ This site was created as a demo for Snapdocs inc. It is based on a need that I h
 - Tests would be good
 
 ### How to compile assets for production
-`RAILS_ENV=development NODE_ENV=production bundle exec rails assets:precompile; bundle exex rails assets:fix-precompile`
+`RAILS_ENV=development NODE_ENV=production bundle exec rails assets:precompile; bundle exec rails assets:fix-precompile`
