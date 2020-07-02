@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_02_024605) do
+ActiveRecord::Schema.define(version: 2020_07_02_175500) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 2020_07_02_024605) do
     t.integer "quality", default: 5
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["lat"], name: "index_grocery_stores_on_lat"
+    t.index ["lat", "long"], name: "index_grocery_stores_on_lat_and_long"
     t.index ["long"], name: "index_grocery_stores_on_long"
   end
 
@@ -75,8 +75,7 @@ ActiveRecord::Schema.define(version: 2020_07_02_024605) do
     t.index ["precision", "lat"], name: "index_heatmap_points_on_precision_and_lat"
     t.index ["precision", "long"], name: "index_heatmap_points_on_precision_and_long"
     t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long", unique: true
-    t.index ["transit_type", "precision", "lat"], name: "index_heatmap_points_on_type_and_lat"
-    t.index ["transit_type", "precision", "long"], name: "index_heatmap_points_on_type_and_long"
+    t.index ["transit_type", "precision", "lat", "long"], name: "index_heatmap_points_on_type_prec_lat_long", unique: true
   end
 
   create_table "isochrone_polygons", force: :cascade do |t|
