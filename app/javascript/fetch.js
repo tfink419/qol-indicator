@@ -303,8 +303,8 @@ export const getBuildHeatmapStatus = (id) => {
   .then(handleResponse)
 }
 
-export const postBuildHeatmap = (user) => {
-  return fetch('/build_heatmap', {
+export const postBuildHeatmap = (rebuild) => {
+  return fetch('/build_heatmap?rebuild='+rebuild, {
     method:'POST', 
     headers: {
       'Accept': 'application/json'
