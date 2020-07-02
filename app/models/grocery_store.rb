@@ -49,16 +49,16 @@ class GroceryStore < ApplicationRecord
 
   scope :where_in_coordinate_range, lambda { |south_west, north_east| 
     extra = ((north_east[0] - south_west[0])*0.1).round(2)
-    where(['lat > ? and lat < ? and long > ? and long < ?', south_west[0]-extra, north_east[0]+extra, south_west[1]-extra, north_east[1]+extra])
+    where(['lat > ? AND lat < ? AND long > ? AND long < ?', south_west[0]-extra, north_east[0]+extra, south_west[1]-extra, north_east[1]+extra])
   }
 
   scope :all_near_point, lambda { |lat, long, transit_type|
-    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.02*transit_type, lat+0.02*transit_type, long-0.02*transit_type, long+0.02*transit_type])
+    where(['lat > ? AND lat < ? AND long > ? AND long < ?', lat-0.02*transit_type, lat+0.02*transit_type, long-0.02*transit_type, long+0.02*transit_type])
   }
 
   scope :all_near_point_wide, lambda { |lat, long, transit_type|
     extra_length = 0.03+transit_type*0.03
-    where(['lat > ? and lat < ? and long > ? and long < ?', lat-extra_length, lat+extra_length, long-extra_length, long+extra_length+0.1])
+    where(['lat > ? AND lat < ? AND long > ? AND long < ?', lat-extra_length, lat+extra_length, long-extra_length, long+extra_length+0.1])
   }
 
   def valid_location?
