@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_30_234417) do
+ActiveRecord::Schema.define(version: 2020_07_02_015022) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(version: 2020_06_30_234417) do
     t.index ["long"], name: "index_heatmap_points_on_long"
     t.index ["precision", "lat"], name: "index_heatmap_points_on_precision_and_lat"
     t.index ["precision", "long"], name: "index_heatmap_points_on_precision_and_long"
-    t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long"
+    t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long", unique: true
     t.index ["transit_type", "precision", "lat"], name: "index_heatmap_points_on_type_and_lat"
     t.index ["transit_type", "precision", "long"], name: "index_heatmap_points_on_type_and_long"
   end
@@ -85,8 +85,7 @@ ActiveRecord::Schema.define(version: 2020_06_30_234417) do
     t.text "polygon", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["isochronable_id", "travel_type"], name: "index_iso_polys_on_travel_type_and_belongs_id"
-    t.index ["isochronable_type", "isochronable_id"], name: "index_iso_polys_on_poly_assoc"
+    t.index ["isochronable_type", "isochronable_id", "travel_type"], name: "index_iso_polys_on_poly_assoc_and_travel_type"
   end
 
   create_table "map_preferences", force: :cascade do |t|
