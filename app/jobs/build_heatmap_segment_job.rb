@@ -79,7 +79,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
               if HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).none? # Skip all the calculation if point already exists
                 lat_lng = Geokit::LatLng.new(lat, long)
                 if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
-                  gstore_ids = GroceryStore.select(:id).all_near_point_wide(lat, long, transit_type).map(&:id)
+                  gstore_ids = GroceryStore.all_near_point_wide(lat, long, transit_type).pluck(:id)
                   isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
                   .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
                   .where(isochronable_id:gstore_ids, isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)

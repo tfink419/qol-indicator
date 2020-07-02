@@ -17,10 +17,6 @@ class HeatmapPoint < ApplicationRecord
     end
   }
 
-  def as_array
-    [lat, long, quality]
-  end
-
   before_validation do
     if self.precision.nil?
       if lat.round == lat && long.round == long
