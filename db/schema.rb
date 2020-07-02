@@ -10,20 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_02_015022) do
+ActiveRecord::Schema.define(version: 2020_07_02_024605) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "build_heatmap_segment_statuses", force: :cascade do |t|
     t.integer "build_heatmap_status_id"
-    t.integer "segment"
     t.float "percent"
     t.string "state"
     t.text "error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["build_heatmap_status_id", "segment"], name: "index_build_heatmap_segment_statuses_on_parent_id"
+    t.integer "segment"
+    t.float "current_lat"
   end
 
   create_table "build_heatmap_statuses", force: :cascade do |t|
@@ -32,6 +32,8 @@ ActiveRecord::Schema.define(version: 2020_07_02_015022) do
     t.text "error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "current_lat"
+    t.boolean "rebuild"
   end
 
   create_table "grocery_store_upload_statuses", force: :cascade do |t|

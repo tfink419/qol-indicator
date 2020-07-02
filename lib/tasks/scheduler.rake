@@ -9,7 +9,7 @@ task :redo_jobs => :environment do
   BuildHeatmapSegmentStatus.last(BuildHeatmapJob::NUM_SEGMENTS).each do |segment_status|
     if !segment_status.complete? && segment_status.updated_at < 15.minutes.ago
       puts "Retrying Build Heatmap Segment #{segment_status.segment} Job"
-      BuildHeatmapSegmentJob.perform_later(segment_status, true)
+      BuildHeatmapSegmentJob.perform_later(segment_status)
     end
   end
   job_status = GroceryStoreUploadStatus.last
