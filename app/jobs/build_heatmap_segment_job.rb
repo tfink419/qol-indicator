@@ -76,7 +76,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             while long < north_east[1]
-              unless HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type) # Skip all the calculation if point already exists
+              unless HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).any? # Skip all the calculation if point already exists
                 lat_lng = Geokit::LatLng.new(lat, long)
                 if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
                   gstore_ids = GroceryStore.select(:id).all_near_point_wide(lat, long, transit_type).map(&:id)
@@ -107,8 +107,10 @@ class BuildHeatmapSegmentJob < ApplicationJob
           build_status.build_heatmap_status.update!(current_lat:lat)
           build_status.update!(current_lat:lat)
         end
+        state = 'complete'
         build_status.update!(percent:100, state:'complete')
       rescue => err
+        state = 'error'
         build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
       end
     }
@@ -120,6 +122,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
           percent = (100.0*current/gstore_count).round(2)
         elsif state == 'heatmap-points'
           percent = calc_heatmap_point_percent(current_transit_type, long, south_west, north_east)
+        elsif state == 'complete' || state == 'error'
+          exit
         end
         build_status.update!(percent:percent, state:state, updated_at:Time.now)
         sleep(5)
