@@ -76,7 +76,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             while long < north_east[1]
-              unless HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).any? # Skip all the calculation if point already exists
+              if HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).none? # Skip all the calculation if point already exists
                 lat_lng = Geokit::LatLng.new(lat, long)
                 if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
                   gstore_ids = GroceryStore.select(:id).all_near_point_wide(lat, long, transit_type).map(&:id)
