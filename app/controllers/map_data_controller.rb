@@ -15,7 +15,7 @@ class MapDataController < ApplicationController
 
     render :json => { 
       :status => 0,
-      :grocery_stores => gstores.map(&:public_attributes),
+      :grocery_stores => gstores.map(&:as_map_data_array),
       :heatmap_points => hmp.map(&:as_array)
     }
   end
