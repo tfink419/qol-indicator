@@ -25,6 +25,10 @@ class GroceryStore < ApplicationRecord
     self.state = self.state.upcase
   end
 
+  def as_map_data_array
+    [self.id, self.lat, self.long]
+  end
+
 
   scope :clean_order, lambda { |attr, dir| 
     #ensure attr and dir are safe values to use by checking within an array of allowed values
