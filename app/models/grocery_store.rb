@@ -25,7 +25,6 @@ class GroceryStore < ApplicationRecord
     self.state = self.state.upcase
   end
 
-
   scope :clean_order, lambda { |attr, dir| 
     #ensure attr and dir are safe values to use by checking within an array of allowed values
     attr = (GroceryStore.attribute_names.include? attr) ? attr : 'created_at'
@@ -44,17 +43,17 @@ class GroceryStore < ApplicationRecord
   }
 
   scope :where_in_coordinate_range, lambda { |south_west, north_east| 
-    extra = ((north_east[0] - south_west[0])*0.1).round(2)
-    where(['lat > ? and lat < ? and long > ? and long < ?', south_west[0]-extra, north_east[0]+extra, south_west[1]-extra, north_east[1]+extra])
+    extra = ((north_east[0] - south_west[0])*0.2).round(2)
+    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
   }
 
   scope :all_near_point, lambda { |lat, long, transit_type|
-    where(['lat > ? and lat < ? and long > ? and long < ?', lat-0.02*transit_type, lat+0.02*transit_type, long-0.02*transit_type, long+0.02*transit_type])
+    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (lat-0.02*transit_type).round(3), (lat+0.02*transit_type).round(3), (long-0.02*transit_type).round(3), (long+0.02*transit_type).round(3)])
   }
 
   scope :all_near_point_wide, lambda { |lat, long, transit_type|
     extra_length = 0.03+transit_type*0.03
-    where(['lat > ? and lat < ? and long > ? and long < ?', lat-extra_length, lat+extra_length, long-extra_length, long+extra_length+0.1])
+    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (lat-extra_length).round(3), (lat+extra_length).round(3), (long-extra_length).round(3), (long+extra_length+0.1).round(3)])
   }
 
   def valid_location?

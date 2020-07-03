@@ -58,6 +58,9 @@ class GroceryStoresController < ApplicationController
     gstore.assign_attributes(grocery_store_params)
     Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
+      if gstore.lat_previously_changed? || gstore.long_previously_changed?
+        gstore.isochrone_polygons.delete_all
+      end
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
@@ -85,7 +88,7 @@ class GroceryStoresController < ApplicationController
     offset = page*limit
     job_statuses = GroceryStoreUploadStatus.offset(offset).limit(limit).order(created_at:'DESC')
     upload_csv_status_count = GroceryStoreUploadStatus.count
-    newest = GroceryStoreUploadStatus.order(created_at:'DESC').first
+    newest = GroceryStoreUploadStatus.last
     render json: {
       status: 0,
       upload_csv_statuses: { all:job_statuses, current:(newest && newest.error.nil? && newest.state != 'complete') ? newest : nil },

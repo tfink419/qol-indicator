@@ -1,9 +1,10 @@
 require 'geokit'
 
 class IsochronePolygon < ApplicationRecord
-  validates :distance, :presence => true, uniqueness: { scope: %i[travel_type isochronable_id]}
+  validates_with IsochronePolygonValidator
+  validates :distance, :presence => true
   validates :travel_type, :presence => true
-  validates :polygon, exclusion: { in: [nil]}
+  validates :polygon, exclusion: { in: [nil], message: 'can\'t be nil' }
 
   def as_mapbox_poly
     [{
