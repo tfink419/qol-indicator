@@ -75,76 +75,74 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
           var marker = new mapboxgl.Marker({
           });
           var lngLat = {
-            lon: gStore.long,
-            lat: gStore.lat
+            lon: gStore[2],
+            lat: gStore[1]
           };
           marker.setLngLat(lngLat).addTo(map.current);
           markers.current.push(marker);
         })
       }
-      if(hasLoaded.current) {
-        map.current.removeLayer('quality-heat')
-        map.current.removeSource('quality-heat')
-      }
-      map.current.addSource('quality-heat', {
-        'type': 'geojson',
-        data: {
-          'type': 'FeatureCollection',
-          'features': []
-        }
-      });
-
-      map.current.addLayer({
-        'id': 'quality-heat',
-        'type': 'heatmap',
-        'source': 'quality-heat',
-        'minZoom': 8,
-        'paint': {
-          'heatmap-weight': [
-            'interpolate',
-            ['exponential',1.5],
-            ['get', 'quality'],
-            0,
-            0,
-            10,
-            1
-          ],
-          'heatmap-intensity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0,
-            1,
-            9,
-            3
-            ],
-          'heatmap-color': [
-            'interpolate',
-            ['linear'],
-            ['heatmap-density'],
-            0,
-            'red',
-            0.9,
-            'yellow',
-            1,
-            'green'
-          ],
-          'heatmap-opacity': 0.5,
-          'heatmap-radius': {
-            "base": 2,
-            "stops": [
-              [
-                10,
-                4.4
-              ],
-              [
-                19,
-                1126.4
-              ]
-            ]
+      if(!hasLoaded.current) {
+        map.current.addSource('quality-heat', {
+          'type': 'geojson',
+          data: {
+            'type': 'FeatureCollection',
+            'features': []
           }
-        }
-      });
+        });
+  
+        map.current.addLayer({
+          'id': 'quality-heat',
+          'type': 'heatmap',
+          'source': 'quality-heat',
+          'minZoom': 8,
+          'paint': {
+            'heatmap-weight': [
+              'interpolate',
+              ['exponential',1.5],
+              ['get', 'quality'],
+              0,
+              0,
+              10,
+              1
+            ],
+            'heatmap-intensity': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              0,
+              1,
+              9,
+              3
+              ],
+            'heatmap-color': [
+              'interpolate',
+              ['linear'],
+              ['heatmap-density'],
+              0,
+              'red',
+              0.9,
+              'yellow',
+              1,
+              'green'
+            ],
+            'heatmap-opacity': 0.5,
+            'heatmap-radius': {
+              "base": 2,
+              "stops": [
+                [
+                  10,
+                  4.4
+                ],
+                [
+                  19,
+                  1126.4
+                ]
+              ]
+            }
+          }
+        });
+      }
       map.current.getSource('quality-heat').setData(buildHeatMapData(response.heatmap_points));
       hasLoaded.current = true;
     })

@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
-import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box } from '@material-ui/core'
+import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box, Checkbox, FormControlLabel } from '@material-ui/core'
 
 import { flashMessage } from '../actions/messages'
 import { setBuildHeatmapStatusReloadIntervalId, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage } from '../actions/admin'
@@ -11,6 +11,7 @@ import { drawerWidth } from '../common'
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',
   'received': 'Job Received By Sidekiq',
+  'branching': 'Branching Into Parellel Sidekiq\'s',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'heatmap-points': 'Building Heatmap Points',
   'complete': 'Completed'
@@ -26,11 +27,12 @@ const useStyles = makeStyles({
 const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapStatuses, flashMessage, 
 loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
   const classes = useStyles();
+  let [rebuild, setRebuild] = React.useState(false);
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildHeatmapStatuses;
 
   const handleBuildHeatmap = (event) => {
     event.preventDefault();
-    postBuildHeatmap()
+    postBuildHeatmap(rebuild)
     .then((response) => {
       flashMessage('info', response.message);
       loadBuildHeatmapStatuses(true);
@@ -140,6 +142,10 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
       {loaded && !current &&
         <React.Fragment>
           <Typography variant="body1">This will Build the Heatmap</Typography>
+          <FormControlLabel
+            control={<Checkbox checked={rebuild} onChange={(e) => setRebuild(e.target.checked)} name="rebuild" />}
+            label="Rebuild"
+          />
           <form onSubmit={handleBuildHeatmap}>
             <Button type="submit"
               color="primary"

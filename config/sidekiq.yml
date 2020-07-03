@@ -5,4 +5,5 @@ production:
   :concurrency: 1
 :queues:
   - build_heatmap
+  - build_heatmap_segment
   - grocery_store_upload

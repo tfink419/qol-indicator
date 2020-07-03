@@ -17,10 +17,6 @@ class HeatmapPoint < ApplicationRecord
     end
   }
 
-  def as_array
-    [lat, long, quality]
-  end
-
   before_validation do
     if self.precision.nil?
       if lat.round == lat && long.round == long
@@ -53,13 +49,15 @@ class HeatmapPoint < ApplicationRecord
     ['cycling', 24],
     ['driving', 8],
     ['driving', 16],
-    ['driving', 24]
+    ['driving', 24],
+    [nil, nil] # Might be used by "fly" value but shouldn't return anything
   ]
 
   private
 
   scope :true_where_in_coordinate_range, lambda { |south_west, north_east| 
-    extra = ((north_east[0] - south_west[0])*0.1).round(2)
-    where(['lat > ? and lat < ? and long > ? and long < ?', south_west[0]-extra, north_east[0]+extra, south_west[1]-extra, north_east[1]+extra])
+    extra = ((north_east[0] - south_west[0])*0.2).round(2)
+    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', 
+      (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
   }
 end
