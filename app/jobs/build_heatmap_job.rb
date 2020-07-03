@@ -27,15 +27,18 @@ class BuildHeatmapJob < ApplicationJob
 
       south_west = furthest_south_west_local
       north_east = furthest_north_east_local
-      lat = south_west[0]
-      if build_status.build_heatmap_segment_statuses.none?
-        (1..NUM_SEGMENTS).each do |segment|
-          build_segment_status = build_status.build_heatmap_segment_statuses.create(state:'initialized', percent:100, segment:segment, current_lat:lat)
-          BuildHeatmapSegmentJob.perform_later(build_segment_status)
-          lat = (lat+STEP).round(STEP_PRECISION)
+      # dont reset lat and try workers if this is a retry and lat already exists
+      unless job_retry && build_status.lat
+        lat = south_west[0]
+        if build_status.build_heatmap_segment_statuses.none?
+          (1..NUM_SEGMENTS).each do |segment|
+            build_segment_status = build_status.build_heatmap_segment_statuses.create(state:'initialized', percent:100, segment:segment, current_lat:lat)
+            BuildHeatmapSegmentJob.perform_later(build_segment_status)
+            lat = (lat+STEP).round(STEP_PRECISION)
+          end
         end
+        build_status.update!(current_lat:(lat-STEP).round(STEP_PRECISION))
       end
-      build_status.update!(current_lat:(lat-STEP).round(STEP_PRECISION))
 
       # in case its different due to an old build and a change in num_segments
       num_segments_this_build = build_status.build_heatmap_segment_statuses.count
