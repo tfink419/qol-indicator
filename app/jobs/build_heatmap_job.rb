@@ -28,7 +28,7 @@ class BuildHeatmapJob < ApplicationJob
       south_west = furthest_south_west_local
       north_east = furthest_north_east_local
       # dont reset lat and try workers if this is a retry and lat already exists
-      unless job_retry && build_status.lat
+      unless job_retry && build_status.current_lat
         lat = south_west[0]
         if build_status.build_heatmap_segment_statuses.none?
           (1..NUM_SEGMENTS).each do |segment|
