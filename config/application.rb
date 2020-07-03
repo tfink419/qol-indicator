@@ -17,6 +17,8 @@ module QolIndicator
       end if File.exists?(env_file)
     end
 
+    config.middleware.use Rack::Deflater
+
     config.active_job.queue_adapter = :sidekiq
 
     # Settings in config/environments/* take precedence over those specified here.
