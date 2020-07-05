@@ -2,6 +2,8 @@ require 'geokit'
 require 'mapbox'
 
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
+ActiveRecord::Base.logger.level = 5
+Rails.logger.level = 5
 
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
