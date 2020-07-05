@@ -33,28 +33,20 @@ const useStyles = makeStyles({
   }
 });
 
-const UpdateMapPreferencesDialog = ({onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences}) => {
-  const blankPreferences = {
-    transit_type: 2
-  };
+const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences}) => {
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
-  let [mapPreferences, setMapPreferences] = React.useState(blankPreferences);
   let [mapPreferenceErrors, setMapPreferenceErrors] = React.useState({})
 
   const loadMapPreferences = () => {
-    if(open) {
-      setLoading(true);
-      setMapPreferences(blankPreferences);
-      setMapPreferenceErrors({});
-      
+    if(!mapPreferences.loaded) {
       getMapPreferences().then(response => {
-        setLoading(false);
-        setMapPreferences(response.map_preferences)
+        updateMapPreferences(response.map_preferences)
       })
     }
+    
   }
-  
+
   const handleClose = () => {
     resetMapPreferences();
     onClose(false);
@@ -63,12 +55,12 @@ const UpdateMapPreferencesDialog = ({onClose, flashMessage, updateMapPreferences
   const handleUpdate = () => {
     setMapPreferenceErrors({});
     setLoading(true)
-    putMapPreferences(mapPreferences)
+    putMapPreferences(mapPreferences.preferences)
     .then(response => {
       setLoading(false)
       onClose(true);
       flashMessage('info', response.message);
-      updateMapPreferences(mapPreferences);
+      updateMapPreferences(response.map_preferences);
     })
     .catch(error => {
       setLoading(false)
@@ -88,12 +80,7 @@ const UpdateMapPreferencesDialog = ({onClose, flashMessage, updateMapPreferences
     })
   }
 
-  const showMapPrefrenceChange = () => {
-    tempUpdateMapPreferences(mapPreferences)
-  }
-
-  React.useEffect(loadMapPreferences, [])
-  React.useEffect(showMapPrefrenceChange, [mapPreferences])
+  React.useEffect(loadMapPreferences, [mapPreferences]);
 
   return (
     <form onSubmit={handleUpdate}>
@@ -103,8 +90,8 @@ const UpdateMapPreferencesDialog = ({onClose, flashMessage, updateMapPreferences
           <form onSubmit={handleUpdate}>
             <Slider
               className={classes.slider}
-              value={mapPreferences.transit_type}
-              onChange={(e, val) => setMapPreferences({ ...mapPreferences, transit_type:val })}
+              value={mapPreferences.preferences.transit_type}
+              onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, transit_type:val })}
               step={1}
               min={1}
               max={10}
@@ -127,6 +114,10 @@ const UpdateMapPreferencesDialog = ({onClose, flashMessage, updateMapPreferences
   );
 }
 
+const mapStateToProps = state => ({
+  mapPreferences: state.mapPreferences
+})
+
 const mapDispatchToProps = {
   flashMessage,
   updateMapPreferences,
@@ -134,4 +125,4 @@ const mapDispatchToProps = {
   resetMapPreferences
 }
 
-export default connect(null, mapDispatchToProps)(UpdateMapPreferencesDialog)
+export default connect(mapStateToProps, mapDispatchToProps)(UpdateMapPreferencesDialog)

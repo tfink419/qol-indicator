@@ -107,7 +107,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
       map.getSource('quality-heat').setData(buildHeatMapData(response.heatmap_points));
       setHasLoaded(true);
     })
-  }, 750)).current;
+  }, 500)).current;
 
   React.useEffect(() => loadMapData(map, currentLocation, mapPreferences, hasLoaded), [map, currentLocation, mapPreferences, hasLoaded])
 
