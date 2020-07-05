@@ -1,4 +1,5 @@
 import React from "react";
+import _ from 'lodash';
 import { connect } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box, Checkbox, FormControlLabel } from '@material-ui/core'
@@ -137,6 +138,31 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
               </Typography>
             </Box>
           </Box>
+          { current.build_heatmap_segment_statuses && _.sortBy(current.build_heatmap_segment_statuses, 'segment').map(segment_status => (
+            <React.Fragment>
+              <Typography variant="subtitle1">
+                Segment #{segment_status.segment}
+              </Typography>
+              <Typography variant="subtitle2">
+                Current State: <strong>{STATE_MAP[segment_status.state]}</strong>
+              </Typography>
+              { segment_status.state == 'heatmap-points' && (
+                <Typography variant="subtitle2">
+                  Current Lat: <strong>{segment_status.current_lat}</strong>
+                </Typography>
+              )}
+              <Box display="flex" alignItems="center">
+                <Box width="100%" mr={1}>
+                  <LinearProgress variant="determinate" value={segment_status.percent} />
+                </Box>
+                <Box minWidth={35}>
+                  <Typography variant="body2">
+                    {`${segment_status.percent}%`}
+                  </Typography>
+                </Box>
+              </Box>
+            </React.Fragment>
+          ))}
         </React.Fragment>
       }
       {loaded && !current &&
