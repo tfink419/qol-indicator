@@ -1,56 +1,117 @@
 import React from "react";
-import { makeStyles } from '@material-ui/core/styles'
-import { connect } from "react-redux";
-import { useLeaflet } from 'react-leaflet'
-import heatmap from 'heatmap.js/build/heatmap'
-import HeatmapOverlay from 'leaflet-heatmap/leaflet-heatmap'
+import _ from 'lodash';
 
-const defaultCfg = {
-  // radius should be small ONLY if scaleRadius is true (or small radius is intended)
-  // if scaleRadius is false it will be the constant radius used in pixels
-  "radius": 0.01,
-  "maxOpacity": .7,
-  "minOpacity": .4,
-  // scales the radius based on map zoom
-  "scaleRadius": true,
-  // if set to false the heatmap uses the global maximum for colorization
-  // if activated: uses the data maximum within the current map boundaries
-  //   (there will always be a red spot with useLocalExtremas true)
-  "useLocalExtrema": false,
-  latField: 'lat',
-  lngField: 'long',
-  valueField: 'quality',
-  defaultColor: 'red',
-  gradient: {
-    // enter n keys between 0 and 1 here
-    // for gradient color customization
-    '0.25': 'red',
-    '.4': 'yellow',
-    '.75': 'blue',
-    '.9': 'green'
+import { getMapData } from '../fetch'
+
+const buildHeatMapData = (points) => (
+  {
+    "type": "FeatureCollection",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": points.map((point,ind) => (
+      { "type": "Feature", "properties": { "id": "heatmap-point-"+ind, "quality":point[2] }, "geometry": { "type": "Point", "coordinates": [ point[1], point[0], 0.0 ] } }
+    ))
   }
-};
+)
 
-const HeatmapLayer = ({groceryStores, config}) => {
-  let leafletContext = useLeaflet();
-  const [heatmapLayer, setHeatmapLayer] = React.useState(null);
-  const data = { min:0, max:10, data:groceryStores || []};
+export default ({ map, currentLocation, mapPreferences }) => {
+  let [hasLoaded, setHasLoaded] = React.useState(false)
+  let [groceryStores, setGroceryStores] = React.useState([])
+  const markers = React.useRef([])
 
-  
-  React.useEffect(() => {
-    console.log({ ...defaultCfg, ...config})
-    if(heatmapLayer) {
-      leafletContext.layerContainer.removeLayer(heatmapLayer)
+  const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences, hasLoaded) => {
+    // Lots of Refs used here because of closure issue with event being handled by mapbox
+    if(!map) {
+      return;
     }
-    const hml = new HeatmapOverlay({ ...defaultCfg, ...config});
-    hml.setData(data);
+    let bounds = map.getBounds();
+    getMapData(bounds._sw, bounds._ne, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null)
+    .then(response => {
+      setGroceryStores(response.grocery_stores)
+      markers.current.forEach(marker => marker.remove());
+      markers.current = [];
+      if(map.getZoom() > 11) {
+        markers.current = response.grocery_stores.map((gStore) => {
+          let marker = new mapboxgl.Marker({
+          });
+          let lngLat = {
+            lon: gStore[2],
+            lat: gStore[1]
+          };
+          marker.setLngLat(lngLat).addTo(map);
+          return marker;
+        })
+      }
+      if(!hasLoaded) {
+        map.addSource('quality-heat', {
+          'type': 'geojson',
+          data: {
+            'type': 'FeatureCollection',
+            'features': []
+          }
+        });
   
-    leafletContext.layerContainer.addLayer(hml)
-    setHeatmapLayer(hml);
-  },[groceryStores, config])
+        map.addLayer({
+          'id': 'quality-heat',
+          'type': 'heatmap',
+          'source': 'quality-heat',
+          'minZoom': 8,
+          'paint': {
+            'heatmap-weight': [
+              'interpolate',
+              ['exponential',1.5],
+              ['get', 'quality'],
+              0,
+              0,
+              10,
+              1
+            ],
+            'heatmap-intensity': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              0,
+              1,
+              9,
+              3
+              ],
+            'heatmap-color': [
+              'interpolate',
+              ['linear'],
+              ['heatmap-density'],
+              0,
+              'red',
+              0.2,
+              'red',
+              0.6,
+              'yellow',
+              1,
+              'green'
+            ],
+            'heatmap-opacity': 0.5,
+            'heatmap-radius': {
+              "base": 2.1,
+              "stops": [
+                [
+                  10,
+                  4
+                ],
+                [
+                  19,
+                  1512.9
+                ]
+              ]
+            }
+          }
+        });
+      }
+      map.getSource('quality-heat').setData(buildHeatMapData(response.heatmap_points));
+      setHasLoaded(true);
+    })
+  }, 750)).current;
 
-  return (<div id='heatmap-layer-react'></div>)
-};
+  React.useEffect(() => loadMapData(map, currentLocation, mapPreferences, hasLoaded), [map, currentLocation, mapPreferences, hasLoaded])
 
-
-export default connect()(HeatmapLayer)
+  return (
+    <div/>
+  );
+}
