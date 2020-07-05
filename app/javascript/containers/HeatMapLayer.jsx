@@ -17,18 +17,21 @@ export default ({ map, currentLocation, mapPreferences }) => {
   let [hasLoaded, setHasLoaded] = React.useState(false)
   let [groceryStores, setGroceryStores] = React.useState([])
   const markers = React.useRef([])
-  const isLoading = React.useRef(false)
+  const prevAbortController = React.useRef(null)
 
   const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences, hasLoaded) => {
     // Lots of Refs used here because of closure issue with event being handled by mapbox
-    if(!map && !isLoading.current) {
+    if(!map) {
       return;
     }
+    if(prevAbortController.current) {
+      prevAbortController.current.abort();
+    }
+    let controller = new AbortController();
+    prevAbortController.current = controller;
     let bounds = map.getBounds();
-    isLoading.current = true;
-    getMapData(bounds._sw, bounds._ne, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null)
+    getMapData(bounds._sw, bounds._ne, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
     .then(response => {
-      isLoading.current = false;
       setGroceryStores(response.grocery_stores)
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
