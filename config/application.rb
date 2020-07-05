@@ -21,10 +21,8 @@ module QolIndicator
 
     config.active_job.queue_adapter = :sidekiq
     if Rails.env == 'production'
-      pp '*'*100
-      pp 'in production'
-      pp '*'*100
       Sidekiq.logger.level = Logger::ERROR
+      Rails.logger.level = :error
     end
 
     # Settings in config/environments/* take precedence over those specified here.
