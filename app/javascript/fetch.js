@@ -171,7 +171,7 @@ export const deleteGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const getMapData = (southWest, northEast, zoom, transit_type) => {
+export const getMapData = (southWest, northEast, zoom, transit_type, abortSignal) => {
   let url = "/map_data",
     params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom};
   if(transit_type) {
@@ -181,6 +181,7 @@ export const getMapData = (southWest, northEast, zoom, transit_type) => {
   url += paramify(params)
 
   return fetch(url, {
+    signal: abortSignal,
     headers: {
       'Accept': 'application/json'
   }})
