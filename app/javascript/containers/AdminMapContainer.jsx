@@ -12,7 +12,7 @@ import { updatedGroceryStores } from '../actions/admin'
 import { getMapData, deleteGroceryStore } from '../fetch'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
-import OldHeatMapLayer from './OldHeatMapLayer'
+import OldHeatmapLayer from './OldHeatmapLayer'
 
 const useStyles = makeStyles({
   map: {
@@ -91,7 +91,7 @@ const AdminMapContainer = ({updatedGroceryStores}) => {
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <OldHeatMapLayer groceryStores={groceryStores} />
+      <OldHeatmapLayer groceryStores={groceryStores} />
       { currentLocation.zoom > 12 && groceryStores.map(groceryStore => (
         <Marker position={[groceryStore.lat, groceryStore.long]} key={groceryStore.id}>
           <Popup>
