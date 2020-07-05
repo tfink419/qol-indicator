@@ -17,15 +17,18 @@ export default ({ map, currentLocation, mapPreferences }) => {
   let [hasLoaded, setHasLoaded] = React.useState(false)
   let [groceryStores, setGroceryStores] = React.useState([])
   const markers = React.useRef([])
+  const isLoading = React.useRef(false)
 
   const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences, hasLoaded) => {
     // Lots of Refs used here because of closure issue with event being handled by mapbox
-    if(!map) {
+    if(!map && !isLoading.current) {
       return;
     }
     let bounds = map.getBounds();
+    isLoading.current = true;
     getMapData(bounds._sw, bounds._ne, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null)
     .then(response => {
+      isLoading.current = false;
       setGroceryStores(response.grocery_stores)
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
