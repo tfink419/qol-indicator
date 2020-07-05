@@ -60,6 +60,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
       style: 'mapbox://styles/mapbox/streets-v11',
       center: currentLocation.center,
       zoom: currentLocation.zoom,
+      maxZoom: 16
     });
     map.on('move', handleMapMove);
     setMap(map);

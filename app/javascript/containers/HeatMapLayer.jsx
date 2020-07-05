@@ -3,23 +3,40 @@ import _ from 'lodash';
 
 import { getMapData } from '../fetch'
 
-const buildHeatMapData = (points) => (
+const buildSquare = (point, zoom) => {
+  zoom = Math.floor(zoom);
+  let radius;
+  if(zoom > 10) {
+    radius = 0.0005;
+  }
+  else if(zoom > 4) {
+    radius = _.round(0.001 * Math.pow(2,9-zoom),3)
+  }
+  else {
+    radius = 0.016;
+  }
+  let diameter = _.round(radius*2,3);
+  let southWest = [point[1]-radius, point[0]-radius];
+  return [southWest, [southWest[0]+diameter, southWest[1]], [southWest[0]+diameter, southWest[1]+diameter],
+    [southWest[0], southWest[1]+diameter], southWest];
+}
+
+const buildHeatMapData = (points, zoom) => (
   {
     "type": "FeatureCollection",
-    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
     "features": points.map((point,ind) => (
-      { "type": "Feature", "properties": { "id": "heatmap-point-"+ind, "quality":point[2] }, "geometry": { "type": "Point", "coordinates": [ point[1], point[0], 0.0 ] } }
+      { "type": "Feature", "properties": { "id": "heatmap-point-"+ind, "quality":point[2] }, "geometry": { "type": "Polygon", "coordinates": [buildSquare(point,zoom)] } }
     ))
   }
 )
 
 export default ({ map, currentLocation, mapPreferences }) => {
-  let [hasLoaded, setHasLoaded] = React.useState(false)
-  let [groceryStores, setGroceryStores] = React.useState([])
+  const hasLoaded = React.useRef(false)
+  const groceryStores = React.useRef([])
   const markers = React.useRef([])
   const prevAbortController = React.useRef(null)
 
-  const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences, hasLoaded) => {
+  const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences) => {
     // Lots of Refs used here because of closure issue with event being handled by mapbox
     if(!map) {
       return;
@@ -32,7 +49,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
     let bounds = map.getBounds();
     getMapData(bounds._sw, bounds._ne, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
     .then(response => {
-      setGroceryStores(response.grocery_stores)
+      groceryStores.current = response.grocery_stores;
       markers.current.forEach(marker => marker.remove());
       markers.current = [];
       if(map.getZoom() > 11) {
@@ -47,7 +64,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
           return marker;
         })
       }
-      if(!hasLoaded) {
+      if(!hasLoaded.current) {
         map.addSource('quality-heat', {
           'type': 'geojson',
           data: {
@@ -55,63 +72,35 @@ export default ({ map, currentLocation, mapPreferences }) => {
             'features': []
           }
         });
-  
+        
         map.addLayer({
-          'id': 'quality-heat',
-          'type': 'heatmap',
+          'id': 'quality-heatpoints',
+          'type': 'fill',
           'source': 'quality-heat',
-          'minZoom': 8,
           'paint': {
-            'heatmap-weight': [
-              'interpolate',
-              ['exponential',1.5],
-              ['get', 'quality'],
-              0,
-              0,
-              10,
-              1
+            'fill-color':[
+              'case',
+              ['all', ['>', ['get', 'quality'], 7]],
+              '#0F0',                 
+              ['>', ['get', 'quality'], 4],
+              '#FF0', 
+              '#F00'
             ],
-            'heatmap-intensity': [
-              'interpolate',
-              ['linear'],
-              ['zoom'],
-              0,
-              1,
-              9,
-              3
-              ],
-            'heatmap-color': [
-              'interpolate',
-              ['linear'],
-              ['heatmap-density'],
-              0,
-              'red',
-              0.2,
-              'red',
-              0.6,
-              'yellow',
-              1,
-              'green'
-            ],
-            'heatmap-opacity': 0.5,
-            'heatmap-radius': {
-              "base": 2.1,
-              "stops": [
-                [
-                  10,
-                  4
-                ],
-                [
-                  19,
-                  1512.9
-                ]
-              ]
-            }
+            'fill-opacity': 0.15
           }
+          // 'paint': {
+          //   'fill-color': '#0F0',
+          //   'fill-opacity': 0.5
+          // },
+          // 'filter': ['==', '$type', 'Polygon']
         });
       }
-      map.getSource('quality-heat').setData(buildHeatMapData(response.heatmap_points));
-      setHasLoaded(true);
+      
+      let data = buildHeatMapData(response.heatmap_points, currentLocation.zoom);
+
+      map.getSource('quality-heat').setData(data);
+      
+      hasLoaded.current = true;
     })
     .catch(error => {
       if(error.name != 'AbortError') {
@@ -120,7 +109,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
     })
   }, 500)).current;
 
-  React.useEffect(() => loadMapData(map, currentLocation, mapPreferences, hasLoaded), [map, currentLocation, mapPreferences, hasLoaded])
+  React.useEffect(() => loadMapData(map, currentLocation, mapPreferences), [map, currentLocation, mapPreferences])
 
   return (
     <div/>
