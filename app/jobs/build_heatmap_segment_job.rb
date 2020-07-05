@@ -137,7 +137,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
   private
 
   def calc_heatmap_point_percent(current_transit_type, long, south_west, north_east)
-    (((long-south_west[1])/(north_east[1]-south_west[1]+BuildHeatmapJob::STEP)/9+(current_transit_type-1)/9)*100).round(3)
+    (((long-south_west[1])/(north_east[1]-south_west[1]+BuildHeatmapJob::STEP)/9+(current_transit_type-1)/9.0)*100).round(3)
   end
 
   def log_exp_sum(values)
