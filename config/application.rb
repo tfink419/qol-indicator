@@ -20,7 +20,12 @@ module QolIndicator
     config.middleware.use Rack::Deflater
 
     config.active_job.queue_adapter = :sidekiq
-    Sidekiq.logger.level = Logger::ERROR if Rails.env == 'production'
+    if Rails.env == 'production'
+      pp '*'*100
+      pp 'in production'
+      pp '*'*100
+      Sidekiq.logger.level = Logger::ERROR
+    end
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
