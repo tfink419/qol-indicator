@@ -5,8 +5,8 @@ end
 def abs_floor(num)
   num >= 0 ? num.floor(1) : num.ceil(1)
 end
-Rails.logger.level = 5
-ActiveRecord::Base.logger.level = 5
+Rails.logger.level = 4 if Rails.env == 'production'
+ActiveRecord::Base.logger.level = 4 if Rails.env == 'production'
 class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
   sidekiq_options retry: 0
