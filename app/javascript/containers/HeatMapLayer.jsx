@@ -35,7 +35,6 @@ const buildColorSetup = () => {
   },[]));
 
   colorSetup.push(colorSetup[colorSetup.length-1])
-  console.log(colorSetup)
   return colorSetup;
 }
 
@@ -48,14 +47,14 @@ const buildSquare = (point, radius, diameter) => {
 const buildHeatMapData = (points, zoom) => {
   zoom = Math.floor(zoom);
   let radius;
-  if(zoom > 11) {
+  if(zoom > 12) {
     radius = 0.0005;
   }
-  else if(zoom > 4) {
-    radius = _.round(0.0005 * Math.pow(2,11-zoom),4)
+  else if(zoom > 5) {
+    radius = _.round(0.0005 * Math.pow(2,12-zoom),4)
   }
   else {
-    radius = 0.032;
+    radius = 0.016;
   }
   let diameter = _.round(radius*2,3);
   return {
