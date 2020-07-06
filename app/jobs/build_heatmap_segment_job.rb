@@ -2,8 +2,8 @@ require 'geokit'
 require 'mapbox'
 
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
-ActiveRecord::Base.logger.level = 5
-Rails.logger.level = 5
+ActiveRecord::Base.logger.level = 4 if Rails.env == 'production'
+Rails.logger.level = 4 if Rails.env == 'production'
 
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
@@ -81,23 +81,25 @@ class BuildHeatmapSegmentJob < ApplicationJob
               if HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).none? # Skip all the calculation if point already exists
                 lat_lng = Geokit::LatLng.new(lat, long)
                 if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
-                  gstore_ids = GroceryStore.all_near_point_wide(lat, long, transit_type).pluck(:id)
                   isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
                   .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
-                  .where(isochronable_id:gstore_ids, isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)
+                  .all_near_point_wide(lat, long)
+                  .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)
+                  # skip to next block if none found
+                  if isochrones.blank?
+                    long = (long+0.1).round(BuildHeatmapJob::STEP_PRECISION)
+                  end
                 end
-                unless gstore_ids.blank?
-                  qualities = []
-                  isochrones.each do |isochrone|
-                    if isochrone.get_geokit_polygon.contains? lat_lng
-                      qualities << isochrone.quality
-                    end
+                qualities = []
+                isochrones.each do |isochrone|
+                  if isochrone.get_geokit_polygon.contains? lat_lng
+                    qualities << isochrone.quality
                   end
-                  
-                  quality = log_exp_sum(qualities)
-                  if(quality > 0)
-                    new_heatmaps << {lat: lat, long: long, quality: quality, transit_type:transit_type}
-                  end
+                end
+                
+                quality = log_exp_sum(qualities)
+                if(quality > 0)
+                  new_heatmaps << {lat: lat, long: long, quality: quality, transit_type:transit_type}
                 end
               end
               long = (long+BuildHeatmapJob::STEP).round(BuildHeatmapJob::STEP_PRECISION)

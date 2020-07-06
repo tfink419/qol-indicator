@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_02_175500) do
+ActiveRecord::Schema.define(version: 2020_07_05_225444) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,7 +86,12 @@ ActiveRecord::Schema.define(version: 2020_07_02_175500) do
     t.text "polygon", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "south_bound", null: false
+    t.float "north_bound", null: false
+    t.float "west_bound", null: false
+    t.float "east_bound", null: false
     t.index ["isochronable_type", "isochronable_id", "travel_type"], name: "index_iso_polys_on_poly_assoc_and_travel_type"
+    t.index ["isochronable_type", "travel_type", "distance", "south_bound", "north_bound", "west_bound", "east_bound"], name: "index_isochrone_polygons_on_bounds_and_type"
   end
 
   create_table "map_preferences", force: :cascade do |t|
