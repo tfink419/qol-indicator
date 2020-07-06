@@ -10,8 +10,10 @@ class MapDataController < ApplicationController
 
     transit_type = params[:transit_type] ? params[:transit_type] : User.find(session[:user_id]).map_preferences.transit_type
 
+    zoom = params[:zoom] ? params[:zoom].to_i : 7
+
     hmp = HeatmapPoint.where(transit_type: transit_type)\
-    .where_in_coordinate_range(south_west, north_east, params[:zoom]).limit(200000)\
+    .where_in_coordinate_range(south_west, north_east, zoom).limit(200000)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
 
     render :json => { 
