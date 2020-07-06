@@ -3,32 +3,68 @@ import _ from 'lodash';
 
 import { getMapData } from '../fetch'
 
-const buildSquare = (point, zoom) => {
-  zoom = Math.floor(zoom);
-  let radius;
-  if(zoom > 10) {
-    radius = 0.0005;
+const buildColorSetup = () => {
+  //Create linear gradient and extract colors from it for heatmap
+  let c = document.createElement("CANVAS");
+  let ctx = c.getContext("2d");
+
+  const NUM_GRADIENT_STEPS=100;
+
+  let grd = ctx.createLinearGradient(0,0,200,0);
+  let colorStops = [
+    [0,"#F00"],
+    [0.5,"#FF0"],
+    [1, "#0F0"]
+  ]
+
+  colorStops.forEach(cs => grd.addColorStop(cs[0], cs[1]))
+
+  let colorMap = colorStops.slice();
+
+  ctx.fillStyle = grd;
+  ctx.fillRect(0,0,200,1);
+  let p;
+  for(let i = 1, pixel = 200/NUM_GRADIENT_STEPS-1; i < NUM_GRADIENT_STEPS; i++, pixel+=200/NUM_GRADIENT_STEPS) {
+    p = ctx.getImageData(pixel, 0, 1, 1).data;
+    colorMap.push([i/NUM_GRADIENT_STEPS, ['rgb'].concat(_.slice(p,0,3))])
   }
-  else if(zoom > 4) {
-    radius = _.round(0.001 * Math.pow(2,9-zoom),3)
-  }
-  else {
-    radius = 0.016;
-  }
-  let diameter = _.round(radius*2,3);
+  let colorSetup = ['case'].concat(colorMap.sort((a,b) => b[0]-a[0]).reduce((arr, colorValue) => {
+    arr.push(['>=', ['get', 'quality'], colorValue[0]*10])
+    arr.push(colorValue[1])
+    return arr;
+  },[]));
+
+  colorSetup.push(colorSetup[colorSetup.length-1])
+  console.log(colorSetup)
+  return colorSetup;
+}
+
+const buildSquare = (point, radius, diameter) => {
   let southWest = [point[1]-radius, point[0]-radius];
-  return [southWest, [southWest[0]+diameter, southWest[1]], [southWest[0]+diameter, southWest[1]+diameter],
+  return [[southWest[0], southWest[1]], [southWest[0]+diameter, southWest[1]], [southWest[0]+diameter, southWest[1]+diameter],
     [southWest[0], southWest[1]+diameter], southWest];
 }
 
-const buildHeatMapData = (points, zoom) => (
-  {
+const buildHeatMapData = (points, zoom) => {
+  zoom = Math.floor(zoom);
+  let radius;
+  if(zoom > 11) {
+    radius = 0.0005;
+  }
+  else if(zoom > 4) {
+    radius = _.round(0.0005 * Math.pow(2,11-zoom),4)
+  }
+  else {
+    radius = 0.032;
+  }
+  let diameter = _.round(radius*2,3);
+  return {
     "type": "FeatureCollection",
     "features": points.map((point,ind) => (
-      { "type": "Feature", "properties": { "id": "heatmap-point-"+ind, "quality":point[2] }, "geometry": { "type": "Polygon", "coordinates": [buildSquare(point,zoom)] } }
+      { "type": "Feature", "properties": { "id": "heatmap-point-"+ind, "quality":point[2] }, "geometry": { "type": "Polygon", "coordinates": [buildSquare(point, radius, diameter)] } }
     ))
   }
-)
+}
 
 export default ({ map, currentLocation, mapPreferences }) => {
   const hasLoaded = React.useRef(false)
@@ -78,15 +114,8 @@ export default ({ map, currentLocation, mapPreferences }) => {
           'type': 'fill',
           'source': 'quality-heat',
           'paint': {
-            'fill-color':[
-              'case',
-              ['all', ['>', ['get', 'quality'], 7]],
-              '#0F0',                 
-              ['>', ['get', 'quality'], 4],
-              '#FF0', 
-              '#F00'
-            ],
-            'fill-opacity': 0.15
+            'fill-color':buildColorSetup(),
+            'fill-opacity': 0.5
           }
           // 'paint': {
           //   'fill-color': '#0F0',

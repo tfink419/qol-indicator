@@ -8,10 +8,10 @@ class HeatmapPoint < ApplicationRecord
 
   scope :where_in_coordinate_range, lambda { |south_west, north_east, zoom|
     zoom = zoom.to_i
-    if zoom > 10
+    if zoom > 11
       true_where_in_coordinate_range(south_west, north_east)
     elsif zoom > 4
-      where(['precision < ?', zoom-2]).true_where_in_coordinate_range(south_west, north_east)
+      where(['precision < ?', zoom-3]).true_where_in_coordinate_range(south_west, north_east)
     else
       where(precision:2).true_where_in_coordinate_range(south_west, north_east)
     end
