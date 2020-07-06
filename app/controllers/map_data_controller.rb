@@ -12,14 +12,13 @@ class MapDataController < ApplicationController
 
     zoom = params[:zoom] ? params[:zoom].to_i : 7
 
-    hmp = HeatmapPoint.where(transit_type: transit_type)\
+    grocery_store_points = HeatmapPoint.where(transit_type: transit_type)\
     .where_in_coordinate_range(south_west, north_east, zoom).limit(200000)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
-
     render :json => { 
       :status => 0,
       :grocery_stores => gstores,
-      :heatmap_points => hmp
+      :heatmap_points => HeatmapPoint.build(south_west, north_east, zoom, grocery_store_points)
     }
   end
 
