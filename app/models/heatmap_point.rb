@@ -71,9 +71,11 @@ class HeatmapPoint < ApplicationRecord
   def self.build(south_west, north_east, zoom, grocery_store_points)
     precision, step = zoom_to_precision_step(zoom)
 
-    extra = ((north_east[1]-south_west[1])*0.25).round(2)
-    south_west = [to_nearest_precision(south_west[0]-extra,precision), to_nearest_precision(south_west[1]-extra,precision)];
-    north_east = [to_nearest_precision(north_east[0]+extra,precision), to_nearest_precision(north_east[1]+extra,precision)];
+    extra = (north_east[1]-south_west[1])*0.2
+    south_west = [to_nearest_precision(south_west[0]-extra,precision), to_nearest_precision(south_west[1]-extra,precision)]
+    north_east = [to_nearest_precision(north_east[0]+extra,precision), to_nearest_precision(north_east[1]+extra,precision)]
+
+    # check if somehow bounds are inside of grocery_store_points
 
     heatmap_points = []
     lat = south_west[0]
@@ -114,7 +116,7 @@ class HeatmapPoint < ApplicationRecord
   private
 
   scope :true_where_in_coordinate_range, lambda { |south_west, north_east| 
-    extra = ((north_east[1] - south_west[1])*0.2).round(2)
+    extra = (north_east[1] - south_west[1])*0.1
     where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', 
       (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
   }
