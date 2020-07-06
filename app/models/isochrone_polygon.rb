@@ -11,7 +11,6 @@ class IsochronePolygon < ApplicationRecord
   validates :east_bound, :presence => true
 
   before_validation do
-    pp 
     if self.polygon
       self.west_bound = self.polygon.min { |a, b| a[0] <=> b[0] }[0].to_f
       self.east_bound = self.polygon.max { |a, b| a[0] <=> b[0] }[0].to_f
