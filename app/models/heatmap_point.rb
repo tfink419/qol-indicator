@@ -112,7 +112,7 @@ class HeatmapPoint < ApplicationRecord
           gstore_ind += 1
           current_gstore_point = grocery_store_points[gstore_ind]
         end
-        quality = 10 if quality > 10
+        quality = 12.5 if quality > 12.5
         quality = 0 if quality < 0
 
         color = GRADIENT_MAP.at(quality/12.5).color
