@@ -2,8 +2,10 @@ require 'gradient'
 
 GRADIENT_MAP = Gradient::Map.new(
   Gradient::Point.new(0, Color::RGB.new(255, 0, 0), 0.5),
+  Gradient::Point.new(0.2, Color::RGB.new(255, 165, 0), 0.5),
   Gradient::Point.new(0.5, Color::RGB.new(255, 255, 0), 0.5),
-  Gradient::Point.new(1, Color::RGB.new(0, 255, 0), 0.5)
+  Gradient::Point.new(0.8, Color::RGB.new(0, 255, 0), 0.5),
+  Gradient::Point.new(1, Color::RGB.new(0, 0, 255), 0.5)
 )
 
 class HeatmapPoint < ApplicationRecord
@@ -113,9 +115,9 @@ class HeatmapPoint < ApplicationRecord
         quality = 10 if quality > 10
         quality = 0 if quality < 0
 
-        color = GRADIENT_MAP.at(quality/10.0).color
+        color = GRADIENT_MAP.at(quality/12.5).color
 
-        png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 128)
+        png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 154)
         x += 1
         long = (long+step).round(3)
       end
