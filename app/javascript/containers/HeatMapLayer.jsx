@@ -54,7 +54,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
         throw error;
       }
     })
-  }, 500)).current;
+  }, 1000)).current;
 
   React.useEffect(() => loadMapData(map, currentLocation, mapPreferences), [map, currentLocation, mapPreferences])
 
