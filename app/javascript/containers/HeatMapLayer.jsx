@@ -18,10 +18,10 @@ export default ({ map, currentLocation, mapPreferences }) => {
     let controller = new AbortController();
     prevAbortController.current = controller;
     getMapDataHeatmap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
-    .then(responseBlob => {
-      let extra = (currentLocation.northEast[1]-currentLocation.southWest[1])*0.3;
-      let north = currentLocation.northEast[0]+extra, south = currentLocation.southWest[0]-extra,
-        west = currentLocation.southWest[1]-extra, east = currentLocation.northEast[1]+extra;
+    .then(({responseBlob, southWest, northEast}) => {
+      console.log(southWest, northEast)
+      let north = northEast[0], south = southWest[0],
+        west = southWest[1], east = northEast[1];
       let url = URL.createObjectURL(responseBlob);
       let coordinates = [
         [west, north],

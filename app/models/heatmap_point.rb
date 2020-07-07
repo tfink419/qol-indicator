@@ -124,7 +124,7 @@ class HeatmapPoint < ApplicationRecord
       y -= 1
       lat = (lat+step).round(3)
     end
-    png.to_datastream()
+    [south_west, north_east, png.to_datastream()]
   end
 
   TRANSIT_TYPE_MAP = [

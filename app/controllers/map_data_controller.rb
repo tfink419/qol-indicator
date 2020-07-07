@@ -11,8 +11,11 @@ class MapDataController < ApplicationController
 
     zoom = params[:zoom] ? params[:zoom].to_i : 7
 
-    image = HeatmapPoint.generate_image(south_west, north_east, zoom, transit_type)
+    fixed_south_west, fixed_north_east, image = HeatmapPoint.generate_image(south_west, north_east, zoom, transit_type)
 
+    puts "bounds: #{fixed_south_west}-#{fixed_north_east}"
+
+    response.headers['Content-Range'] = "Coordinates #{fixed_south_west}-#{fixed_north_east}"
     send_data image.to_blob
   end
 
