@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_07_183726) do
+ActiveRecord::Schema.define(version: 2020_07_07_222904) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,11 +63,11 @@ ActiveRecord::Schema.define(version: 2020_07_07_183726) do
   end
 
   create_table "heatmap_points", force: :cascade do |t|
-    t.integer "transit_type"
-    t.integer "precision"
-    t.float "lat"
-    t.float "long"
-    t.float "quality"
+    t.integer "transit_type", null: false
+    t.integer "precision", null: false
+    t.float "lat", null: false
+    t.float "long", null: false
+    t.float "quality", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long", unique: true
@@ -75,10 +75,10 @@ ActiveRecord::Schema.define(version: 2020_07_07_183726) do
   end
 
   create_table "isochrone_polygons", force: :cascade do |t|
-    t.string "isochronable_type"
-    t.bigint "isochronable_id"
-    t.string "travel_type"
-    t.integer "distance"
+    t.string "isochronable_type", null: false
+    t.bigint "isochronable_id", null: false
+    t.string "travel_type", null: false
+    t.integer "distance", null: false
     t.text "polygon", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
