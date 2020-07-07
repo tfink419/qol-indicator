@@ -21,7 +21,7 @@ class IsochronePolygon < ApplicationRecord
 
   scope :all_near_point_wide, lambda { |lat, long|
     wide_long = long+0.1
-    where(['south_bound <= ? AND ? <= north_bound AND ((west_bound <= ? AND ? <= east_bound) OR (west_bound <= ? AND ? <= east_bound) OR (west_bound >= ? AND east_bound <= ?))', lat, lat, long, long, wide_long, wide_long, long, wide_long])
+    where(['south_bound <= ? AND ? <= north_bound AND ((west_bound <= ? AND ? <= east_bound) OR (west_bound <= ? AND ? <= east_bound) OR (? <= west_bound AND east_bound <= ?))', lat, lat, long, long, wide_long, wide_long, long, wide_long])
   }
 
   def as_mapbox_poly
