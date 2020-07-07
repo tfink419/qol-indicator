@@ -28,7 +28,8 @@ Rails.application.routes.draw do
   get 'user/self', :to => 'user_self#show', :as => 'show_user_self'
   put 'user/self', :to => 'user_self#update'
   patch 'user/self', :to => 'user_self#update', :as => 'update_user_self'
-  get 'map_data', :to => 'map_data#retrieve_map_data', :as => 'retrieve_map_data'
+  get 'map_data/heatmap', :to => 'map_data#get_heatmap_image', :as => 'map_data_get_heatmap_image'
+  get 'map_data/grocery_stores', :to => 'map_data#get_grocery_stores', :as => 'map_data_get_grocery_stores'
 
   # Public Routes
   get 'register', :to => 'app#index', :as => 'register'

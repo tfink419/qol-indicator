@@ -69,3 +69,6 @@ gem 'httplog'
 gem 'sidekiq', '~> 6.1.0'
 
 gem 'geokit', '~> 1.13.1'
+
+gem 'chunky_png', '~> 1.3.11'
+gem 'gradient', '~> 0.5.1'
