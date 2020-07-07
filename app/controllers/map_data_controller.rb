@@ -2,23 +2,29 @@ require 'json'
 # require 'httplog'
 
 class MapDataController < ApplicationController
-  def retrieve_map_data
+  def get_heatmap_image
     south_west = JSON.parse(params[:south_west])
     north_east = JSON.parse(params[:north_east])
-    gstores = GroceryStore.where_in_coordinate_range(south_west, north_east).limit(1000).pluck(:id, :lat, :long)
     isochrones = []
 
     transit_type = params[:transit_type] ? params[:transit_type] : User.find(session[:user_id]).map_preferences.transit_type
 
     zoom = params[:zoom] ? params[:zoom].to_i : 7
 
-    grocery_store_points = HeatmapPoint.where(transit_type: transit_type)\
-    .where_in_coordinate_range(south_west, north_east, zoom).limit(200000)\
-    .order(:lat, :long).pluck(:lat, :long, :quality)
-    render :json => { 
-      :status => 0,
-      :grocery_stores => gstores,
-      :heatmap_points => HeatmapPoint.build(south_west, north_east, zoom, grocery_store_points)
+    image = HeatmapPoint.generate_image(south_west, north_east, zoom, transit_type)
+
+    send_data image.to_blob
+  end
+
+  def get_grocery_stores
+    south_west = JSON.parse(params[:south_west])
+    north_east = JSON.parse(params[:north_east])
+
+    grocery_stores = GroceryStore.where_in_coordinate_range(south_west, north_east).limit(1000).pluck(:id, :lat, :long)
+
+    render :json => {
+      status: 0,
+      grocery_stores: grocery_stores
     }
   end
 

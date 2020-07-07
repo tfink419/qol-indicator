@@ -1,3 +1,11 @@
+require 'gradient'
+
+GRADIENT_MAP = Gradient::Map.new(
+  Gradient::Point.new(0, Color::RGB.new(255, 0, 0), 0.5),
+  Gradient::Point.new(0.5, Color::RGB.new(255, 255, 0), 0.5),
+  Gradient::Point.new(1, Color::RGB.new(0, 255, 0), 0.5)
+)
+
 class HeatmapPoint < ApplicationRecord
   validates_with HeatmapPointValidator
   validates :transit_type, :presence => true
@@ -8,10 +16,10 @@ class HeatmapPoint < ApplicationRecord
 
   scope :where_in_coordinate_range, lambda { |south_west, north_east, zoom|
     zoom = zoom.to_i
-    if zoom > 12
+    if zoom > 11
       true_where_in_coordinate_range(south_west, north_east)
-    elsif zoom > 5
-      where(['precision < ?', zoom-4]).true_where_in_coordinate_range(south_west, north_east)
+    elsif zoom > 4
+      where(['precision < ?', zoom-3]).true_where_in_coordinate_range(south_west, north_east)
     else
       where(precision:2).true_where_in_coordinate_range(south_west, north_east)
     end
@@ -55,12 +63,12 @@ class HeatmapPoint < ApplicationRecord
   def self.zoom_to_precision_step(zoom)
     precision = 0
     step = 0.064
-    if zoom > 12
+    if zoom > 11
       step = 0.001
       precision = 7
-    elsif zoom > 5
-      step = (0.001 * 2**(12-zoom)).round(3)
-      precision = zoom-5
+    elsif zoom > 4
+      step = (0.001 * 2**(11-zoom)).round(3)
+      precision = zoom-4
     else
       step = 0.032
       precision = 2
@@ -68,35 +76,51 @@ class HeatmapPoint < ApplicationRecord
     [precision, step]
   end
 
-  def self.build(south_west, north_east, zoom, grocery_store_points)
+  def self.generate_image(south_west, north_east, zoom, transit_type)
+    grocery_store_points = HeatmapPoint.where(transit_type: transit_type)\
+    .where_in_coordinate_range(south_west, north_east, zoom).limit(300000)\
+    .order(:lat, :long).pluck(:lat, :long, :quality)
+
     precision, step = zoom_to_precision_step(zoom)
 
-    extra = (north_east[1]-south_west[1])*0.2
+    extra = (north_east[1]-south_west[1])*0.3
     south_west = [to_nearest_precision(south_west[0]-extra,precision), to_nearest_precision(south_west[1]-extra,precision)]
     north_east = [to_nearest_precision(north_east[0]+extra,precision), to_nearest_precision(north_east[1]+extra,precision)]
 
-    # check if somehow bounds are inside of grocery_store_points
+    width = ((north_east[1]-south_west[1])/step).round+1
+    height = ((north_east[0]-south_west[0])/step).round+1
 
+    png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.5'))
+    
     heatmap_points = []
     lat = south_west[0]
+    y = height-1
     gstore_ind = 0
     current_gstore_point = grocery_store_points[gstore_ind]
     # ierate through both "arrays", only works on sorted in same exact way
-    while lat < north_east[0]
+    while lat <= north_east[0]
       long = south_west[1]
-      while long < north_east[1]
+      x = 0
+      while long <= north_east[1]
         quality = 0
         if current_gstore_point && current_gstore_point[0] == lat && current_gstore_point[1] == long
           quality = current_gstore_point[2]
           gstore_ind += 1
           current_gstore_point = grocery_store_points[gstore_ind]
         end
-        heatmap_points << [lat, long, quality]
+        quality = 10 if quality > 10
+        quality = 0 if quality < 0
+
+        color = GRADIENT_MAP.at(quality/10.0).color
+
+        png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 128)
+        x += 1
         long = (long+step).round(3)
       end
+      y -= 1
       lat = (lat+step).round(3)
     end
-    heatmap_points
+    png.to_datastream()
   end
 
   TRANSIT_TYPE_MAP = [
@@ -116,7 +140,7 @@ class HeatmapPoint < ApplicationRecord
   private
 
   scope :true_where_in_coordinate_range, lambda { |south_west, north_east| 
-    extra = (north_east[1] - south_west[1])*0.1
+    extra = (north_east[1] - south_west[1])*0.2
     where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', 
       (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
   }

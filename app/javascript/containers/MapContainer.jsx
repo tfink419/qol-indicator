@@ -6,6 +6,7 @@ import { getMapPreferences } from '../fetch'
 import { updateMapPreferences } from "../actions/map-preferences";
 
 import HeatmapLayer from './HeatmapLayer'
+import GroceryStoreLayer from './GroceryStoreLayer'
 mapboxgl.accessToken = 'pk.eyJ1IjoidGZpbms0MTkiLCJhIjoiY2tibWhvYTFzMWlwNzJxcWk5Z2I2ajExcSJ9.kNmK4p8B3GOXf6OWMNXcoQ';
 
 const useStyles = makeStyles({
@@ -35,7 +36,9 @@ const cityZipPrint = (city, state, zip) => {
 
 const startLocation = {
   center: [-104.988, 39.743],
-  zoom:13
+  zoom:13,
+  southWest:[39.721, -105.042],
+  northEast:[39.765, -104.927]
 }
 
 const MapContainer = ({mapPreferences, updateMapPreferences}) => {
@@ -46,11 +49,13 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
 
   const handleMapMove = (event) => {
     let map = event.target;
-    let bounds = map.getBounds();
     let center = map.getCenter();
+    let bounds = map.getBounds();
     setCurrentLocation({
       center: [center.lng.toFixed(3), center.lat.toFixed(3)],
-      zoom: map.getZoom().toFixed(2)
+      zoom: map.getZoom().toFixed(2),
+      southWest: [bounds._sw.lat, bounds._sw.lng],
+      northEast: [bounds._ne.lat, bounds._ne.lng]
     });
   }
   
@@ -60,7 +65,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
       style: 'mapbox://styles/mapbox/streets-v11',
       center: currentLocation.center,
       zoom: currentLocation.zoom,
-      minZoom: 6,
+      minZoom: 4,
       maxZoom: 16
     });
     map.on('move', handleMapMove);
@@ -79,7 +84,8 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
 
   return (
     <div ref={mapContainer} className={classes.mapContainer}>
-      <HeatmapLayer currentLocation={currentLocation} map={map} mapPreferences={mapPreferences} />
+      <HeatmapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
+      <GroceryStoreLayer map={map} currentLocation={currentLocation} />
     </div>
   )};
     

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 const UNWANTED_PARAMETERS = ['id', 'created_at', 'updated_at']
 
-const paramify = (params) => '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
+export const paramify = (params) => '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
 
 function handleResponse(response) {
   if(response.status != 0 && response.status != 200) {
@@ -20,7 +20,7 @@ function filterUnwantedParams(obj) {
   return newObj;
 }
 
-const parseLatLng = (latLng) => `[${_.round(latLng.lat,3)},${_.round(latLng.lng,3)}]`
+export const parseLatLng = (latLng) => `[${_.round(latLng[0],3)},${_.round(latLng[1],3)}]`
 
 
 export const postLogin = (username, password) => {
@@ -171,12 +171,26 @@ export const deleteGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const getMapData = (southWest, northEast, zoom, transit_type, abortSignal) => {
-  let url = "/map_data",
+export const getMapDataHeatmap = (southWest, northEast, zoom, transit_type, abortSignal) => {
+  let url = "/map_data/heatmap",
     params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom};
   if(transit_type) {
     params.transit_type = transit_type;
   }
+  // Turn object into http params
+  url += paramify(params)
+
+  return fetch(url, {
+    signal: abortSignal,
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.blob())
+}
+
+export const getMapDataGroceryStores = (southWest, northEast, abortSignal) => {
+  let url = "/map_data/grocery_stores",
+    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast) };
   // Turn object into http params
   url += paramify(params)
 
