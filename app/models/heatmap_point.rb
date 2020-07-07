@@ -20,10 +20,12 @@ class HeatmapPoint < ApplicationRecord
     zoom = zoom.to_i
     if zoom > 11
       true_where_in_coordinate_range(south_west, north_east)
-    elsif zoom > 4
+    elsif zoom > 7
       where(['precision < ?', zoom-3]).true_where_in_coordinate_range(south_west, north_east)
+    elsif zoom > 3
+      where(['precision < ?', zoom-1]).true_where_in_coordinate_range(south_west, north_east)
     else
-      where(precision:2).true_where_in_coordinate_range(south_west, north_east)
+      where(precision:3).true_where_in_coordinate_range(south_west, north_east)
     end
   }
 
@@ -68,12 +70,15 @@ class HeatmapPoint < ApplicationRecord
     if zoom > 11
       step = 0.001
       precision = 7
-    elsif zoom > 4
+    elsif zoom > 7
       step = (0.001 * 2**(11-zoom)).round(3)
       precision = zoom-4
+    elsif zoom > 3
+      step = (0.001 * 2**(9-zoom)).round(3)
+      precision = zoom-2
     else
-      step = 0.032
-      precision = 2
+      step = 0.016
+      precision = 3
     end
     [precision, step]
   end
@@ -82,8 +87,6 @@ class HeatmapPoint < ApplicationRecord
     grocery_store_points = HeatmapPoint.where(transit_type: transit_type)\
     .where_in_coordinate_range(south_west, north_east, zoom).limit(300000)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
-
-    puts "Num Points: #{grocery_store_points.length}"
 
     precision, step = zoom_to_precision_step(zoom)
 
@@ -101,6 +104,7 @@ class HeatmapPoint < ApplicationRecord
     y = height-1
     gstore_ind = 0
     current_gstore_point = grocery_store_points[gstore_ind]
+    max_lat = 0, max_long = 0
     # ierate through both "arrays", only works on sorted in same exact way
     while lat <= north_east[0]
       long = south_west[1]
@@ -109,6 +113,8 @@ class HeatmapPoint < ApplicationRecord
         quality = 0
         if current_gstore_point && current_gstore_point[0] == lat && current_gstore_point[1] == long
           quality = current_gstore_point[2]
+          max_lat = lat
+          max_long = long
           gstore_ind += 1
           current_gstore_point = grocery_store_points[gstore_ind]
         end
@@ -124,6 +130,9 @@ class HeatmapPoint < ApplicationRecord
       y -= 1
       lat = (lat+step).round(3)
     end
+    puts "Max Lat: #{max_lat}"
+    puts "Max Long: #{max_long}"
+    puts "Num Points: #{grocery_store_points.length}"
     [south_west, north_east, png.to_datastream()]
   end
 
