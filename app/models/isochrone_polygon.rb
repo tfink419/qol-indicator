@@ -12,10 +12,10 @@ class IsochronePolygon < ApplicationRecord
 
   before_validation do
     if self.polygon
-      self.west_bound = self.polygon.min { |a, b| a[0] <=> b[0] }[0].to_f
-      self.east_bound = self.polygon.max { |a, b| a[0] <=> b[0] }[0].to_f
-      self.south_bound = self.polygon.min { |a, b| a[1] <=> b[1] }[1].to_f
-      self.north_bound = self.polygon.max { |a, b| a[1] <=> b[1] }[1].to_f
+      self.west_bound = self.polygon.min { |a, b| a[0].to_f <=> b[0].to_f }[0].to_f
+      self.east_bound = self.polygon.max { |a, b| a[0].to_f <=> b[0].to_f }[0].to_f
+      self.south_bound = self.polygon.min { |a, b| a[1].to_f <=> b[1].to_f }[1].to_f
+      self.north_bound = self.polygon.max { |a, b| a[1].to_f <=> b[1].to_f }[1].to_f
     end
   end
 
