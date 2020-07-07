@@ -144,10 +144,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
 
   def log_exp_sum(values)
     return 0 if values.blank?
-    sum = 0
-    values.each do |value|
-      sum += LOG_EXP**value
-    end
+    sum = values.sum{ |value| LOG_EXP**value }
     Math.log(sum, LOG_EXP)
   end
 end
