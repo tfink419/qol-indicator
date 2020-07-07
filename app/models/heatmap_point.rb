@@ -113,8 +113,6 @@ class HeatmapPoint < ApplicationRecord
         quality = 0
         if current_gstore_point && current_gstore_point[0] == lat && current_gstore_point[1] == long
           quality = current_gstore_point[2]
-          max_lat = lat
-          max_long = long
           gstore_ind += 1
           current_gstore_point = grocery_store_points[gstore_ind]
         end
@@ -130,9 +128,6 @@ class HeatmapPoint < ApplicationRecord
       y -= 1
       lat = (lat+step).round(3)
     end
-    puts "Max Lat: #{max_lat}"
-    puts "Max Long: #{max_long}"
-    puts "Num Points: #{grocery_store_points.length}"
     [south_west, north_east, png.to_datastream()]
   end
 
