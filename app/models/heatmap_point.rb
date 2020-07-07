@@ -81,6 +81,8 @@ class HeatmapPoint < ApplicationRecord
     .where_in_coordinate_range(south_west, north_east, zoom).limit(300000)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
 
+    puts "Num Points: #{grocery_store_points.length}"
+
     precision, step = zoom_to_precision_step(zoom)
 
     extra = (north_east[1]-south_west[1])*0.3
