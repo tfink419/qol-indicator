@@ -83,11 +83,12 @@ class BuildHeatmapSegmentJob < ApplicationJob
                 if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
                   isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
                   .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
-                  .all_near_point_wide(lat, long)
+                  .all_near_point_wide(lat, long)\
                   .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)
                   # skip to next block if none found
                   if isochrones.blank?
-                    long = (long+0.1).round(BuildHeatmapJob::STEP_PRECISION)
+                    long = (long+0.1).round(1)
+                    next
                   end
                 end
                 qualities = []
