@@ -185,7 +185,15 @@ export const getMapDataHeatmap = (southWest, northEast, zoom, transit_type, abor
     headers: {
       'Accept': 'application/json'
   }})
-  .then(response => response.blob())
+  .then(response => {
+    let range = response.headers.get('Content-Range');
+    let bounds = range.match(/Coordinates (\[.+\])-(\[.+\])/)
+    return response.blob().then(responseBlob => ({
+      responseBlob,
+      southWest: bounds && JSON.parse(bounds[1]),
+      northEast: bounds && JSON.parse(bounds[2])
+    }))
+  })
 }
 
 export const getMapDataGroceryStores = (southWest, northEast, abortSignal) => {
