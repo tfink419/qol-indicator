@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_05_225444) do
+ActiveRecord::Schema.define(version: 2020_07_07_183726) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,10 +70,6 @@ ActiveRecord::Schema.define(version: 2020_07_05_225444) do
     t.float "quality"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["lat"], name: "index_heatmap_points_on_lat"
-    t.index ["long"], name: "index_heatmap_points_on_long"
-    t.index ["precision", "lat"], name: "index_heatmap_points_on_precision_and_lat"
-    t.index ["precision", "long"], name: "index_heatmap_points_on_precision_and_long"
     t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long", unique: true
     t.index ["transit_type", "precision", "lat", "long"], name: "index_heatmap_points_on_type_prec_lat_long", unique: true
   end
