@@ -23,9 +23,9 @@ class HeatmapPoint < ApplicationRecord
     elsif zoom > 7
       where(['precision < ?', zoom-3]).true_where_in_coordinate_range(south_west, north_east)
     elsif zoom > 3
-      where(['precision < ?', zoom-1]).true_where_in_coordinate_range(south_west, north_east)
+      where(['precision < ?', zoom-2]).true_where_in_coordinate_range(south_west, north_east)
     else
-      where(precision:3).true_where_in_coordinate_range(south_west, north_east)
+      where(precision:2).true_where_in_coordinate_range(south_west, north_east)
     end
   }
 
@@ -74,11 +74,11 @@ class HeatmapPoint < ApplicationRecord
       step = (0.001 * 2**(11-zoom)).round(3)
       precision = zoom-4
     elsif zoom > 3
-      step = (0.001 * 2**(9-zoom)).round(3)
-      precision = zoom-2
+      step = (0.001 * 2**(10-zoom)).round(3)
+      precision = zoom-3
     else
-      step = 0.016
-      precision = 3
+      step = 0.032
+      precision = 2
     end
     [precision, step]
   end
