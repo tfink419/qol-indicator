@@ -19,7 +19,6 @@ export default ({ map, currentLocation, mapPreferences }) => {
     prevAbortController.current = controller;
     getMapDataHeatmap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
     .then(({responseBlob, southWest, northEast}) => {
-      console.log(southWest, northEast)
       let north = northEast[0], south = southWest[0],
         west = southWest[1], east = northEast[1];
       let url = URL.createObjectURL(responseBlob);
