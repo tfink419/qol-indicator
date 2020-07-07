@@ -9,7 +9,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import { drawerWidth } from '../common'
 import { updatedGroceryStores } from '../actions/admin'
-import { getMapData, deleteGroceryStore } from '../fetch'
+import { getMapDataGroceryStores, deleteGroceryStore } from '../fetch'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
 import OldHeatmapLayer from './OldHeatmapLayer'
@@ -64,7 +64,7 @@ const AdminMapContainer = ({updatedGroceryStores}) => {
 
   const loadMapData = (bounds) => {
     bounds = bounds || currentBounds;
-    getMapData(bounds._southWest, bounds._northEast)
+    getMapDataGroceryStores(bounds._southWest, bounds._northEast)
     .then(response => {
       setGroceryStores(response.grocery_stores)
     })
