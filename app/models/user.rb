@@ -12,11 +12,11 @@ class User < ApplicationRecord
     :format => URI::MailTo::EMAIL_REGEXP,
     :uniqueness => true
 
-  has_many :password_resets
-  has_one :map_preferences
+  has_many :password_resets, dependent: :destroy
+  has_one :map_preferences, dependent: :destroy
 
   before_validation do
-    
+
   end
 
   scope :clean_order, lambda { |attr, dir| 
