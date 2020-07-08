@@ -22,18 +22,6 @@ const useStyles = makeStyles({
   }
 });
 
-const cityZipPrint = (city, state, zip) => {
-  if(!city && state && zip) {
-    return `${state} ${zip}`
-  }
-  else if(city && state && !zip) {
-    return `${city}, ${state}`
-  }
-  else {
-    return `${city}, ${state} ${zip}`
-  }
-}
-
 const startLocation = {
   center: [-104.988, 39.743],
   zoom:13,
