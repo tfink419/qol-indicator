@@ -11,7 +11,6 @@ import AddIcon from '@material-ui/icons/AddCircle';
 
 import { getAdminGroceryStores, deleteAdminGroceryStore } from '../fetch'
 import { loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage, updateGroceryStoresSearchField} from '../actions/admin'
-import { drawerWidth } from '../common'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
 import CreateGroceryStoreDialog from '../components/CreateGroceryStoreDialog';

@@ -7,7 +7,6 @@ import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box
 import { flashMessage } from '../actions/messages'
 import { setBuildHeatmapStatusReloadIntervalId, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage } from '../actions/admin'
 import { getAdminBuildHeatmapStatuses, getAdminBuildHeatmapStatus, postAdminBuildHeatmap } from '../fetch'
-import { drawerWidth } from '../common'
 
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',
