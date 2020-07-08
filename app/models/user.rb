@@ -15,6 +15,10 @@ class User < ApplicationRecord
   has_many :password_resets
   has_one :map_preferences
 
+  before_validation do
+    
+  end
+
   scope :clean_order, lambda { |attr, dir| 
     #ensure attr and dir are safe values to use by checking within an array of allowed values
     attr = (User.attribute_names.include? attr) ? attr : 'created_at'

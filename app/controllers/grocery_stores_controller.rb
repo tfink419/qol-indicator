@@ -1,6 +1,6 @@
 class GroceryStoresController < ApplicationController
   before_action :confirm_logged_in
-  before_action :admin_only
+  before_action :admin_only, except: [:show]
 
   def index
     page = params[:page].to_i

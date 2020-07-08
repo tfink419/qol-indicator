@@ -33,7 +33,9 @@ class MapDataController < ApplicationController
     south_west = JSON.parse(params[:south_west])
     north_east = JSON.parse(params[:north_east])
 
-    grocery_stores = GroceryStore.where_in_coordinate_range(south_west, north_east).limit(1000).pluck(:id, :lat, :long)
+    grocery_stores = GroceryStore.where_in_coordinate_range(south_west, north_east)\
+    .limit(1000)\
+    .pluck(:id, :lat, :long, :quality)
 
     render :json => {
       status: 0,
