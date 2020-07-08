@@ -29,13 +29,14 @@ const useStyles = makeStyles({
   }
 });
 
-export default ({groceryStoreId, open, isAdmin}) => {
+export default ({groceryStoreId, open, isAdmin, onGroceryStoreChange}) => {
   const classes = useStyles();
   let [groceryStore, setGroceryStore] = React.useState(null);
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
 
   const loadGroceryStore = () => {
     if(open) {
+      setGroceryStore(null);
       getGroceryStore(groceryStoreId)
       .then(response => {
         setGroceryStore(response.grocery_store);
@@ -46,8 +47,7 @@ export default ({groceryStoreId, open, isAdmin}) => {
   const handleCloseDialogs = (groceryStoreChange) => {
     setCurrentDialogOpen(null);
     if(groceryStoreChange) {
-      loadMapData();
-      updatedGroceryStores();
+      onGroceryStoreChange();
     }
   }
 
