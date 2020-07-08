@@ -28,7 +28,7 @@ export default ({ map, currentLocation, isAdmin }) => {
       markers.current = [];
       if(currentLocation.zoom > 10) {
         markers.current = response.grocery_stores.map((groceryStore) => {
-          let color = 'orange';
+          let color = 'orangered';
           if(groceryStore[3] > 10) {
             color = 'blue';
           } else if(groceryStore[3] > 7) {
@@ -56,11 +56,15 @@ export default ({ map, currentLocation, isAdmin }) => {
             lat: groceryStore[1]
           };
           let popupPlaceholder = document.createElement('div');
-          ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin}/></Provider>, popupPlaceholder);
+          
+          const onGroceryStoreChange = () => loadMapData(map, currentLocation);
+          
+          ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, popupPlaceholder);
+          
           let popup = new mapboxgl.Popup({ offset: 25 })
           .setDOMContent(popupPlaceholder)
-          .on('open', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={true} isAdmin={isAdmin}/></Provider>, popupPlaceholder))
-          .on('close', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin}/></Provider>, popupPlaceholder))
+          .on('open', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={true} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, popupPlaceholder))
+          .on('close', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, popupPlaceholder))
 
           marker.setLngLat(lngLat)
           .setPopup(popup)
