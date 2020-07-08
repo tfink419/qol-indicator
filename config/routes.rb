@@ -4,15 +4,16 @@ Rails.application.routes.draw do
   root :to => 'app#index'
   
   # Admin routes
-  post 'grocery_stores/upload_csv'
-  get 'grocery_stores/upload_csv/status', :to => 'grocery_stores#upload_csv_status_index'
-  get 'grocery_stores/upload_csv/status/:id', :to => 'grocery_stores#upload_csv_status_show'
-  resources :grocery_stores, :only => [:index, :create, :show, :update, :destroy]
-  resources :users, :only => [:index, :create, :show, :update, :destroy]
-  post 'build_heatmap', :to => 'build_heatmap#build', :as => 'build_heatmap'
-  get 'build_heatmap/status', :to => 'build_heatmap#status_index', :as => 'build_heatmap_status_index'
-  get 'build_heatmap/status/:id', :to => 'build_heatmap#status_show', :as => 'build_heatmap_status_show'
-  
+  scope '/api/' do
+    post 'admin/grocery_stores/upload_csv'
+    get 'admin/grocery_stores/upload_csv/status', :to => 'admin/grocery_stores#upload_csv_status_index'
+    get 'admin/grocery_stores/upload_csv/status/:id', :to => 'admin/grocery_stores#upload_csv_status_show'
+    resources 'admin/grocery_stores', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_grocery_stores'
+    resources 'admin/users', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_users'
+    post 'admin/build_heatmap', :to => 'admin/build_heatmap#build', :as => 'admin_build_heatmap'
+    get 'admin/build_heatmap/status', :to => 'admin/build_heatmap#status_index', :as => 'admin_build_heatmap_status_index'
+    get 'admin/build_heatmap/status/:id', :to => 'admin/build_heatmap#status_show', :as => 'admin_build_heatmap_status_show'
+  end
   sidekiq_web_constraint = lambda do |request|
     request.session[:user_id] and User.find(request.session[:user_id]).admin?
   end
@@ -22,6 +23,7 @@ Rails.application.routes.draw do
   end
 
   # User routes
+  resources 'grocery_stores', :only => [:show], :as => 'grocery_stores'
   get 'map_preferences', :to => 'map_preferences#show', :as => 'show_map_preferences'
   put 'map_preferences', :to => 'map_preferences#update'
   patch 'map_preferences', :to => 'map_preferences#update', :as => 'update_map_preferences'

@@ -6,7 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardCo
   CircularProgress, Grid, Typography, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core/';
 
 import { flashMessage } from '../actions/messages'
-import { getGroceryStore, putGroceryStore } from '../fetch';
+import { getAdminGroceryStore, putAdminGroceryStore } from '../fetch';
 import StateSelect from './StateSelect';
 import { qualityMarks } from '../common'
 
@@ -44,7 +44,7 @@ const CreateGroceryStoreDialog = ({groceryStoreId, open, onClose, flashMessage})
       setOriginalStoreName('Store Name');
       setGroceryStoreErrors({});
       
-      getGroceryStore(groceryStoreId).then(response => {
+      getAdminGroceryStore(groceryStoreId).then(response => {
         setLoading(false);
         setGroceryStore(response.grocery_store)
         setOriginalStoreName(response.grocery_store.name);
@@ -60,7 +60,7 @@ const CreateGroceryStoreDialog = ({groceryStoreId, open, onClose, flashMessage})
     event.preventDefault();
     setGroceryStoreErrors({});
     setLoading(true)
-    putGroceryStore(groceryStore)
+    putAdminGroceryStore(groceryStore)
     .then(response => {
       flashMessage('info', 'GroceryStore created successfully')
       setLoading(false)

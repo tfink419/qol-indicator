@@ -6,7 +6,7 @@ import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box
 
 import { flashMessage } from '../actions/messages'
 import { setBuildHeatmapStatusReloadIntervalId, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage } from '../actions/admin'
-import { getBuildHeatmapStatuses, getBuildHeatmapStatus, postBuildHeatmap } from '../fetch'
+import { getAdminBuildHeatmapStatuses, getAdminBuildHeatmapStatus, postAdminBuildHeatmap } from '../fetch'
 import { drawerWidth } from '../common'
 
 const STATE_MAP = {
@@ -18,22 +18,14 @@ const STATE_MAP = {
   'complete': 'Completed'
 }
 
-const useStyles = makeStyles({
-  pushRight: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-  }
-});
-
 const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapStatuses, flashMessage, 
 loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
-  const classes = useStyles();
   let [rebuild, setRebuild] = React.useState(false);
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildHeatmapStatuses;
 
   const handleBuildHeatmap = (event) => {
     event.preventDefault();
-    postBuildHeatmap(rebuild)
+    postAdminBuildHeatmap(rebuild)
     .then((response) => {
       flashMessage('info', response.message);
       loadBuildHeatmapStatuses(true);
@@ -48,7 +40,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
 
   const loadBuildHeatmapStatuses = (force) => {
     if(!loaded || force) {
-      getBuildHeatmapStatuses(page, rowsPerPage).then(response => {
+      getAdminBuildHeatmapStatuses(page, rowsPerPage).then(response => {
         if(response.status == 0) {
           loadedBuildHeatmapStatuses(response.build_heatmap_statuses.all, response.build_heatmap_status_count, response.build_heatmap_statuses.current)
         }
@@ -57,7 +49,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
   }
   
   const reloadCurrentBuildHeatmapStatus = () => {
-    getBuildHeatmapStatus(current.id).then(response => {
+    getAdminBuildHeatmapStatus(current.id).then(response => {
       if(response.status == 0) {
         loadedCurrentBuildHeatmapStatus(response.build_heatmap_status)
       }
@@ -114,7 +106,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
   }, [current]);
   
   return (
-    <Paper className={classes.pushRight}>
+    <Paper>
       <Typography variant="h3">Build Heatmap</Typography>
       { !loaded && <CircularProgress/>}
       {loaded && current &&
