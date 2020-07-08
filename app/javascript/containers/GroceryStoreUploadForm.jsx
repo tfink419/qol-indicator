@@ -6,7 +6,7 @@ import { Typography, Paper, Input, Button, CircularProgress, Slider, Box, Linear
 import { flashMessage } from '../actions/messages'
 import { setUploadCsvStatusReloadIntervalId, loadedUploadCsvStatuses, loadedCurrentUploadCsvStatus, 
   updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
-import { postGroceryStoreUploadCsv, getGroceryStoreUploadCsvStatuses, getGroceryStoreUploadCsvStatus } from '../fetch'
+import { postAdminGroceryStoreUploadCsv, getAdminGroceryStoreUploadCsvStatuses, getAdminGroceryStoreUploadCsvStatus } from '../fetch'
 import { drawerWidth, qualityMarks } from '../common'
 
 const STATE_MAP = {
@@ -18,10 +18,6 @@ const STATE_MAP = {
 }
 
 const useStyles = makeStyles({
-  pushRight: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-  },
   buttonMargin: {
     marginLeft: '2em',
   },
@@ -46,7 +42,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
 
   const handleFileSubmit = (event) => {
     event.preventDefault();
-    postGroceryStoreUploadCsv(selectedFile, quality)
+    postAdminGroceryStoreUploadCsv(selectedFile, quality)
     .then((response) => {
       flashMessage('info', response.message);
       loadUploadCsvStatuses(true)
@@ -61,7 +57,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
 
   const loadUploadCsvStatuses = (force) => {
     if(!loaded || force) {
-      getGroceryStoreUploadCsvStatuses(page, rowsPerPage).then(response => {
+      getAdminGroceryStoreUploadCsvStatuses(page, rowsPerPage).then(response => {
         if(response.status == 0) {
           loadedUploadCsvStatuses(response.upload_csv_statuses.all, response.upload_csv_status_count, response.upload_csv_statuses.current)
         }
@@ -70,7 +66,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
   }
   
   const reloadCurrentUploadCsvStatus = () => {
-    getGroceryStoreUploadCsvStatus(current.id).then(response => {
+    getAdminGroceryStoreUploadCsvStatus(current.id).then(response => {
       if(response.status == 0) {
         loadedCurrentUploadCsvStatus(response.upload_csv_status)
       }
@@ -104,7 +100,7 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
   }, [current]);
 
   return (
-    <Paper className={classes.pushRight}>
+    <Paper>
       <Typography variant="h3">Upload CSV</Typography>
       { !loaded && <CircularProgress />}
       { loaded && current &&

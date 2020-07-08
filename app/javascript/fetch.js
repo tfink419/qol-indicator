@@ -43,8 +43,8 @@ export const postRegister = (user) => {
   .then(handleResponse)
 }
 
-export const getUsers = (page, rowsPerPage, sortOrder, dir) => {
-  let url = "/users",
+export const getAdminUsers = (page, rowsPerPage, sortOrder, dir) => {
+  let url = "/api/admin/users",
     params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase() };
   // Turn object into http params
   url += paramify(params)
@@ -57,8 +57,8 @@ export const getUsers = (page, rowsPerPage, sortOrder, dir) => {
   .then(handleResponse)
 }
 
-export const getGroceryStores = (page, rowsPerPage, sortOrder, dir, search) => {
-  let url = "/grocery_stores",
+export const getAdminGroceryStores = (page, rowsPerPage, sortOrder, dir, search) => {
+  let url = "/api/admin/grocery_stores",
     params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase(), search };
   // Turn object into http params
   url += paramify(params)
@@ -72,8 +72,8 @@ export const getGroceryStores = (page, rowsPerPage, sortOrder, dir, search) => {
 }
 
 
-export const getUser = (userId) => {
-  return fetch('/users/'+userId, { 
+export const getAdminUser = (userId) => {
+  return fetch('/api/admin/users/'+userId, { 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -82,8 +82,8 @@ export const getUser = (userId) => {
   .then(handleResponse)
 }
 
-export const putUser = (user) => {
-  return fetch('/users/'+user.id, { method:'PUT', body: JSON.stringify({user: filterUnwantedParams(user)}), 
+export const putAdminUser = (user) => {
+  return fetch('/api/admin/users/'+user.id, { method:'PUT', body: JSON.stringify({user: filterUnwantedParams(user)}), 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -92,8 +92,8 @@ export const putUser = (user) => {
   .then(handleResponse)
 }
 
-export const postUser = (user) => {
-  return fetch('/users', { method:'POST', body: JSON.stringify({user}), 
+export const postAdminUser = (user) => {
+  return fetch('/api/admin/users', { method:'POST', body: JSON.stringify({user}), 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -102,8 +102,8 @@ export const postUser = (user) => {
   .then(handleResponse)
 }
 
-export const deleteUser = (userId) => {
-  let url = "/users/"+userId;
+export const deleteAdminUser = (userId) => {
+  let url = "/api/admin/users/"+userId;
 
   return fetch(url, {
     method: 'DELETE',
@@ -114,12 +114,12 @@ export const deleteUser = (userId) => {
   .then(handleResponse)
 }
 
-export const postGroceryStoreUploadCsv = (file, quality) => {
+export const postAdminGroceryStoreUploadCsv = (file, quality) => {
   const formData = new FormData();
   formData.append('csv_file', file);
   formData.append('filename', file.name);
   formData.append('default_quality', quality);
-  return fetch('/grocery_stores/upload_csv', { method:'POST', body: formData, 
+  return fetch('/api/admin/grocery_stores/upload_csv', { method:'POST', body: formData, 
     headers: {
       'Accept': 'application/json'
   }})
@@ -127,8 +127,8 @@ export const postGroceryStoreUploadCsv = (file, quality) => {
   .then(handleResponse)
 }
 
-export const getGroceryStore = (groceryStoreId) => {
-  return fetch('/grocery_stores/'+groceryStoreId, { 
+export const getAdminGroceryStore = (groceryStoreId) => {
+  return fetch('/api/admin/grocery_stores/'+groceryStoreId, { 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -137,9 +137,9 @@ export const getGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const postGroceryStore = (groceryStore) => {
+export const postAdminGroceryStore = (groceryStore) => {
   let obj = { grocery_store: groceryStore};
-  return fetch('/grocery_stores', { method:'POST', body: JSON.stringify(obj), 
+  return fetch('/api/admin/grocery_stores', { method:'POST', body: JSON.stringify(obj), 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -148,9 +148,9 @@ export const postGroceryStore = (groceryStore) => {
   .then(handleResponse)
 }
 
-export const putGroceryStore = (groceryStore) => {
+export const putAdminGroceryStore = (groceryStore) => {
   let obj = { grocery_store: filterUnwantedParams(groceryStore)};
-  return fetch('/grocery_stores/'+groceryStore.id, { method:'PUT', body: JSON.stringify(obj), 
+  return fetch('/api/admin/grocery_stores/'+groceryStore.id, { method:'PUT', body: JSON.stringify(obj), 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -159,8 +159,8 @@ export const putGroceryStore = (groceryStore) => {
   .then(handleResponse)
 }
 
-export const deleteGroceryStore = (groceryStoreId) => {
-  let url = "/grocery_stores/"+groceryStoreId;
+export const deleteAdminGroceryStore = (groceryStoreId) => {
+  let url = "/api/admin/grocery_stores/"+groceryStoreId;
 
   return fetch(url, {
     method: 'DELETE',
@@ -170,6 +170,63 @@ export const deleteGroceryStore = (groceryStoreId) => {
   .then(response => response.json())
   .then(handleResponse)
 }
+
+export const getAdminBuildHeatmapStatuses = (page, rowsPerPage) => {
+  let url = "/api/admin/build_heatmap/status",
+    params = { limit: rowsPerPage, page };
+  url += paramify(params)
+  return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getAdminGroceryStoreUploadCsvStatuses = (page, rowsPerPage) => {
+  let url = "/api/admin/grocery_stores/upload_csv/status",
+    params = { limit: rowsPerPage, page };
+  url += paramify(params)
+  return fetch(url, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getAdminGroceryStoreUploadCsvStatus = (id) => {
+  return fetch("/api/admin/grocery_stores/upload_csv/status/"+id, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getAdminBuildHeatmapStatus = (id) => {
+  return fetch("/api/admin/build_heatmap/status/"+id, {
+    method:'GET', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const postAdminBuildHeatmap = (rebuild) => {
+  return fetch('/api/admin/build_heatmap?rebuild='+rebuild, {
+    method:'POST', 
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
 
 export const getMapDataHeatmap = (southWest, northEast, zoom, transit_type, abortSignal) => {
   let url = "/map_data/heatmap",
@@ -281,56 +338,10 @@ export const putMapPreferences = (user) => {
   .then(handleResponse)
 }
 
-export const getBuildHeatmapStatuses = (page, rowsPerPage) => {
-  let url = "/build_heatmap/status",
-    params = { limit: rowsPerPage, page };
-  url += paramify(params)
-  return fetch(url, {
-    method:'GET', 
+export const getGroceryStore = (groceryStoreId) => {
+  return fetch('/grocery_stores/'+groceryStoreId, { 
     headers: {
-      'Accept': 'application/json'
-  }})
-  .then(response => response.json())
-  .then(handleResponse)
-}
-
-export const getGroceryStoreUploadCsvStatuses = (page, rowsPerPage) => {
-  let url = "/grocery_stores/upload_csv/status",
-    params = { limit: rowsPerPage, page };
-  url += paramify(params)
-  return fetch(url, {
-    method:'GET', 
-    headers: {
-      'Accept': 'application/json'
-  }})
-  .then(response => response.json())
-  .then(handleResponse)
-}
-
-export const getGroceryStoreUploadCsvStatus = (id) => {
-  return fetch("/grocery_stores/upload_csv/status/"+id, {
-    method:'GET', 
-    headers: {
-      'Accept': 'application/json'
-  }})
-  .then(response => response.json())
-  .then(handleResponse)
-}
-
-export const getBuildHeatmapStatus = (id) => {
-  return fetch("/build_heatmap/status/"+id, {
-    method:'GET', 
-    headers: {
-      'Accept': 'application/json'
-  }})
-  .then(response => response.json())
-  .then(handleResponse)
-}
-
-export const postBuildHeatmap = (rebuild) => {
-  return fetch('/build_heatmap?rebuild='+rebuild, {
-    method:'POST', 
-    headers: {
+      'Content-Type': 'application/json',
       'Accept': 'application/json'
   }})
   .then(response => response.json())

@@ -9,7 +9,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
-import { getUsers } from '../fetch'
+import { getAdminUsers } from '../fetch'
 import { loadedUsers, clearUsers, updateUsersOrderDir, updateUsersOrder, updateUsersPage, updateUsersRowsPerPage } from '../actions/admin'
 import { drawerWidth } from '../common'
 import DeleteDialog from '../components/DeleteDialog';
@@ -31,10 +31,6 @@ const useStyles = makeStyles({
   deleteIcon: {
     color: 'red',
   },
-  pushRight: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-  },
   actionsCell:{
     minWidth:'96px', // 2x icon size
   },
@@ -52,7 +48,7 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
 
   const loadUsers = (force) => {
     if(!loaded || force) {
-      getUsers(page, rowsPerPage, order, orderDir).then(response => {
+      getAdminUsers(page, rowsPerPage, order, orderDir).then(response => {
         if(response.status == 0) {
           loadedUsers(response.users, response.user_count)
         }
@@ -109,7 +105,7 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
   const dense = (rowsPerPage == 25);
 
   return (
-    <Paper className={classes.pushRight}>
+    <Paper>
       <Toolbar>
         <Typography variant="h6" component="div" className={classes.topBarFlex}>
           Users
@@ -229,7 +225,7 @@ function UserTable({users, loadedUsers, updateUsersOrder, updateUsersOrderDir, u
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />}
       <DeleteDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} objectId={selectedUser && selectedUser.id} 
-        objectName={selectedUser && selectedUser.username} objectType={'User'} deleteAction={deleteUser} />
+        objectName={selectedUser && selectedUser.username} objectType={'User'} deleteAction={deleteAdminUser} />
       <UpdateUserDialog open={currentDialogOpen == 'update'} onClose={handleCloseDialogs} userId={selectedUser && selectedUser.id} />
       <CreateUserDialog open={currentDialogOpen == 'create'} onClose={handleCloseDialogs}/>
     </Paper>

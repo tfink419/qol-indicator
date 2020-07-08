@@ -1,122 +1,89 @@
 import React from "react";
+import _ from 'lodash'
 import { makeStyles } from '@material-ui/core/styles'
 import { connect } from "react-redux";
+import { getMapPreferences } from '../fetch'
+import { updateMapPreferences } from "../actions/map-preferences";
 
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
-import { IconButton } from '@material-ui/core';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
-
-import { drawerWidth } from '../common'
-import { updatedGroceryStores } from '../actions/admin'
-import { getMapDataGroceryStores, deleteGroceryStore } from '../fetch'
-import DeleteDialog from '../components/DeleteDialog';
-import UpdateGroceryStoreDialog from '../components/UpdateGroceryStoreDialog';
-import OldHeatmapLayer from './OldHeatmapLayer'
+import HeatmapLayer from './HeatmapLayer'
+import GroceryStoreLayer from './GroceryStoreLayer'
+mapboxgl.accessToken = 'pk.eyJ1IjoidGZpbms0MTkiLCJhIjoiY2tibWhvYTFzMWlwNzJxcWk5Z2I2ajExcSJ9.kNmK4p8B3GOXf6OWMNXcoQ';
 
 const useStyles = makeStyles({
   map: {
-    height: 'calc(100vh - 64px)',
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
+    height: 'calc(100vh - 64px)'
   },
-  editIcon: {
-    color: 'green',
-  },
-  deleteIcon: {
-    color: 'red',
+  mapContainer: {
+    position: 'absolute',
+    top: '64px',
+    bottom: 0,
+    width: 'calc(100vw - 48px)',
+    maxWidth: '1232px'
   }
 });
 
-const cityZipPrint = (city, state, zip) => {
-  if(!city && state && zip) {
-    return `${state} ${zip}`
-  }
-  else if(city && state && !zip) {
-    return `${city}, ${state}`
-  }
-  else {
-    return `${city}, ${state} ${zip}`
-  }
-}
-
 const startLocation = {
-  lat:39.743,
-  long:-104.988,
-  zoom:13
+  center: [-104.988, 39.743],
+  zoom:13,
+  southWest:[39.721, -105.042],
+  northEast:[39.765, -104.927]
 }
 
-const AdminMapContainer = ({updatedGroceryStores}) => {
+const AdminMapContainer = ({mapPreferences, updateMapPreferences}) => {
   const classes = useStyles();
-  let [groceryStores, setGroceryStores] = React.useState([])
-  let [selectedGroceryStore, setSelectedGroceryStore] = React.useState(null)
-  let [currentLocation, setCurrentLocation] = React.useState([])
-  let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
-  let [currentBounds, setCurrentBounds] = React.useState(null)
+  let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
+  let [map, setMap] = React.useState(null);
+  const mapContainer = React.useRef(null);
 
   const handleMapMove = (event) => {
     let map = event.target;
+    let center = map.getCenter();
     let bounds = map.getBounds();
-    setCurrentBounds(bounds);
-    setCurrentLocation( {...map.getCenter(), zoom:map.getZoom()})
-    loadMapData(bounds);
+    setCurrentLocation({
+      center: [center.lng.toFixed(3), center.lat.toFixed(3)],
+      zoom: map.getZoom().toFixed(2),
+      southWest: [bounds._sw.lat, bounds._sw.lng],
+      northEast: [bounds._ne.lat, bounds._ne.lng]
+    });
   }
-
-  const loadMapData = (bounds) => {
-    bounds = bounds || currentBounds;
-    getMapDataGroceryStores(bounds._southWest, bounds._northEast)
-    .then(response => {
-      setGroceryStores(response.grocery_stores)
-    })
-  }
-
-  const handleCloseDialogs = (groceryStoreChange) => {
-    setCurrentDialogOpen(null);
-    setSelectedGroceryStore(null);
-    if(groceryStoreChange) {
-      loadMapData();
-      updatedGroceryStores();
+  
+  React.useEffect(() => {
+    let map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: currentLocation.center,
+      zoom: currentLocation.zoom,
+      minZoom: 5,
+      maxZoom: 16
+    });
+    map.on('move', handleMapMove);
+    setMap(map);
+  },[])
+  
+  const loadMapPreferences = () => {
+    if(!mapPreferences.loaded) {
+      getMapPreferences().then(response => {
+        updateMapPreferences(response.map_preferences)
+      })
     }
   }
 
-  const handleOpenDialog = (type, groceryStore) => {
-    setSelectedGroceryStore(groceryStore)
-    setCurrentDialogOpen(type);
-  }
+  React.useEffect(loadMapPreferences, [mapPreferences]);
 
-  const startPosition = [startLocation.lat, startLocation.long]
   return (
-    <Map center={startPosition} zoom={startLocation.zoom} className={classes.map} onMoveEnd={handleMapMove} whenReady={handleMapMove}>
-      <TileLayer
-        attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <OldHeatmapLayer groceryStores={groceryStores} />
-      { currentLocation.zoom > 12 && groceryStores.map(groceryStore => (
-        <Marker position={[groceryStore.lat, groceryStore.long]} key={groceryStore.id}>
-          <Popup>
-            {groceryStore.name} <br/>
-            {groceryStore.address} <br/>
-            {cityZipPrint(groceryStore.city, groceryStore.state, groceryStore.zip)}
-            <br />
-            <IconButton onClick={() => handleOpenDialog('update', groceryStore)}>
-              <EditIcon className={classes.editIcon} />
-            </IconButton>
-            <IconButton onClick={() => handleOpenDialog('delete', groceryStore)}>
-              <DeleteIcon className={classes.deleteIcon}/>
-            </IconButton>
-          </Popup>
-        </Marker>
-      ))}
-      <DeleteDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} objectId={selectedGroceryStore && selectedGroceryStore.id} 
-        objectName={selectedGroceryStore && `${selectedGroceryStore.name} at ${selectedGroceryStore.address}`} objectType="Grocery Store"  deleteAction={deleteGroceryStore} />
-      <UpdateGroceryStoreDialog open={currentDialogOpen == 'update'} onClose={handleCloseDialogs} groceryStoreId={selectedGroceryStore && selectedGroceryStore.id} />
-    </Map>
-)};
-
+    <div ref={mapContainer} className={classes.mapContainer}>
+      <HeatmapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
+      <GroceryStoreLayer map={map} currentLocation={currentLocation} isAdmin={true}/>
+    </div>
+  )};
+    
+const mapStateToProps = state => ({
+  mapPreferences: state.mapPreferences
+})
 
 const mapDispatchToProps = {
-  updatedGroceryStores
+  updateMapPreferences
 }
 
-export default connect(null, mapDispatchToProps)(AdminMapContainer)
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdminMapContainer)

@@ -1,13 +1,14 @@
 import React from "react";
 import ReactDOM from 'react-dom'
 import _ from 'lodash';
-
+import { Provider, useStore } from 'react-redux'
 import GroceryStorePopup from '../components/GroceryStorePopup';
 
 import { getMapDataGroceryStores } from '../fetch';
 
-export default ({ map, currentLocation }) => {
+export default ({ map, currentLocation, isAdmin }) => {
   const groceryStores = React.useRef([])
+  const store = useStore();
   const markers = React.useRef([])
   const prevAbortController = React.useRef(null)
 
@@ -55,11 +56,11 @@ export default ({ map, currentLocation }) => {
             lat: groceryStore[1]
           };
           let popupPlaceholder = document.createElement('div');
-          ReactDOM.render(<GroceryStorePopup groceryStoreId={groceryStore[0]} open={false}/>, popupPlaceholder);
+          ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin}/></Provider>, popupPlaceholder);
           let popup = new mapboxgl.Popup({ offset: 25 })
           .setDOMContent(popupPlaceholder)
-          .on('open', () => ReactDOM.render(<GroceryStorePopup groceryStoreId={groceryStore[0]} open={true}/>, popupPlaceholder))
-          .on('close', () => ReactDOM.render(<GroceryStorePopup groceryStoreId={groceryStore[0]} open={false}/>, popupPlaceholder))
+          .on('open', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={true} isAdmin={isAdmin}/></Provider>, popupPlaceholder))
+          .on('close', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin}/></Provider>, popupPlaceholder))
 
           marker.setLngLat(lngLat)
           .setPopup(popup)

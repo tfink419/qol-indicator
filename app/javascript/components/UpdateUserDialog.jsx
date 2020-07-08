@@ -7,7 +7,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle,
 
 import { flashMessage } from '../actions/messages'
 import { userLogin } from '../actions/user'
-import { getUser, putUser } from '../fetch';
+import { getAdminUser, putAdminUser } from '../fetch';
 
 const useStyles = makeStyles({
   cancelButton: {

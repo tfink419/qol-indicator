@@ -7,7 +7,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle,
 
 import { flashMessage } from '../actions/messages'
 import { userLogin } from '../actions/user'
-import { postUser } from '../fetch';
+import { postAdminUser } from '../fetch';
 
 const useStyles = makeStyles({
   cancelButton: {
@@ -38,7 +38,7 @@ const CreateUserDialog = ({open, onClose, flashMessage, userLogin}) => {
     event.preventDefault();
     setUserErrors({});
     setLoading(true)
-    postUser(user)
+    postAdminUser(user)
     .then(response => {
       flashMessage('info', 'User created successfully')
       setLoading(false)

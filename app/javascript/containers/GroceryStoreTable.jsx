@@ -9,7 +9,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
-import { getGroceryStores, deleteGroceryStore } from '../fetch'
+import { getAdminGroceryStores, deleteAdminGroceryStore } from '../fetch'
 import { loadedGroceryStores, updateGroceryStoresOrder, updateGroceryStoresOrderDir, updateGroceryStoresPage, updateGroceryStoresRowsPerPage, updateGroceryStoresSearchField} from '../actions/admin'
 import { drawerWidth } from '../common'
 import DeleteDialog from '../components/DeleteDialog';
@@ -28,10 +28,6 @@ const useStyles = makeStyles({
   },
   deleteIcon: {
     color: 'red',
-  },
-  pushRight: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
   },
   actionsCell:{
     minWidth:'96px', // 2x icon size
@@ -53,7 +49,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
 
   const loadGroceryStores = React.useRef(_.throttle((loaded, page, rowsPerPage, order, orderDir, searchField, force) => { // only allow once every 100 ms
     if(!loaded || force) {
-      getGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
+      getAdminGroceryStores(page, rowsPerPage, order, orderDir, searchField).then(response => {
         if(response.status == 0) {
           loadedGroceryStores(response.grocery_stores, response.grocery_store_count)
         }
@@ -120,7 +116,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
   const dense = (rowsPerPage == 25);
 
   return (
-    <Paper className={classes.pushRight}>
+    <Paper>
       <Toolbar>
         <Typography variant="h6" component="div" className={classes.topBarFlex}>
           Grocery Stores
@@ -277,7 +273,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />}
       <DeleteDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} objectId={selectedGroceryStore && selectedGroceryStore.id} 
-        objectName={selectedGroceryStore && `${selectedGroceryStore.name} at ${selectedGroceryStore.address}`} objectType="Grocery Store"  deleteAction={deleteGroceryStore} />
+        objectName={selectedGroceryStore && `${selectedGroceryStore.name} at ${selectedGroceryStore.address}`} objectType="Grocery Store"  deleteAction={deleteAdminGroceryStore} />
       <UpdateGroceryStoreDialog open={currentDialogOpen == 'update'} onClose={handleCloseDialogs} groceryStoreId={selectedGroceryStore && selectedGroceryStore.id} />
       <CreateGroceryStoreDialog open={currentDialogOpen == 'create'} onClose={handleCloseDialogs}/>
     </Paper>
