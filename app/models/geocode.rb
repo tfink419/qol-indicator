@@ -84,7 +84,6 @@ class Geocode
       response = Mapbox::Geocoder.geocode_forward(location, { country:'US', types:['address']})
       response[0]["features"][0]
     rescue StandardError => err
-      pp 'It should get rescued here'
       $stderr.print err
       $stderr.print err.backtrace
       nil
