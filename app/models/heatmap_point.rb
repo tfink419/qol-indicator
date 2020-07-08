@@ -95,7 +95,7 @@ class HeatmapPoint < ApplicationRecord
     width = ((north_east[1]-south_west[1])/step).round+1
     height = ((north_east[0]-south_west[0])/step).round+1
 
-    png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.5'))
+    png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.6'))
     
     heatmap_points = []
     lat = south_west[0]
@@ -126,7 +126,7 @@ class HeatmapPoint < ApplicationRecord
       y -= 1
       lat = (lat+step).round(3)
     end
-    [south_west, north_east, png.to_datastream()]
+    [south_west, north_east, png.to_datastream(:fast_rgba)]
   end
 
   TRANSIT_TYPE_MAP = [

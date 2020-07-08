@@ -26,12 +26,12 @@ class BuildHeatmapSegmentJob < ApplicationJob
     long = nil
     job_retry ||= build_status.created_at < 15.minutes.ago
     build_status.update!(percent:percent, state:state)
-    pp "Segment #{segment}"
+    puts "Segment #{segment}"
     build_thread = Thread.new {
       begin
         Signal.trap('INT') { throw SystemExit }
         Signal.trap('TERM') { throw SystemExit }
-        pp 'Starting Thread...'
+        puts 'Starting Thread...'
         gstore_count = segment_part = (GroceryStore.count/BuildHeatmapJob::NUM_SEGMENTS).floor(1)
         segment_low = (segment-1)*segment_part
         segment_low += 1 unless segment == 1
@@ -39,7 +39,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         
         current = 0
         state = 'isochrones'
-        pp 'Isochrones State...'
+        puts 'Isochrones State...'
         GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
           current += 1
           
@@ -68,7 +68,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         north_east =  BuildHeatmapJob.furthest_north_east
         lat = build_status.current_lat
 
-        pp 'Heatmap Points'
+        puts 'Heatmap Points'
         state = 'heatmap-points'
         while true # see towards bottom of loop
           isochrones = []
