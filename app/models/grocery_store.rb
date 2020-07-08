@@ -17,7 +17,7 @@ class GroceryStore < ApplicationRecord
 
   validates :quality, :inclusion => 0..10
 
-  has_many :isochrone_polygons, as: :isochronable
+  has_many :isochrone_polygons, as: :isochronable, dependent: :destroy
 
   before_validation do
     self.address = self.address.strip.titleize
