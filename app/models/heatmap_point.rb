@@ -6,7 +6,7 @@ GRADIENT_MAP = Gradient::Map.new(
   Gradient::Point.new(0.2, Color::RGB.new(255, 165, 0), 0.5),
   Gradient::Point.new(0.5, Color::RGB.new(255, 255, 0), 0.5),
   Gradient::Point.new(0.8, Color::RGB.new(0, 255, 0), 0.5),
-  Gradient::Point.new(1, Color::RGB.new(0, 0, 255), 0.5)
+  Gradient::Point.new(1, Color::RGB.new(0, 255, 255), 0.5)
 )
 
 class HeatmapPoint < ApplicationRecord
