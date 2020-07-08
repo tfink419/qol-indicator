@@ -7,7 +7,7 @@ import { flashMessage } from '../actions/messages'
 import { setUploadCsvStatusReloadIntervalId, loadedUploadCsvStatuses, loadedCurrentUploadCsvStatus, 
   updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
 import { postAdminGroceryStoreUploadCsv, getAdminGroceryStoreUploadCsvStatuses, getAdminGroceryStoreUploadCsvStatus } from '../fetch'
-import { drawerWidth, qualityMarks } from '../common'
+import { qualityMarks } from '../common'
 
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',

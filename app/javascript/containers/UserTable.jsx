@@ -9,14 +9,11 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
-import { getAdminUsers } from '../fetch'
+import { getAdminUsers, deleteAdminUser } from '../fetch'
 import { loadedUsers, clearUsers, updateUsersOrderDir, updateUsersOrder, updateUsersPage, updateUsersRowsPerPage } from '../actions/admin'
-import { drawerWidth } from '../common'
 import DeleteDialog from '../components/DeleteDialog';
 import UpdateUserDialog from '../components/UpdateUserDialog';
 import CreateUserDialog from '../components/CreateUserDialog';
-
-import { deleteUser } from '../fetch'
 
 const useStyles = makeStyles({
   iconButton: {
