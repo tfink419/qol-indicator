@@ -21,12 +21,12 @@ export default ({ map, currentLocation, isAdmin }) => {
     }
     let controller = new AbortController();
     prevAbortController.current = controller;
-    getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
-    .then(response => {
-      groceryStores.current = response.grocery_stores;
-      markers.current.forEach(marker => marker.remove());
-      markers.current = [];
-      if(currentLocation.zoom > 10) {
+    if(currentLocation.zoom > 10) {
+      getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
+      .then(response => {
+        groceryStores.current = response.grocery_stores;
+        markers.current.forEach(marker => marker.remove());
+        markers.current = [];
         markers.current = response.grocery_stores.map((groceryStore) => {
           let color = 'orangered';
           if(groceryStore[3] > 10) {
@@ -71,13 +71,13 @@ export default ({ map, currentLocation, isAdmin }) => {
           .addTo(map);
           return marker;
         })
-      }
-    })
-    .catch(error => {
-      if(error.name != 'AbortError') {
-        throw error;
-      }
-    })
+      })
+      .catch(error => {
+        if(error.name != 'AbortError') {
+          throw error;
+        }
+      })
+    }
   }, 500)).current;
 
   React.useEffect(() => loadMapData(map, currentLocation), [map, currentLocation])
