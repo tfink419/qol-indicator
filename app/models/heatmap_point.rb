@@ -32,7 +32,7 @@ class HeatmapPoint < ApplicationRecord
 
   before_validation do
     if self.precision.nil?
-      if lat%1000 == 0 && long%1000 == 0
+      if lat%64 == 0 && long%64 == 0
         self.precision = 0
       elsif lat%64 == 0 && long%64 == 0
         self.precision = 1
