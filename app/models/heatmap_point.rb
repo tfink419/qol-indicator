@@ -88,9 +88,10 @@ class HeatmapPoint < ApplicationRecord
 
     precision, step = zoom_to_precision_step(zoom)
 
-    extra = (north_east[1]-south_west[1])*0.3
-    south_west = [to_nearest_precision(south_west[0]-extra,precision), to_nearest_precision(south_west[1]-extra,precision)]
-    north_east = [to_nearest_precision(north_east[0]+extra,precision), to_nearest_precision(north_east[1]+extra,precision)]
+    extra_long = (north_east[1]-south_west[1])*0.3
+    extra_lat = (north_east[0]-south_west[0])*0.3
+    south_west = [to_nearest_precision(south_west[0]-extra_lat,precision), to_nearest_precision(south_west[1]-extra_long,precision)]
+    north_east = [to_nearest_precision(north_east[0]+extra_lat,precision), to_nearest_precision(north_east[1]+extra_long,precision)]
 
     south_west_int = south_west.map { |val| (val*1000).round.to_i }
     north_east_int = north_east.map { |val| (val*1000).round.to_i }
@@ -129,6 +130,12 @@ class HeatmapPoint < ApplicationRecord
       y -= 1
       lat += step_int
     end
+
+    if zoom < 7 # WTF is up with this
+      magic_bug_offset = 0.06*extra_lat*1.2**extra_lat
+      south_west[0] -= magic_bug_offset
+      north_east[0] -= magic_bug_offset
+    end
     [south_west, north_east, png.to_datastream(:fast_rgba)]
   end
 
@@ -148,9 +155,10 @@ class HeatmapPoint < ApplicationRecord
 
   private
 
-  scope :true_where_in_coordinate_range, lambda { |south_west, north_east| 
-    extra = (north_east[1] - south_west[1])*0.2
+  scope :true_where_in_coordinate_range, lambda { |south_west, north_east|
+    extra_long = (north_east[1]-south_west[1])*0.2
+    extra_lat = (north_east[0]-south_west[0])*0.2
     where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', 
-      (south_west[0]-extra)*1000, (north_east[0]+extra)*1000, (south_west[1]-extra)*1000, (north_east[1]+extra)*1000])
+      (south_west[0]-extra_lat)*1000, (north_east[0]+extra_lat)*1000, (south_west[1]-extra_long)*1000, (north_east[1]+extra_long)*1000])
   }
 end
