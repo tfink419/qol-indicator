@@ -83,7 +83,7 @@ class HeatmapPoint < ApplicationRecord
 
   def self.generate_image(south_west, north_east, zoom, transit_type)
     grocery_store_points = HeatmapPoint.where(transit_type: transit_type)\
-    .where_in_coordinate_range(south_west, north_east, zoom).limit(300000)\
+    .where_in_coordinate_range(south_west, north_east, zoom)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
 
     precision, step = zoom_to_precision_step(zoom)
