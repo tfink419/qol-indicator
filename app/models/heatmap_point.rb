@@ -1,5 +1,5 @@
 require 'gradient'
-require 'oily_png'
+# require 'oily_png'
 
 GRADIENT_MAP = Gradient::Map.new(
   Gradient::Point.new(0, Color::RGB.new(255, 0, 0), 0.5),
@@ -32,21 +32,21 @@ class HeatmapPoint < ApplicationRecord
 
   before_validation do
     if self.precision.nil?
-      if lat.round == lat && long.round == long
+      if lat%128 == 0 && long%128 == 0
         self.precision = 0
-      elsif (lat*15.625).round == (lat*15.625) && (long*15.625).round == (long*15.625)
+      elsif lat%64 == 0 && long%64 == 0
         self.precision = 1
-      elsif (lat*31.25).round == (lat*31.25) && (long*31.25).round == (long*31.25)
+      elsif lat%32 == 0 && long%32 == 0
         self.precision = 2
-      elsif (lat*62.5).round == (lat*62.5) && (long*62.5).round == (long*62.5)
+      elsif lat%16 == 0 && long%16 == 0
         self.precision = 3
-      elsif (lat*125).round == (lat*125) && (long*125).round == (long*125)
+      elsif lat%8 == 0 && long%8 == 0
         self.precision = 4
-      elsif (lat*250).round == (lat*250) && (long*250).round == (long*250)
+      elsif lat%4 == 0 && long%4 == 0
         self.precision = 5
-      elsif (lat*500).round == (lat*500) && (long*500).round == (long*500)
+      elsif lat%2 == 0 && long%2 == 0
         self.precision = 6
-      else # (lat*1000).round == (lat*1000) && (long*1000).round == (long*1000)
+      else
         self.precision = 7
       end
     end
@@ -92,22 +92,25 @@ class HeatmapPoint < ApplicationRecord
     south_west = [to_nearest_precision(south_west[0]-extra,precision), to_nearest_precision(south_west[1]-extra,precision)]
     north_east = [to_nearest_precision(north_east[0]+extra,precision), to_nearest_precision(north_east[1]+extra,precision)]
 
+    south_west_int = south_west.map { |val| (val*1000).round.to_i }
+    north_east_int = north_east.map { |val| (val*1000).round.to_i }
+
     width = ((north_east[1]-south_west[1])/step).round+1
     height = ((north_east[0]-south_west[0])/step).round+1
 
     png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.6'))
     
+    step_int = (step*1000).round.to_i
     heatmap_points = []
-    lat = south_west[0]
+    lat = south_west_int[0]
     y = height-1
     gstore_ind = 0
     current_gstore_point = grocery_store_points[gstore_ind]
-    max_lat = 0, max_long = 0
     # ierate through both "arrays", only works on sorted in same exact way
-    while lat <= north_east[0]
-      long = south_west[1]
+    while lat <= north_east_int[0]
+      long = south_west_int[1]
       x = 0
-      while long <= north_east[1]
+      while long <= north_east_int[1]
         quality = 0
         if current_gstore_point && current_gstore_point[0] == lat && current_gstore_point[1] == long
           quality = current_gstore_point[2]
@@ -121,10 +124,10 @@ class HeatmapPoint < ApplicationRecord
 
         png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 154)
         x += 1
-        long = (long+step).round(3)
+        long += step_int
       end
       y -= 1
-      lat = (lat+step).round(3)
+      lat += step_int
     end
     [south_west, north_east, png.to_datastream(:fast_rgba)]
   end
@@ -148,6 +151,6 @@ class HeatmapPoint < ApplicationRecord
   scope :true_where_in_coordinate_range, lambda { |south_west, north_east| 
     extra = (north_east[1] - south_west[1])*0.2
     where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', 
-      (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
+      (south_west[0]-extra)*1000, (north_east[0]+extra)*1000, (south_west[1]-extra)*1000, (north_east[1]+extra)*1000])
   }
 end

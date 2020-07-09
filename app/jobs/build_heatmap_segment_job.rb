@@ -19,8 +19,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
     percent = 100
     gstore_count = nil
     current = nil
-    south_west = nil
-    north_east = nil
+    south_west_int = nil
+    north_east_int = nil
     current_transit_type = nil
     lat = nil
     long = nil
@@ -66,6 +66,12 @@ class BuildHeatmapSegmentJob < ApplicationJob
 
         south_west = BuildHeatmapJob.furthest_south_west
         north_east =  BuildHeatmapJob.furthest_north_east
+
+        south_west_int = south_west.map { |val| (val*1000).round.to_i }
+        north_east_int = north_east.map { |val| (val*1000).round.to_i }
+
+        step_int = (BuildHeatmapJob::STEP*1000).round.to_i
+
         lat = build_status.current_lat
 
         puts 'Heatmap Points'
@@ -77,17 +83,17 @@ class BuildHeatmapSegmentJob < ApplicationJob
             new_heatmaps = []
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-            while long < north_east[1]
+            while long < north_east_int[1]
               if HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).none? # Skip all the calculation if point already exists
-                lat_lng = Geokit::LatLng.new(lat, long)
-                if (long*10).round == long*10 ## trying to be efficient with gstore and isochrone fetches
+                lat_lng = Geokit::LatLng.new(lat/1000.0, long/1000.0)
+                if long%100 == 0 ## trying to be efficient with gstore and isochrone fetches
                   isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
                   .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
                   .all_near_point_wide(lat, long)\
                   .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)
                   # skip to next block if none found
                   if isochrones.blank?
-                    long = (long+0.1).round(1)
+                    long += 100
                     next
                   end
                 end
@@ -103,12 +109,12 @@ class BuildHeatmapSegmentJob < ApplicationJob
                   new_heatmaps << {lat: lat, long: long, quality: quality, transit_type:transit_type}
                 end
               end
-              long = (long+BuildHeatmapJob::STEP).round(BuildHeatmapJob::STEP_PRECISION)
+              long += step_int
             end
             HeatmapPoint.create(new_heatmaps)
           end
-          lat = (build_status.build_heatmap_status.reload.current_lat+BuildHeatmapJob::STEP).round(BuildHeatmapJob::STEP_PRECISION)
-          break unless lat <= north_east[0] # essentially while lat <= north_east[0]
+          lat = build_status.build_heatmap_status.reload.current_lat+step_int
+          break unless lat <= north_east_int[0] # essentially while lat <= north_east[0]
           build_status.build_heatmap_status.update!(current_lat:lat)
           build_status.update!(current_lat:lat)
         end
@@ -140,7 +146,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
   private
 
   def calc_heatmap_point_percent(current_transit_type, long, south_west, north_east)
-    (((long-south_west[1])/(north_east[1]-south_west[1]+BuildHeatmapJob::STEP)/9+(current_transit_type-1)/9.0)*100).round(3)
+    (((long-south_west_int[1])/(north_east_int[1]-south_west_int[1]+BuildHeatmapJob::STEP)/9+(current_transit_type-1)/9.0)*100).round(3)
   end
 
   def log_exp_sum(values)
