@@ -131,6 +131,8 @@ class HeatmapPoint < ApplicationRecord
       lat += step_int
     end
 
+    south_west = south_west.map { |val| val+step/2 }
+    north_east = north_east.map { |val| val+step/2 }
     if zoom < 7 # WTF is up with this
       magic_bug_offset = 0.06*extra_lat*1.2**extra_lat
       south_west[0] -= magic_bug_offset
