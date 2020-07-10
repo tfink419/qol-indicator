@@ -4,8 +4,8 @@ import _ from 'lodash';
 import { getMapDataHeatmap } from '../fetch'
 
 export default ({ map, currentLocation, mapPreferences }) => {
-  const hasLoaded = React.useRef(false)
   const prevAbortController = React.useRef(null)
+  const prevOverlay = React.useRef(null)
 
   const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences) => {
     // Lots of Refs and passed params used here because of closure issue with throttle
@@ -22,31 +22,15 @@ export default ({ map, currentLocation, mapPreferences }) => {
       let north = northEast[0], south = southWest[0],
         west = southWest[1], east = northEast[1];
       let url = URL.createObjectURL(responseBlob);
-      let coordinates = [
-        [west, north],
-        [east, north],
-        [east, south],
-        [west, south]
-      ];
 
-      if(hasLoaded.current) {
-        map.getSource('heatmap').updateImage({ url, coordinates })
+      if(prevOverlay.current) {
+        prevOverlay.current.setMap(null);
       }
-      else {
-        map.addSource('heatmap',{
-          'type': 'image',
-          url,
-          coordinates
-        });
-        map.addLayer({
-          'id': 'heatmap-layer',
-          'source': 'heatmap',
-          'type': 'raster',
-          'paint': { 'raster-opacity': 0.50 }
-        })
-      }
-      
-      hasLoaded.current = true;
+
+      let imageBounds = { north, south, east, west };
+      let heatmapOverlay = new google.maps.GroundOverlay(url, imageBounds);
+      heatmapOverlay.setMap(map);
+      prevOverlay.current = heatmapOverlay;
     })
     .catch(error => {
       if(error.name != 'AbortError') {

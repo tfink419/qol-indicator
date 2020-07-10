@@ -2,12 +2,18 @@ import React from "react";
 import _ from 'lodash'
 import { makeStyles } from '@material-ui/core/styles'
 import { connect } from "react-redux";
+import { Loader } from '@googlemaps/js-api-loader';
 import { getMapPreferences } from '../fetch'
 import { updateMapPreferences } from "../actions/map-preferences";
 
 import HeatmapLayer from './HeatmapLayer'
 import GroceryStoreLayer from './GroceryStoreLayer'
-mapboxgl.accessToken = 'pk.eyJ1IjoidGZpbms0MTkiLCJhIjoiY2tibWhvYTFzMWlwNzJxcWk5Z2I2ajExcSJ9.kNmK4p8B3GOXf6OWMNXcoQ';
+
+const loader = new Loader({
+  apiKey: GOOGLE_KEY,
+  version: "weekly",
+  libraries: ["places"]
+});
 
 const useStyles = makeStyles({
   map: {
@@ -23,42 +29,28 @@ const useStyles = makeStyles({
 });
 
 const startLocation = {
-  center: [-104.988, 39.743],
-  zoom:13,
+  center: [39.743, -104.988],
+  zoom:12,
   southWest:[39.721, -105.042],
   northEast:[39.765, -104.927]
 }
 
-const MapContainer = ({mapPreferences, updateMapPreferences}) => {
+const MapContainer = ({mapPreferences, updateMapPreferences, isAdmin = false}) => {
   const classes = useStyles();
   let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
   let [map, setMap] = React.useState(null);
-  const mapContainer = React.useRef(null);
+  const mapRef = React.useRef(null);
 
-  const handleMapMove = (event) => {
-    let map = event.target;
+  const handleMapMove = (map) => {
     let center = map.getCenter();
     let bounds = map.getBounds();
     setCurrentLocation({
-      center: [center.lng.toFixed(3), center.lat.toFixed(3)],
+      center: [center.lat().toFixed(3), center.lng().toFixed(3)],
       zoom: map.getZoom().toFixed(2),
-      southWest: [bounds._sw.lat, bounds._sw.lng],
-      northEast: [bounds._ne.lat, bounds._ne.lng]
+      southWest: [bounds.getSouthWest().lat(), bounds.getSouthWest().lng()],
+      northEast: [bounds.getNorthEast().lat(), bounds.getNorthEast().lng()]
     });
   }
-  
-  React.useEffect(() => {
-    let map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: currentLocation.center,
-      zoom: currentLocation.zoom,
-      minZoom: 5,
-      maxZoom: 16
-    });
-    map.on('move', handleMapMove);
-    setMap(map);
-  },[])
   
   const loadMapPreferences = () => {
     if(!mapPreferences.loaded) {
@@ -70,10 +62,31 @@ const MapContainer = ({mapPreferences, updateMapPreferences}) => {
 
   React.useEffect(loadMapPreferences, [mapPreferences]);
 
+  const loadMap = () => {
+    const mapOptions = {
+      center: {
+        lat: currentLocation.center[0],
+        lng: currentLocation.center[1]
+      },
+      zoom: currentLocation.zoom,
+      minZoom: 7,
+      maxZoom: 17
+    };
+    loader
+    .load()
+    .then(() => {
+      let mapTemp = new window.google.maps.Map(mapRef.current, mapOptions);
+      setMap(mapTemp);
+      mapTemp.addListener('bounds_changed', () => handleMapMove(mapTemp))
+    })
+  }
+
+  React.useEffect(loadMap, [])
+
   return (
-    <div ref={mapContainer} className={classes.mapContainer}>
+    <div className={classes.mapContainer} ref={mapRef}>
       <HeatmapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
-      <GroceryStoreLayer map={map} currentLocation={currentLocation} />
+      <GroceryStoreLayer map={map} currentLocation={currentLocation} isAdmin={isAdmin} />
     </div>
   )};
     

@@ -99,7 +99,7 @@ class HeatmapPoint < ApplicationRecord
     width = ((north_east[1]-south_west[1])/step).round+1
     height = ((north_east[0]-south_west[0])/step).round+1
 
-    png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.6'))
+    png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.5'))
     
     step_int = (step*1000).round.to_i
     heatmap_points = []
@@ -123,7 +123,7 @@ class HeatmapPoint < ApplicationRecord
 
         color = GRADIENT_MAP.at(quality/12.5).color
 
-        png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 154)
+        png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 128)
         x += 1
         long += step_int
       end
