@@ -10,26 +10,25 @@ import { getMapPreferences, putMapPreferences } from '../fetch';
 
 const transitTypeMarks = [
   {
-    value: 2,
+    value: 1,
     label: 'Walkable',
   },
   {
-    value: 5,
+    value: 4,
     label: 'Bike/Bus',
   },
   {
-    value: 8,
+    value: 7,
     label: 'Car',
-  },
-  {
-    value: 10,
-    label: 'Fly?',
   }
 ];  
 
 const useStyles = makeStyles({
   cancelButton: {
     color: 'green'
+  },
+  markLabel:{
+    marginLeft:'12.5%'
   }
 });
 
@@ -89,12 +88,12 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
         <DialogContent>
           <form onSubmit={handleUpdate}>
             <Slider
-              className={classes.slider}
+              classes={{markLabel:classes.markLabel}}
               value={mapPreferences.preferences.transit_type}
               onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, transit_type:val })}
               step={1}
               min={1}
-              max={10}
+              max={9}
               valueLabelDisplay="auto"
               marks={transitTypeMarks}
             />
