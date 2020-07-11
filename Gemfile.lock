@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 66f37b8a17be904a7636dfe84f21bab18357dd10
+  revision: 896761ae42cf4945fdbf05c1562f6c5691a8462a
   specs:
-    quality_map_image (0.1.1)
+    quality_map_image (0.1.2)
 
 GEM
   remote: https://rubygems.org/
@@ -235,7 +235,7 @@ DEPENDENCIES
   mapbox-sdk (~> 2.3.0)
   pg (>= 0.18, < 2.0)
   puma (~> 3.11)
-  quality_map_image (~> 0.1.1)!
+  quality_map_image (~> 0.1.2)!
   rails (~> 5.2.4, >= 5.2.4.3)
   sass-rails (~> 5.0)
   selenium-webdriver
