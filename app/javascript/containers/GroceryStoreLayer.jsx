@@ -8,6 +8,8 @@ import { getMapDataGroceryStores } from '../fetch';
 
 const MAX_STORES_TO_HOLD = 10000;
 
+const ICON_SVG_PATH = "M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z";
+
 export default ({ map, currentLocation, isAdmin }) => {
   const groceryStores = React.useRef([]);
   const justRetrievedGroceryStores = React.useRef([]);
@@ -37,9 +39,7 @@ export default ({ map, currentLocation, isAdmin }) => {
         justRetrievedGroceryStores.current = [];
         response.grocery_stores.forEach((groceryStore) => {
           justRetrievedGroceryStores.current.push(groceryStore[0]);
-          if(groceryStores.current.findIndex(storeToFind => storeToFind.groceryStore[0] == groceryStore[0]) >= 0) {
-            return;
-          }
+          let scale = Math.pow(1.3, (currentLocation.zoom-12));
           let fillColor = 'orangered';
           if(groceryStore[3] > 10) {
             fillColor = 'blue';
@@ -49,10 +49,8 @@ export default ({ map, currentLocation, isAdmin }) => {
           else if(groceryStore[3] > 3)  {
             fillColor = 'yellow';
           }
-          let scale = Math.pow(1.3, (currentLocation.zoom-12));
-
           let icon = {
-            path: "M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z",
+            path: ICON_SVG_PATH,
             fillColor,
             fillOpacity: 1,
             anchor: new window.google.maps.Point(12*scale,12*scale),
@@ -60,7 +58,11 @@ export default ({ map, currentLocation, isAdmin }) => {
             strokeColor:'black',
             scale
           }
-
+          let foundIndex = groceryStores.current.findIndex(storeToFind => storeToFind.groceryStore[0] == groceryStore[0]);
+          if(foundIndex >= 0) {
+            groceryStores.current[foundIndex].marker.setIcon(icon);
+            return;
+          }
           let latLng = {lat:groceryStore[1], lng:groceryStore[2]};
           let marker = new window.google.maps.Marker({
             position: latLng,
