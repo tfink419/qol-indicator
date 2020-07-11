@@ -22,9 +22,7 @@ class HeatmapPoint < ApplicationRecord
     if zoom > 11
       true_where_in_coordinate_range(south_west, north_east)
     elsif zoom > 7
-      where(['precision <= ?', zoom-4]).true_where_in_coordinate_range(south_west, north_east)
-    elsif zoom > 3
-      where(['precision <= ?', zoom-3]).true_where_in_coordinate_range(south_west, north_east)
+      where(['precision <= ?', zoom-5]).true_where_in_coordinate_range(south_west, north_east)
     else
       where(['precision <= ?', 2]).true_where_in_coordinate_range(south_west, north_east)
     end
@@ -72,11 +70,8 @@ class HeatmapPoint < ApplicationRecord
       step = 0.001
       precision = 7
     elsif zoom > 7
-      step = (0.001 * 2**(11-zoom)).round(3)
-      precision = zoom-4
-    elsif zoom > 3
-      step = (0.001 * 2**(10-zoom)).round(3)
-      precision = zoom-3
+      step = (0.001 * 2**(12-zoom)).round(3)
+      precision = zoom-5
     end
     [precision, step]
   end
@@ -131,8 +126,6 @@ class HeatmapPoint < ApplicationRecord
       lat += step_int
     end
 
-    south_west = south_west.map { |val| val+step/2 }
-    north_east = north_east.map { |val| val+step/2 }
     [south_west, north_east, png.to_datastream(:fast_rgba)]
   end
 

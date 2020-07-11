@@ -70,7 +70,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdmin = false}) =
       },
       zoom: currentLocation.zoom,
       minZoom: 7,
-      maxZoom: 17
+      maxZoom: 16
     };
     loader
     .load()

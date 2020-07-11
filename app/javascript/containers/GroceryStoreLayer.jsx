@@ -21,7 +21,7 @@ export default ({ map, currentLocation, isAdmin }) => {
     }
     let controller = new AbortController();
     prevAbortController.current = controller;
-    if(currentLocation.zoom > 9) {
+    if(currentLocation.zoom > 10) {
       getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
       .then(response => {
         groceryStores.current = response.grocery_stores;
