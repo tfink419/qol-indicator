@@ -9,8 +9,15 @@ import { getMapDataGroceryStores } from '../fetch';
 export default ({ map, currentLocation, isAdmin }) => {
   const groceryStores = React.useRef([])
   const store = useStore();
-  const markers = React.useRef([])
   const prevAbortController = React.useRef(null)
+
+  const closeOtherWindows = (groceryStoreId) => {
+    groceryStores.current.forEach((groceryStore) => {
+      if(groceryStore.groceryStore[0] != groceryStoreId) {
+        groceryStore.infoWindow.close();
+      }
+    });
+  }
 
   const loadMapData = React.useRef(_.throttle((map, currentLocation) => {
     if(!map) {
@@ -24,10 +31,8 @@ export default ({ map, currentLocation, isAdmin }) => {
     if(currentLocation.zoom > 10) {
       getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
       .then(response => {
-        groceryStores.current = response.grocery_stores;
-        markers.current.forEach(marker => marker.setMap(null));
-        markers.current = [];
-        markers.current = response.grocery_stores.map((groceryStore) => {
+        groceryStores.current.forEach(groceryStore => groceryStore.marker.setMap(null));
+        groceryStores.current = response.grocery_stores.map((groceryStore) => {
           let fillColor = 'orangered';
           if(groceryStore[3] > 10) {
             fillColor = 'blue';
@@ -68,8 +73,8 @@ export default ({ map, currentLocation, isAdmin }) => {
           marker.addListener('click', () => {
             infoWindow.open(map, marker);
             ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={true} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, infoWindowPlaceholder);
+            closeOtherWindows(groceryStore[0]);
           });
-
           
           infoWindow.addListener('closeclick', () => ReactDOM.render(<div/>, infoWindowPlaceholder));
 
@@ -84,7 +89,7 @@ export default ({ map, currentLocation, isAdmin }) => {
           // marker.setLngLat(lngLat)
           // .setPopup(popup)
           // .addTo(map);
-          return marker;
+          return { marker, groceryStore, infoWindow };
         })
       })
       .catch(error => {
@@ -94,8 +99,8 @@ export default ({ map, currentLocation, isAdmin }) => {
       })
     }
     else {
-      markers.current.forEach(marker => marker.setMap(null));
-      markers.current = [];
+      groceryStores.current.forEach(groceryStore => groceryStore.marker.setMap(null));
+      groceryStores.current = [];
     }
   }, 500)).current;
 
