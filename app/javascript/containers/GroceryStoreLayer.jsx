@@ -48,7 +48,6 @@ export default ({ map, currentLocation, isAdmin }) => {
             color = 'yellow';
           }
           let url = ICON_BASE_URL+`grocery_store_${color}.png`;
-          console.log(scale, 24*scale);
           let icon = {
             url,
             scaledSize: new google.maps.Size(24*scale, 24*scale),
