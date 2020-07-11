@@ -2,6 +2,7 @@ require 'json'
 # require 'httplog'
 
 class MapDataController < ApplicationController
+  before_action :confirm_logged_in
   def get_heatmap_image
     south_west = JSON.parse(params[:south_west])
     north_east = JSON.parse(params[:north_east])
