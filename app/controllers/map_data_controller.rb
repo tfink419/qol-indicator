@@ -26,7 +26,7 @@ class MapDataController < ApplicationController
     fixed_south_west, fixed_north_east, image = HeatmapPoint.generate_image(south_west, north_east, zoom, transit_type)
 
     response.headers['Content-Range'] = "Coordinates #{fixed_south_west}-#{fixed_north_east}"
-    send_data image.to_blob
+    send_data image
   end
 
   def get_grocery_stores

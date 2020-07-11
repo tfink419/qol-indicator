@@ -70,5 +70,4 @@ gem 'sidekiq', '~> 6.1.0'
 
 gem 'geokit', '~> 1.13.1'
 
-gem 'oily_png', '~> 1.2.1'
-gem 'gradient', '~> 0.5.1'
+gem 'quality_map_image', '~> 0.1.1'

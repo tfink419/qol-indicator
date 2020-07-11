@@ -1,13 +1,4 @@
-require 'gradient'
-# require 'oily_png'
-
-GRADIENT_MAP = Gradient::Map.new(
-  Gradient::Point.new(0, Color::RGB.new(255, 0, 0), 0.5),
-  Gradient::Point.new(0.2, Color::RGB.new(255, 165, 0), 0.5),
-  Gradient::Point.new(0.5, Color::RGB.new(255, 255, 0), 0.5),
-  Gradient::Point.new(0.8, Color::RGB.new(0, 255, 0), 0.5),
-  Gradient::Point.new(1, Color::RGB.new(0, 255, 255), 0.5)
-)
+require 'quality_map_image'
 
 class HeatmapPoint < ApplicationRecord
   validates_with HeatmapPointValidator
@@ -85,48 +76,17 @@ class HeatmapPoint < ApplicationRecord
 
     extra_long = (north_east[1]-south_west[1])*0.3
     extra_lat = (north_east[0]-south_west[0])*0.3
+    extra_lat = step if extra_lat < step
+    extra_long = step if extra_long < step
     south_west = [to_nearest_precision(south_west[0]-extra_lat,precision), to_nearest_precision(south_west[1]-extra_long,precision)]
     north_east = [to_nearest_precision(north_east[0]+extra_lat,precision), to_nearest_precision(north_east[1]+extra_long,precision)]
 
     south_west_int = south_west.map { |val| (val*1000).round.to_i }
     north_east_int = north_east.map { |val| (val*1000).round.to_i }
 
-    width = ((north_east[1]-south_west[1])/step).round+1
-    height = ((north_east[0]-south_west[0])/step).round+1
-
-    png = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('red @ 0.5'))
-    
     step_int = (step*1000).round.to_i
-    heatmap_points = []
-    lat = south_west_int[0]
-    y = height-1
-    gstore_ind = 0
-    current_gstore_point = grocery_store_points[gstore_ind]
-    # ierate through both "arrays", only works on sorted in same exact way
-    while lat <= north_east_int[0]
-      long = south_west_int[1]
-      x = 0
-      while long <= north_east_int[1]
-        quality = 0
-        if current_gstore_point && current_gstore_point[0] == lat && current_gstore_point[1] == long
-          quality = current_gstore_point[2]
-          gstore_ind += 1
-          current_gstore_point = grocery_store_points[gstore_ind]
-        end
-        quality = 12.5 if quality > 12.5
-        quality = 0 if quality < 0
 
-        color = GRADIENT_MAP.at(quality/12.5).color
-
-        png[x,y] = ChunkyPNG::Color.rgba(color.red.to_i, color.green.to_i, color.blue.to_i, 128)
-        x += 1
-        long += step_int
-      end
-      y -= 1
-      lat += step_int
-    end
-
-    [south_west, north_east, png.to_datastream(:fast_rgba)]
+    [south_west, north_east, QualityMapImage.get_image(south_west_int, north_east_int, step_int, grocery_store_points)]
   end
 
   TRANSIT_TYPE_MAP = [
