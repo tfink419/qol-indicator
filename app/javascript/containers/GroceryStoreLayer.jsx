@@ -6,8 +6,11 @@ import GroceryStorePopup from '../components/GroceryStorePopup';
 
 import { getMapDataGroceryStores } from '../fetch';
 
+const MAX_STORES_TO_HOLD = 10000;
+
 export default ({ map, currentLocation, isAdmin }) => {
-  const groceryStores = React.useRef([])
+  const groceryStores = React.useRef([]);
+  const justRetrievedGroceryStores = React.useRef([]);
   const store = useStore();
   const prevAbortController = React.useRef(null)
 
@@ -31,8 +34,12 @@ export default ({ map, currentLocation, isAdmin }) => {
     if(currentLocation.zoom > 10) {
       getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
       .then(response => {
-        groceryStores.current.forEach(groceryStore => groceryStore.marker.setMap(null));
-        groceryStores.current = response.grocery_stores.map((groceryStore) => {
+        justRetrievedGroceryStores.current = [];
+        response.grocery_stores.forEach((groceryStore) => {
+          justRetrievedGroceryStores.current.push(groceryStore[0]);
+          if(groceryStores.current.findIndex(storeToFind => storeToFind.groceryStore[0] == groceryStore[0]) >= 0) {
+            return;
+          }
           let fillColor = 'orangered';
           if(groceryStore[3] > 10) {
             fillColor = 'blue';
@@ -57,7 +64,6 @@ export default ({ map, currentLocation, isAdmin }) => {
           let latLng = {lat:groceryStore[1], lng:groceryStore[2]};
           let marker = new window.google.maps.Marker({
             position: latLng,
-            map: map,
             draggable: false,
             icon: icon
           });
@@ -78,19 +84,23 @@ export default ({ map, currentLocation, isAdmin }) => {
           
           infoWindow.addListener('closeclick', () => ReactDOM.render(<div/>, infoWindowPlaceholder));
 
-          
-          // ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, popupPlaceholder);
-          
-          // let popup = new mapboxgl.Popup({ offset: 25 })
-          // .setDOMContent(popupPlaceholder)
-          // .on('open', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={true} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, popupPlaceholder))
-          // .on('close', () => ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={false} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, popupPlaceholder))
-
-          // marker.setLngLat(lngLat)
-          // .setPopup(popup)
-          // .addTo(map);
-          return { marker, groceryStore, infoWindow };
+          groceryStores.current.push({ marker, groceryStore, infoWindow });
         })
+        if(groceryStores.current.length > MAX_STORES_TO_HOLD) {
+          let amountToDelete = groceryStores.current.length - MAX_STORES_TO_HOLD;
+          let deleted = 0;
+          groceryStores.current = groceryStores.current.reduce((newArr, groceryStore) => {
+            if(deleted < amountToDelete && justRetrievedGroceryStores.current.findIndex(groceryStore[0]) == -1) {
+              groceryStores.current.marker.setMap(null);
+              deleted++;
+            }
+            else {
+              newArr.push(groceryStore);
+            }
+            return newArr;
+          }, []);
+        }
+        groceryStores.current.forEach(groceryStore => groceryStore.marker.setMap(map));
       })
       .catch(error => {
         if(error.name != 'AbortError') {
@@ -100,7 +110,6 @@ export default ({ map, currentLocation, isAdmin }) => {
     }
     else {
       groceryStores.current.forEach(groceryStore => groceryStore.marker.setMap(null));
-      groceryStores.current = [];
     }
   }, 500)).current;
 
