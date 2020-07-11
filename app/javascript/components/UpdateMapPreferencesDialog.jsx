@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash'
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slider, CircularProgress } from '@material-ui/core/';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slider, CircularProgress, Typography } from '@material-ui/core/';
 
 import { flashMessage } from '../actions/messages'
 import { updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences } from '../actions/map-preferences'
@@ -11,15 +11,15 @@ import { getMapPreferences, putMapPreferences } from '../fetch';
 const transitTypeMarks = [
   {
     value: 1,
-    label: 'Walkable',
+    label: 'Walking',
   },
   {
     value: 4,
-    label: 'Bike/Bus',
+    label: 'Biking',
   },
   {
     value: 7,
-    label: 'Car',
+    label: 'Driving',
   }
 ];  
 
@@ -87,6 +87,9 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
         <DialogTitle>Update Your Map Preferences</DialogTitle>
         <DialogContent>
           <form onSubmit={handleUpdate}>
+            <Typography id="grcoery-store-label" gutterBottom>
+              Grocery Store Proximity
+            </Typography>
             <Slider
               classes={{markLabel:classes.markLabel}}
               value={mapPreferences.preferences.transit_type}

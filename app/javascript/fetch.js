@@ -1,10 +1,19 @@
 import _ from 'lodash'
+
+import { userLogout } from 'actions/user';
 const UNWANTED_PARAMETERS = ['id', 'created_at', 'updated_at']
+
+var store = null;
+
+export const setStore = (sto) => store = sto;
 
 export const paramify = (params) => '?'+Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&')
 
 function handleResponse(response) {
   if(response.status != 0 && response.status != 200) {
+    if(response.status == 401 && response.error == 'Please log in.') {
+      store.dispatch(userLogout());
+    }
     throw {
       status: response.status,
       message: response.error,

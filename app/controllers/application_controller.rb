@@ -14,8 +14,11 @@ class ApplicationController < ActionController::Base
 
   def confirm_logged_in
     unless session[:user_id]
-      flash[:notice] = "Please log in."
-      redirect_to(login_page_path)
+      unless request.format.json?
+        flash[:notice] = "Please log in."
+        redirect_to(login_page_path)
+      end
+      render :json => {:status => 401, :error => "Please log in."}, :status => 401
     end
   end
 

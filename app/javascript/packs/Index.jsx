@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
+import { setStore } from '../fetch'
 import rootReducer from '../reducers'
 
 import App from "../components/App";
@@ -17,6 +18,8 @@ store.subscribe(() => {
     messages:store.getState().messages
   })
 })
+
+setStore(store);
 
 document.addEventListener('DOMContentLoaded', () => {
   ReactDOM.render(
