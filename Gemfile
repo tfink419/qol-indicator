@@ -70,4 +70,4 @@ gem 'sidekiq', '~> 6.1.0'
 
 gem 'geokit', '~> 1.13.1'
 
-gem 'quality_map_image', '~> 0.1.1', git: 'git@github.com:tfink419/quality_map_image.git'
+gem 'quality_map_image', '~> 0.1.1', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@github.com/tfink419/quality_map_image.git"
