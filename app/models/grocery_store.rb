@@ -69,6 +69,15 @@ class GroceryStore < ApplicationRecord
     true
   end
 
+  def self.furthest_south_west
+    [CoordCalc.abs_floor(GroceryStore.minimum(:lat)-0.3), CoordCalc.abs_floor(GroceryStore.minimum(:long))-0.3]
+  end
+
+  def self.furthest_north_east
+    [CoordCalc.abs_ceil(GroceryStore.maximum(:lat)+0.3), CoordCalc.abs_ceil(GroceryStore.maximum(:long)+0.3)]
+  end
+
+
   def public_attributes 
     {
       :id => id,

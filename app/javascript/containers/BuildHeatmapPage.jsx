@@ -13,6 +13,7 @@ const STATE_MAP = {
   'received': 'Job Received By Sidekiq',
   'branching': 'Branching Into Parellel Sidekiq\'s',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
+  'isochrones-complete': 'Finished Isochrone Polygons, Waiting For Others',
   'heatmap-points': 'Building Heatmap Points',
   'complete': 'Completed'
 }
@@ -97,11 +98,6 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
       clearInterval(reloadIntervalId);
       setBuildHeatmapStatusReloadIntervalId(null);
     }
-    // return () => {
-    //   console.log('2should get here eventually')
-    //   clearInterval(intervalId);
-    //   setIntervalId(null);
-    // }
   }, [current]);
   
   return (
@@ -130,7 +126,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
             </Box>
           </Box>
           { current.build_heatmap_segment_statuses && _.sortBy(current.build_heatmap_segment_statuses, 'segment').map(segment_status => (
-            <React.Fragment>
+            <React.Fragment key={segment_status.id}>
               <Typography variant="subtitle1">
                 Segment #{segment_status.segment}
               </Typography>

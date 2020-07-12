@@ -3,7 +3,13 @@ class Admin::BuildHeatmapController < ApplicationController
   before_action :admin_only
 
   def build
-    build_status = BuildHeatmapStatus.create(state:'initialized', percent:100, rebuild:params[:rebuild])
+    south_west = GroceryStore.furthest_south_west
+    north_east = GroceryStore.furthest_north_east
+    south_west_int = south_west.map { |val| (val*1000).round.to_i }
+    north_east_int = north_east.map { |val| (val*1000).round.to_i }
+    build_status = BuildHeatmapStatus.create(state:'initialized', percent:100,
+    rebuild:params[:rebuild], south_west:south_west_int, north_east:north_east_int,
+    transit_type_low:1, transit_type_high:9)
     BuildHeatmapJob.perform_later(build_status)
     render json: {
       status: 0,
@@ -18,9 +24,7 @@ class Admin::BuildHeatmapController < ApplicationController
     offset = page*limit
     build_statuses = BuildHeatmapStatus.offset(offset).limit(limit).order(created_at:'DESC')
     build_heatmap_status_count = BuildHeatmapStatus.count
-    newest = BuildHeatmapStatus.last
-    current = nil
-    current = newest if newest && !newest.complete?
+    current = BuildHeatmapStatus.most_recent
     render json: {
       status: 0,
       build_heatmap_statuses: { all:build_statuses, current:current},
