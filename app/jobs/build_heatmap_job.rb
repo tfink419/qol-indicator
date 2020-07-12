@@ -1,10 +1,3 @@
-def abs_ceil(num)
-  num >= 0 ? num.ceil(1) : num.floor(1)
-end
-
-def abs_floor(num)
-  num >= 0 ? num.floor(1) : num.ceil(1)
-end
 Rails.logger.level = 4 if Rails.env == 'production'
 ActiveRecord::Base.logger.level = 4 if Rails.env == 'production'
 class BuildHeatmapJob < ApplicationJob
@@ -21,17 +14,14 @@ class BuildHeatmapJob < ApplicationJob
       Signal.trap('INT') { throw SystemExit }
       Signal.trap('TERM') { throw SystemExit }
       job_retry ||= build_status.created_at < 15.minutes.ago
+
       build_status.update!(state:'received', percent:100)
 
-      HeatmapPoint.delete_all if build_status.rebuild? && !job_retry
-      
+      south_west_int = build_status.south_west
+      north_east_int = build_status.north_east
+      HeatmapPoint.where(["lat BETWEEN ? AND ? AND long BETWEEN ? AND ?", south_west_int[0], north_east_int[0], south_west_int[1], north_east_int[1]]).delete_all if build_status.rebuild? && !job_retry
+
       build_status.update!(state:'branching', percent:100)
-
-      south_west = furthest_south_west_local
-      north_east = furthest_north_east_local
-      south_west_int = south_west.map { |val| (val*1000).round.to_i }
-      north_east_int = north_east.map { |val| (val*1000).round.to_i }
-
       # dont reset lat and try workers if this is a retry and lat already exists
       unless job_retry && build_status.current_lat
         lat = south_west_int[0]
@@ -77,23 +67,7 @@ class BuildHeatmapJob < ApplicationJob
     end
   end
 
-  def self.furthest_south_west
-    [abs_floor(GroceryStore.minimum(:lat)-0.3), abs_floor(GroceryStore.minimum(:long))-0.3]
-  end
-
-  def self.furthest_north_east
-    [abs_ceil(GroceryStore.maximum(:lat)+0.3), abs_ceil(GroceryStore.maximum(:long)+0.3)]
-  end
-
   private
-
-  def furthest_south_west_local
-    [abs_floor(GroceryStore.minimum(:lat)-0.3), abs_floor(GroceryStore.minimum(:long))-0.3]
-  end
-
-  def furthest_north_east_local
-    [abs_ceil(GroceryStore.maximum(:lat)+0.3), abs_ceil(GroceryStore.maximum(:long)+0.3)]
-  end
 
   def error_found(build_status)
     errored = build_status.reload.build_heatmap_segment_statuses.where.not(error:nil).first

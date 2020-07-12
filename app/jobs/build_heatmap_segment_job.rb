@@ -21,6 +21,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
     south_west_int = nil
     north_east_int = nil
     current_transit_type = nil
+    transit_type_low = nil
+    transit_type_high = nil
     lat = nil
     long = nil
     job_retry ||= build_status.created_at < 15.minutes.ago
@@ -35,6 +37,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
         segment_low = (segment-1)*segment_part
         segment_low += 1 unless segment == 1
         segment_low = segment_low.round
+        transit_type_low = build_status.build_heatmap_status.transit_type_low
+        transit_type_high = build_status.build_heatmap_status.transit_type_high
         
         current = 0
         state = 'isochrones'
@@ -43,7 +47,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
           current += 1
           
           isochrones = []
-          (1..9).each do |transit_type|
+          (transit_type_low..transit_type_high).each do |transit_type|
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             no_isochrones = gstore.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
             if no_isochrones
@@ -63,11 +67,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
         build_status.update!(state:state, percent:percent);
         sleep(5) until build_status.reload.build_heatmap_status.state == 'heatmap-points'
 
-        south_west = BuildHeatmapJob.furthest_south_west
-        north_east =  BuildHeatmapJob.furthest_north_east
-
-        south_west_int = south_west.map { |val| (val*1000).round.to_i }
-        north_east_int = north_east.map { |val| (val*1000).round.to_i }
+        south_west_int = build_status.build_heatmap_status.south_west
+        north_east_int =  build_status.build_heatmap_status.north_east
 
         step_int = (BuildHeatmapJob::STEP*1000).round.to_i
 
@@ -76,7 +77,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         puts 'Heatmap Points'
         state = 'heatmap-points'
         while true # see towards bottom of loop
-          (1..9).each do |transit_type|
+          (transit_type_low..transit_type_high).each do |transit_type|
             long = south_west_int[1]
             new_heatmaps = []
             current_transit_type = transit_type
@@ -125,7 +126,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         if state == 'isochrones'
           percent = (100.0*current/gstore_count).round(2)
         elsif state == 'heatmap-points'
-          percent = calc_heatmap_point_percent(current_transit_type, long, south_west_int, north_east_int)
+          percent = calc_heatmap_point_percent(current_transit_type, long, south_west_int, north_east_int, transit_type_low, transit_type_high)
         elsif state == 'complete' || state == 'error'
           exit
         end
@@ -138,7 +139,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
 
   private
 
-  def calc_heatmap_point_percent(current_transit_type, long, south_west_int, north_east_int)
-    (((long-south_west_int[1])/(north_east_int[1]-south_west_int[1]+BuildHeatmapJob::STEP)/9+(current_transit_type-1)/9.0)*100).round(3)
+  def calc_heatmap_point_percent(current_transit_type, long, south_west_int, north_east_int, transit_type_low, transit_type_high)
+    num_transit_types = (transit_type_high-transit_type_low+1).to_f
+    (((long-south_west_int[1])/(north_east_int[1]-south_west_int[1]+BuildHeatmapJob::STEP)/num_transit_types+(current_transit_type-transit_type_low)/num_transit_types)*100).round(3)
   end
 end
