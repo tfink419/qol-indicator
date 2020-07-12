@@ -1,5 +1,6 @@
 require 'geokit'
 require 'mapbox'
+require 'quality_map_image'
 
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 ActiveRecord::Base.logger.level = 4 if Rails.env == 'production'
@@ -8,8 +9,6 @@ Rails.logger.level = 4 if Rails.env == 'production'
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
   sidekiq_options retry: 0
-
-  LOG_EXP = 1.7
 
   def perform(build_status)
     Signal.trap('INT') { throw SystemExit }
@@ -72,49 +71,43 @@ class BuildHeatmapSegmentJob < ApplicationJob
 
         step_int = (BuildHeatmapJob::STEP*1000).round.to_i
 
-        lat = build_status.current_lat
+        lat = build_status.current_lat.to_i
 
         puts 'Heatmap Points'
         state = 'heatmap-points'
         while true # see towards bottom of loop
-          isochrones = []
           (1..9).each do |transit_type|
-            long = south_west[1]
+            long = south_west_int[1]
             new_heatmaps = []
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             while long < north_east_int[1]
-              if HeatmapPoint.where(lat:lat, long:long, transit_type:transit_type).none? # Skip all the calculation if point already exists
-                lat_lng = Geokit::LatLng.new(lat/1000.0, long/1000.0)
-                if long%100 == 0 ## trying to be efficient with gstore and isochrone fetches
-                  isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
-                  .select('isochrone_polygons.*', 'grocery_stores.quality AS quality')\
-                  .all_near_point_wide(lat, long)\
-                  .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)
-                  # skip to next block if none found
-                  if isochrones.blank?
-                    long += 100
-                    next
+              isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
+              .all_near_point_wide(lat, long)\
+              .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)\
+              .pluck('isochrone_polygons.polygon', 'grocery_stores.quality')
+              # skip to next block if none found
+              unless isochrones.blank?
+                qualities = QualityMapImage.quality_of_points(lat, long, 100, isochrones)
+                qualities.each{ |quality|
+                  if quality > 0
+                    begin
+                      HeatmapPoint.create(lat:lat, long:long, transit_type: transit_type, quality:quality)
+                    rescue
+                      # there was probably a race condition on current_lat and then this exact point
+                      # this is okay but not great
+                    end
                   end
-                end
-                qualities = []
-                isochrones.each do |isochrone|
-                  if isochrone.get_geokit_polygon.contains? lat_lng
-                    qualities << isochrone.quality
-                  end
-                end
-                
-                quality = log_exp_sum(qualities)
-                if(quality > 0)
-                  new_heatmaps << {lat: lat, long: long, quality: quality, transit_type:transit_type}
-                end
+                  long += step_int
+                }
+              else
+                long += step_int*100
               end
-              long += step_int
+              
             end
-            HeatmapPoint.create(new_heatmaps)
           end
-          lat = build_status.build_heatmap_status.reload.current_lat+step_int
-          break unless lat <= north_east_int[0] # essentially while lat <= north_east[0]
+          lat = build_status.build_heatmap_status.reload.current_lat.to_i+step_int
+          break unless lat <= north_east_int[0] # essentially while lat <= north_east_int[0]
           build_status.build_heatmap_status.update!(current_lat:lat)
           build_status.update!(current_lat:lat)
         end
@@ -132,7 +125,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         if state == 'isochrones'
           percent = (100.0*current/gstore_count).round(2)
         elsif state == 'heatmap-points'
-          percent = calc_heatmap_point_percent(current_transit_type, long, south_west, north_east)
+          percent = calc_heatmap_point_percent(current_transit_type, long, south_west_int, north_east_int)
         elsif state == 'complete' || state == 'error'
           exit
         end
@@ -145,13 +138,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
 
   private
 
-  def calc_heatmap_point_percent(current_transit_type, long, south_west, north_east)
+  def calc_heatmap_point_percent(current_transit_type, long, south_west_int, north_east_int)
     (((long-south_west_int[1])/(north_east_int[1]-south_west_int[1]+BuildHeatmapJob::STEP)/9+(current_transit_type-1)/9.0)*100).round(3)
-  end
-
-  def log_exp_sum(values)
-    return 0 if values.blank?
-    sum = values.sum{ |value| LOG_EXP**value }
-    Math.log(sum, LOG_EXP)
   end
 end

@@ -88,7 +88,7 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
         <DialogContent>
           <form onSubmit={handleUpdate}>
             <Typography id="grcoery-store-label" gutterBottom>
-              Grocery Store Proximity
+              Grocery Store Proximity (minutes)
             </Typography>
             <Slider
               classes={{markLabel:classes.markLabel}}
@@ -99,6 +99,7 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
               max={9}
               valueLabelDisplay="auto"
               marks={transitTypeMarks}
+              valueLabelFormat={(val) => ((val-1)%3+1)*8}
             />
           </form>
           { loading && <CircularProgress className={classes.circularProgress} />}

@@ -20,23 +20,11 @@ class IsochronePolygon < ApplicationRecord
   end
 
   scope :all_near_point_wide, lambda { |lat, long|
-    wide_long = long+0.1
+    wide_long = (long+100)/1000.0
+    lat = lat/1000.0
+    long = long/1000.0
     where(['south_bound <= ? AND ? <= north_bound AND ((west_bound <= ? AND ? <= east_bound) OR (west_bound <= ? AND ? <= east_bound) OR (? <= west_bound AND east_bound <= ?))', lat, lat, long, long, wide_long, wide_long, long, wide_long])
   }
-
-  def as_mapbox_poly
-    [{
-      "features":
-        [{
-          "properties":{"fillOpacity":0.33,"color":"#bf4040","fill":"#bf4040","fillColor":"#bf4040","contour":30,"opacity":0.33,"fill-opacity":0.33},
-          "type":"Feature",
-          "geometry":{
-            "coordinates":[string_path_to_float(self.polygon)],
-            "type":"Polygon"
-        }}],
-      "type":"FeatureCollection"
-    }, {}]
-  end
 
   def get_geokit_polygon
     unless geokit_polygon
@@ -47,20 +35,6 @@ class IsochronePolygon < ApplicationRecord
 
   def get_polygon_floats
     string_path_to_float(self.polygon)
-  end
-
-  def self.to_mapbox_poly(polygon)
-    [{
-      "features":
-        [{
-          "properties":{"fillOpacity":0.33,"color":"#bf4040","fill":"#bf4040","fillColor":"#bf4040","contour":30,"opacity":0.33,"fill-opacity":0.33},
-          "type":"Feature",
-          "geometry":{
-            "coordinates":[polygon],
-            "type":"Polygon"
-        }}],
-      "type":"FeatureCollection"
-    }, {}]
   end
 
   def self.extract_poly_from_mapbox(resp)

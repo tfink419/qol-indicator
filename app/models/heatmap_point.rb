@@ -88,6 +88,10 @@ class HeatmapPoint < ApplicationRecord
 
     [south_west, north_east, QualityMapImage.get_image(south_west_int, north_east_int, step_int, grocery_store_points)]
   end
+  
+  def quality_at_points(lat, lng_start, isochrones)
+
+  end
 
   TRANSIT_TYPE_MAP = [
     ['walking', 8], # shouldn't be used
@@ -99,8 +103,7 @@ class HeatmapPoint < ApplicationRecord
     ['cycling', 24],
     ['driving', 8],
     ['driving', 16],
-    ['driving', 24],
-    [nil, nil] # Might be used by "fly" value but shouldn't return anything
+    ['driving', 24]
   ]
 
   private
