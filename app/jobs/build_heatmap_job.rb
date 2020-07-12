@@ -14,6 +14,7 @@ class BuildHeatmapJob < ApplicationJob
   NUM_SEGMENTS=(ENV['NUM_HEATMAP_THREADS'] || 8).to_i
   STEP_PRECISION=3
   STEP=(0.1**STEP_PRECISION).round(STEP_PRECISION) # 0.001
+  STEP_INT=(STEP*1000).round.to_i # 1
 
   def perform(build_status, job_retry=false)
     begin
@@ -28,17 +29,20 @@ class BuildHeatmapJob < ApplicationJob
 
       south_west = furthest_south_west_local
       north_east = furthest_north_east_local
+      south_west_int = south_west.map { |val| (val*1000).round.to_i }
+      north_east_int = north_east.map { |val| (val*1000).round.to_i }
+
       # dont reset lat and try workers if this is a retry and lat already exists
       unless job_retry && build_status.current_lat
-        lat = south_west[0]
+        lat = south_west_int[0]
         if build_status.build_heatmap_segment_statuses.none?
           (1..NUM_SEGMENTS).each do |segment|
             build_segment_status = build_status.build_heatmap_segment_statuses.create(state:'initialized', percent:100, segment:segment, current_lat:lat)
             BuildHeatmapSegmentJob.perform_later(build_segment_status)
-            lat = (lat+STEP).round(STEP_PRECISION)
+            lat += STEP_INT
           end
         end
-        build_status.update!(current_lat:(lat-STEP).round(STEP_PRECISION))
+        build_status.update!(current_lat:lat-STEP_INT)
       end
 
       # in case its different due to an old build and a change in num_segments
@@ -64,7 +68,7 @@ class BuildHeatmapJob < ApplicationJob
 
       until build_status.reload.build_heatmap_segment_statuses.all? { |segment_status| segment_status.error ||  segment_status.state == 'complete' } 
         sleep(5)
-        build_status.update!(percent:calc_total_heatmap_percent(build_status, num_segments_this_build, south_west, north_east), updated_at:Time.now)
+        build_status.update!(percent:calc_total_heatmap_percent(build_status, num_segments_this_build, south_west_int, north_east_int), updated_at:Time.now)
       end
       return if error_found(build_status)
       build_status.update!(percent:100, state:'complete')
@@ -92,18 +96,18 @@ class BuildHeatmapJob < ApplicationJob
   end
 
   def error_found(build_status)
-    errored = build_status.build_heatmap_segment_statuses.where.not(error:nil).first
+    errored = build_status.reload.build_heatmap_segment_statuses.where.not(error:nil).first
     if errored
       build_status.update!(error: errored.error)
     end
     errored
   end
 
-  def calc_total_heatmap_percent(build_status, num_segments, south_west, north_east)
+  def calc_total_heatmap_percent(build_status, num_segments, south_west_int, north_east_int)
     long_percent = build_status.build_heatmap_segment_statuses.sum { |segment_status|
       segment_status.atleast_heatmap_state? ? (segment_status.percent/num_segments) : 0 # 0 if not yet in the right state
     }
-    lat_percent_per_step = (STEP / (north_east[0]-south_west[0]+STEP))
-    (((build_status.current_lat-south_west[0])/(north_east[0]-south_west[0]+STEP)+long_percent*lat_percent_per_step)*100).round(3)
+    lat_percent_per_step = (STEP_INT / (north_east_int[0]-south_west_int[0]+STEP_INT))
+    (((build_status.current_lat-south_west_int[0])/(north_east_int[0]-south_west_int[0]+STEP_INT)+long_percent*lat_percent_per_step)*100).round(3)
   end
 end

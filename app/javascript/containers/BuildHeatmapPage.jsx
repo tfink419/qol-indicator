@@ -139,7 +139,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
               </Typography>
               { segment_status.state == 'heatmap-points' && (
                 <Typography variant="subtitle2">
-                  Current Lat: <strong>{segment_status.current_lat}</strong>
+                  Current Lat: <strong>{segment_status.current_lat/1000.0}</strong>
                 </Typography>
               )}
               <Box display="flex" alignItems="center">
