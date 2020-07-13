@@ -83,6 +83,9 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
     if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
       loadedCurrentUploadCsvStatus(null)
+      if(current.error) {
+        flashMessage('error', current.error);
+      }
       updatedGroceryStores();
     }
     if(!reloadIntervalId && current) {
