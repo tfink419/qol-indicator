@@ -8,11 +8,11 @@ class BuildHeatmapStatus < ApplicationRecord
   has_many :build_heatmap_segment_statuses, dependent: :destroy
 
   def self.most_recent
-    last_not_error_and_not_initialized = where(error: nil).where.not(state:["intialized", "complete"]).last
+    last_not_error_and_not_initialized = where(error: nil).where.not(state:["intialized", "complete"]).first
     if last_not_error_and_not_initialized
       last_not_error_and_not_initialized
     else
-      where(error:nil).where.not(state:"complete").last
+      where(error:nil).where.not(state:"complete").first
     end
   end
 
