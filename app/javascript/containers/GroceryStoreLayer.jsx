@@ -72,7 +72,17 @@ export default ({ map, currentLocation, isAdmin }) => {
             content: infoWindowPlaceholder
           });
 
-          const onGroceryStoreChange = () => loadMapData(map, currentLocation);
+          const onGroceryStoreChange = (id) => {
+            justRetrievedGroceryStores.current = justRetrievedGroceryStores.current.filter(groceryStore => groceryStore != id);
+            groceryStores.current = groceryStores.current.filter(groceryStore => {
+              if(groceryStore != id) {
+                groceryStore.marker.setMap(null);
+                return true;
+              }
+              return false;
+            });
+            loadMapData(map, currentLocation)
+          };
           
           marker.addListener('click', () => {
             infoWindow.open(map, marker);
@@ -89,7 +99,7 @@ export default ({ map, currentLocation, isAdmin }) => {
           let deleted = 0;
           groceryStores.current = groceryStores.current.reduce((newArr, groceryStore) => {
             if(deleted < amountToDelete && justRetrievedGroceryStores.current.findIndex(groceryStore[0]) == -1) {
-              groceryStores.current.marker.setMap(null);
+              groceryStore.marker.setMap(null);
               deleted++;
             }
             else {

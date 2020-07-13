@@ -56,13 +56,13 @@ class LoginController < ApplicationController
     pass_reset = PasswordReset.find_by_uuid(params[:uuid])
     if pass_reset
       if pass_reset.expires_at < DateTime.now
-        pass_reset.delete
+        pass_reset.destroy!
       else
         user = pass_reset.user
         user.password = params[:password]
         user.password_confirmation = params[:password_confirmation]
         if user.save
-          pass_reset.delete
+          pass_reset.destroy!
           return render :json => {:status => 200, :message => 'Password Reset'}
         else
           return render :json => {:status => 401, :error => 'Registration Failed', :error_details => user.errors.messages}, :status => 401
@@ -76,7 +76,7 @@ class LoginController < ApplicationController
     pass_reset = PasswordReset.find_by_uuid(params[:uuid])
     if pass_reset
       if pass_reset.expires_at < DateTime.now
-        pass_reset.delete
+        pass_reset.destroy!
       else
         return render :json => {:status => 200, :username => pass_reset.user.username}
       end

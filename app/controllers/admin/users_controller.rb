@@ -44,7 +44,7 @@ class Admin::UsersController < ApplicationController
       }, :status => 403
     else
       user = User.find(params[:id])
-      user.delete
+      user.destroy!
 
       render :json => { 
         :status => 0, 
