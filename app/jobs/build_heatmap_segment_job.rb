@@ -73,7 +73,13 @@ class BuildHeatmapSegmentJob < ApplicationJob
               isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
               .all_near_point_wide(lat, long)\
               .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)\
-              .pluck('isochrone_polygons.polygon', 'grocery_stores.quality')
+              .select('isochrone_polygons.polygon', 'grocery_stores.quality AS quality')\
+              .map{ |isochrone|
+                [
+                  isochrone.polygon.map(&:to_f),
+                  isochrone.quality
+                ]
+              }
               # skip to next block if none found
               unless isochrones.blank?
                 qualities = QualityMapImage.quality_of_points(lat, long, 100, isochrones)
