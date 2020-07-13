@@ -34,6 +34,7 @@ class GroceryStore < ApplicationRecord
   end
 
   before_destroy do
+    puts "Before Destroy"
     self.rebuild_points_near
   end
 
@@ -110,6 +111,7 @@ class GroceryStore < ApplicationRecord
 
   def rebuild_points_near(new_store = false)
     self.fetch_isochrone_polygons(1, 9) if new_store
+    puts "Rebuilding Points"
     (1..9).each do |transit_type|
       travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
       isochrone = IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore', travel_type:travel_type, distance:distance).first

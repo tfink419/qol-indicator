@@ -1,15 +1,17 @@
 desc "Check Job Statuses and redo Build Heatmap if it has hung"
 task :redo_jobs => :environment do
   puts "Checking jobs..."
-  job_status = BuildHeatmapStatus.last
-  if !job_status.complete? && job_status.updated_at < 15.minutes.ago
-    puts 'Retrying Build Heatmap Job'
-    BuildHeatmapJob.perform_later(job_status, true)
-  end
-  job_status.build_heatmap_segment_statuses.each do |segment_status|
-    if !segment_status.complete? && segment_status.updated_at < 15.minutes.ago
-      puts "Retrying Build Heatmap Segment #{segment_status.segment} Job"
-      BuildHeatmapSegmentJob.perform_later(segment_status)
+  job_status = BuildHeatmapStatus.most_recent
+  if job_status
+    if job_status.updated_at < 15.minutes.ago
+      puts 'Retrying Build Heatmap Job'
+      BuildHeatmapJob.perform_later(job_status, true)
+    end
+    job_status.build_heatmap_segment_statuses.each do |segment_status|
+      if !segment_status.complete? && segment_status.updated_at < 15.minutes.ago
+        puts "Retrying Build Heatmap Segment #{segment_status.segment} Job"
+        BuildHeatmapSegmentJob.perform_later(segment_status)
+      end
     end
   end
   job_status = GroceryStoreUploadStatus.last
