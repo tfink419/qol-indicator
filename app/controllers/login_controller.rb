@@ -48,7 +48,7 @@ class LoginController < ApplicationController
     user = User.find_by_email(params[:email])
     pass_reset = user.password_resets.create(:uuid => SecureRandom.uuid, :expires_at => 1.day.from_now)
     pass_reset.save
-    PasswordResetMailer.with(uuid: pass_reset.uuid, email: user.email, username: user.username).send_reset_password.deliver_later
+    PasswordResetMailer.with(uuid: pass_reset.uuid, email: user.email, username: user.username).send_reset_password.deliver_now
     render :json => {:status => 200, :message => 'Reset Password Email Sent'}
   end
 
