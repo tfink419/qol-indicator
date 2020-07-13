@@ -90,6 +90,10 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
     if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
       loadedCurrentBuildHeatmapStatus(null);
+      loadBuildHeatmapStatuses(true);
+      if(current.error) {
+        flashMessage('error', current.error);
+      }
     }
     if(!reloadIntervalId && current) {
       setBuildHeatmapStatusReloadIntervalId(setInterval(reloadCurrentBuildHeatmapStatus, 5000))

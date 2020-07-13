@@ -33,9 +33,16 @@ class Admin::BuildHeatmapController < ApplicationController
   end
 
   def status_show
-    render json: {
-      status: 0,
-      build_heatmap_status: BuildHeatmapStatus.find(params[:id]).as_json(:include => :build_heatmap_segment_statuses)
-    }
+    if params[:id] == 'undefined'
+      render json: {
+        status: 400,
+        message: 'Missing Id'
+      }, status: 400
+    else
+      render json: {
+        status: 0,
+        build_heatmap_status: BuildHeatmapStatus.find(params[:id]).as_json(:include => :build_heatmap_segment_statuses)
+      }
+    end
   end
 end

@@ -7,14 +7,14 @@ class BuildHeatmapStatus < ApplicationRecord
 
   has_many :build_heatmap_segment_statuses, dependent: :destroy
 
-  scope :most_recent, lambda { 
-    last_not_error_or_initialized = where(['error != ? OR state != ?', nil, "intialized"]).order(created_at:'DESC').first
-    if last_not_error_or_initialized
-      last_not_error_or_initialized
+  def self.most_recent
+    last_not_error_and_not_initialized = where(error: nil).where.not(state:["intialized", "complete"]).order(created_at:'DESC').last
+    if last_not_error_and_not_initialized
+      last_not_error_and_not_initialized
     else
-      where(['error != ? OR state != ?', nil, "intialized"]).order(created_at:'DESC').first
+      where(error:nil).where.not(state:"complete").order(created_at:'DESC').last
     end
-  }
+  end
 
   def complete?
     error || state == 'complete'

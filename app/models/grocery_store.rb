@@ -25,6 +25,24 @@ class GroceryStore < ApplicationRecord
     self.state = self.state.upcase
   end
 
+  after_update do
+    if self.quality_previously_changed?
+      (1..9).each do |transit_type|
+        travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
+        isochrone = IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore', travel_type:travel_type, distance:distance).first
+        south_west_int = [(isochrone.south_bound.floor(1)*1000).round.to_i, (isochrone.west_bound.floor(1)*1000).round.to_i]
+        north_east_int = [(isochrone.north_bound.ceil(1)*1000).round.to_i, (isochrone.east_bound.ceil(1)*1000).round.to_i]
+        build_status = BuildHeatmapStatus.create(state:'initialized', percent:100,
+        rebuild:true, south_west:south_west_int, north_east:north_east_int,
+        transit_type_low:transit_type, transit_type_high:transit_type)
+        puts "Enqueued: #{build_status.as_json}"
+        BuildHeatmapJob.set(wait: ((transit_type-1)*15).seconds).perform_later(build_status)
+      end
+    elsif self.lat_previously_changed? || self.long_previously_changed?
+      puts "coord changed"
+    end
+  end
+
   scope :clean_order, lambda { |attr, dir| 
     #ensure attr and dir are safe values to use by checking within an array of allowed values
     attr = (GroceryStore.attribute_names.include? attr) ? attr : 'created_at'
@@ -70,11 +88,11 @@ class GroceryStore < ApplicationRecord
   end
 
   def self.furthest_south_west
-    [CoordCalc.abs_floor(GroceryStore.minimum(:lat)-0.3), CoordCalc.abs_floor(GroceryStore.minimum(:long))-0.3]
+    [(GroceryStore.minimum(:lat)-0.3).floor(1), (GroceryStore.minimum(:long)-0.3).floor(1)]
   end
 
   def self.furthest_north_east
-    [CoordCalc.abs_ceil(GroceryStore.maximum(:lat)+0.3), CoordCalc.abs_ceil(GroceryStore.maximum(:long)+0.3)]
+    [(GroceryStore.maximum(:lat)+0.3).ceil(1), (GroceryStore.maximum(:long)+0.3).ceil(1)]
   end
 
 
