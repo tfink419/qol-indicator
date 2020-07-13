@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 321a3325f5992c498c42ee8873ec5e61614d3735
+  revision: f4e2d9ee37ce0eef63a38a22e00b352773fd54d6
   specs:
-    quality_map_image (0.2.6)
+    quality_map_image (0.2.7)
 
 GEM
   remote: https://rubygems.org/
