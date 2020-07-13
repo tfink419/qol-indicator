@@ -21,6 +21,10 @@ class GroceryStoreUploadJob < ApplicationJob
         percent = 100
 
         number_sucessful = 0
+        south = 9999
+        north = -9999
+        west = 9999
+        east = -9999
         failed = []
         column = 2 # Skip title
         table_length = csv_table.length
@@ -33,6 +37,10 @@ class GroceryStoreUploadJob < ApplicationJob
           Geocode::attempt_geocode_if_needed(gstore)
           if gstore.save
             number_sucessful += 1
+            south = gstore.lat if gstore.lat < south
+            north = gstore.lat if gstore.lat > north
+            west = gstore.long if gstore.long < west
+            east = gstore.long if gstore.long > east
           else
             failed << column
             failed_example = gstore.errors.full_messages
@@ -45,16 +53,29 @@ class GroceryStoreUploadJob < ApplicationJob
           job_status.message = "File uploaded and All Grocery Stores were added successfully."
         elsif number_sucessful.to_f/(column-2) > 0.8
           job_status.message = "File uploaded and #{number_sucessful}/#{column-2} Grocery Stores were added successfully."
-          job_status.details = "Grocery Stores at columns #{failed} failed to upload\n"+failed_example
+          job_status.details = "Grocery Stores at columns #{failed.to_s} failed to upload\n"+failed_example.to_s
         elsif number_sucessful == 0
             job_status.message = "All Grocery Stores Failed to Upload"
             job_status.details = failed_example
         elsif number_sucessful.to_f/(column-2) < 0.5
           job_status.message = "More than half the Grocery Stores Failed to Upload"
-          job_status.error = "Grocery Stores at columns #{failed} failed to upload"
+          job_status.error = "Grocery Stores at columns #{failed.to_s} failed to upload"
           job_status.details = failed_example
         end
         job_status.save
+
+        unless south == 9999 # should only happen if all failed to upload
+          # Rebuild all points in the range of added grocery stores
+          south_west = [(south-0.3).floor(1), (west-0.3).floor(1)]
+          north_east = [(north+0.3).ceil(1), (east+0.3).ceil(1)]
+          south_west_int = south_west.map { |val| (val*1000).round.to_i }
+          north_east_int = north_east.map { |val| (val*1000).round.to_i }
+          build_status = BuildHeatmapStatus.create(state:'initialized', percent:100,
+          rebuild:true, south_west:south_west_int, north_east:north_east_int,
+          transit_type_low:1, transit_type_high:9)
+          BuildHeatmapJob.perform_later(build_status)
+        end
+
       rescue StandardError => err
         job_status.update!(error: "#{err.message}:\n#{err.backtrace}")
       end
