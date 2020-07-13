@@ -69,7 +69,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
             new_heatmaps = []
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-            while long < north_east_int[1]
+            while long <= north_east_int[1]
               isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
               .all_near_point_wide(lat, long)\
               .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)\
