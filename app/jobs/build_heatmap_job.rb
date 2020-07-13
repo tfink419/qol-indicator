@@ -14,7 +14,7 @@ class BuildHeatmapJob < ApplicationJob
       Signal.trap('INT') { throw SystemExit }
       Signal.trap('TERM') { throw SystemExit }
       if build_status.id != BuildHeatmapStatus.most_recent.id
-        return BuildHeatmapJob.set(wait: 30.seconds).perform_later(build_status)
+        return BuildHeatmapJob.set(wait: 15.seconds).perform_later(build_status)
       end
       job_retry ||= !(['initialized', 'received', 'branching'].include? build_status.state)
 

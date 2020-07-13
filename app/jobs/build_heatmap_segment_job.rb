@@ -45,20 +45,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         puts 'Isochrones State...'
         GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
           current += 1
-          
-          isochrones = []
-          (transit_type_low..transit_type_high).each do |transit_type|
-            travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-            no_isochrones = gstore.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
-            if no_isochrones
-              isochrone = Mapbox::Isochrone.isochrone(travel_type, "#{gstore[:long]},#{gstore[:lat]}", {contours_minutes: [distance], generalize: 25, polygons:true})
-              isochrones << {travel_type:travel_type, distance:distance, polygon:isochrone[0]['features'][0]['geometry']['coordinates'][0]}
-            end
-          rescue StandardError => err
-            pp err
-            pp err.backtrace
-          end
-          gstore.isochrone_polygons.create(isochrones)
+          gstore.fetch_isochrone_polygons(transit_type_low, transit_type_high)
         end
 
         # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)

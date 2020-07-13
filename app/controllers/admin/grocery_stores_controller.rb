@@ -34,6 +34,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore = GroceryStore.new(grocery_store_params)
     Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
+      gstore.rebuild_points_near(true)
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
