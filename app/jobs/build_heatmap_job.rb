@@ -13,14 +13,19 @@ class BuildHeatmapJob < ApplicationJob
     begin
       Signal.trap('INT') { throw SystemExit }
       Signal.trap('TERM') { throw SystemExit }
-      job_retry ||= build_status.created_at < 15.minutes.ago
+      if build_status.id != BuildHeatmapStatus.most_recent.id
+        return BuildHeatmapJob.set(wait: 30.seconds).perform_later(build_status)
+      end
+      job_retry ||= !(['initialized', 'received', 'branching'].include? build_status.state)
 
       build_status.update!(state:'received', percent:100)
 
       south_west_int = build_status.south_west
       north_east_int = build_status.north_east
-      HeatmapPoint.where(["lat BETWEEN ? AND ? AND long BETWEEN ? AND ?", south_west_int[0], north_east_int[0], south_west_int[1], north_east_int[1]]).delete_all if build_status.rebuild? && !job_retry
-
+      if build_status.rebuild? && !job_retry
+        HeatmapPoint.where(["lat BETWEEN ? AND ? AND long BETWEEN ? AND ? AND transit_type BETWEEN ? AND ?", south_west_int[0], 
+        north_east_int[0], south_west_int[1], north_east_int[1], build_status.transit_type_low, build_status.transit_type_high]).delete_all
+      end
       build_status.update!(state:'branching', percent:100)
       # dont reset lat and try workers if this is a retry and lat already exists
       unless job_retry && build_status.current_lat
