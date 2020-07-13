@@ -1,5 +1,5 @@
-Rails.logger.level = 4 if Rails.env == 'production'
-ActiveRecord::Base.logger.level = 4 if Rails.env == 'production'
+Rails.logger.level = 3 if Rails.env == 'production'
+ActiveRecord::Base.logger.level = 3 if Rails.env == 'production'
 class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
   sidekiq_options retry: 0

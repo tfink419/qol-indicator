@@ -3,8 +3,8 @@ require 'mapbox'
 require 'quality_map_image'
 
 Mapbox.access_token = ENV["MAPBOX_TOKEN"]
-ActiveRecord::Base.logger.level = 4 if Rails.env == 'production'
-Rails.logger.level = 4 if Rails.env == 'production'
+ActiveRecord::Base.logger.level = 3 if Rails.env == 'production'
+Rails.logger.level = 3 if Rails.env == 'production'
 
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
