@@ -17,7 +17,7 @@ class GroceryStore < ApplicationRecord
 
   validates :quality, :inclusion => 0..10
 
-  has_many :isochrone_polygons, as: :isochronable, dependent: :destroy
+  has_many :isochrone_polygons, as: :isochronable
 
   before_validation do
     self.address = self.address.strip.titleize
@@ -38,8 +38,8 @@ class GroceryStore < ApplicationRecord
   end
 
   after_destroy do
-    # normally this happens via dependent: :destroy, but I think because of polymorphic association it doesnt work
-    IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').delete_all
+    # can not use dependent destroy because it destroys before
+    IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').destroy_all
   end
 
   scope :clean_order, lambda { |attr, dir| 

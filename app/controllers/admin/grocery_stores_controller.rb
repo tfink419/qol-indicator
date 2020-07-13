@@ -46,7 +46,7 @@ class Admin::GroceryStoresController < ApplicationController
 
   def destroy
     gstore = GroceryStore.find(params[:id])
-    gstore.delete
+    gstore.destroy!
 
     render :json => { 
       :status => 0, 
@@ -59,9 +59,6 @@ class Admin::GroceryStoresController < ApplicationController
     gstore.assign_attributes(grocery_store_params)
     Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
-      if gstore.lat_previously_changed? || gstore.long_previously_changed?
-        gstore.isochrone_polygons.delete_all
-      end
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
