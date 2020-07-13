@@ -76,7 +76,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
               .select('isochrone_polygons.polygon', 'grocery_stores.quality AS quality')\
               .map{ |isochrone|
                 [
-                  isochrone.polygon.map(&:to_f),
+                  isochrone.polygon.map{ |coord| coord.map(&:to_f) },
                   isochrone.quality
                 ]
               }
