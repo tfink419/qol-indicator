@@ -8,11 +8,11 @@ class HerokuWorkersService
   def initialize
     @heroku = PlatformAPI.connect_oauth(ENV['HEROKU_TOKEN'])
   end
-  def self.start
+  def start
     @heroku.formation.update(HEROKU_APP_NAME, HEROKU_PROC_NAME, { quantity: NUM_WORKERS })
   end
 
-  def self.stop
+  def stop
     @heroku.formation.update(HEROKU_APP_NAME, HEROKU_PROC_NAME, { quantity: 0 })
   end
 end
