@@ -24,7 +24,7 @@ class BuildHeatmapJob < ApplicationJob
       north_east_int = build_status.north_east
       if build_status.rebuild? && !job_retry
         HeatmapPoint.where(["lat BETWEEN ? AND ? AND long BETWEEN ? AND ? AND transit_type BETWEEN ? AND ?", south_west_int[0], 
-        north_east_int[0], south_west_int[1], north_east_int[1], build_status.transit_type_low, build_status.transit_type_high]).destroy_all
+        north_east_int[0], south_west_int[1], north_east_int[1], build_status.transit_type_low, build_status.transit_type_high]).delete_all
       end
       build_status.update!(state:'branching', percent:100)
       # dont reset lat and try workers if this is a retry and lat already exists

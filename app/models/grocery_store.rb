@@ -29,7 +29,7 @@ class GroceryStore < ApplicationRecord
 
   after_destroy do
     # can not use dependent destroy because it destroys before
-    IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').destroy_all
+    IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').delete_all
   end
 
   scope :clean_order, lambda { |attr, dir| 
