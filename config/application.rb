@@ -21,7 +21,7 @@ module QolIndicator
 
     config.middleware.use Rack::Deflater
 
-    config.active_job.queue_adapter = :sidekiq
+    config.active_job.queue_adapter = :inline
 
     Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
