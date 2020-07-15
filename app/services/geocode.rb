@@ -144,8 +144,8 @@ class Geocode
     end
     with_retries(max_tries: 3) {
       response = Google::Maps.geocode(location)
+      response.first
     }
-    response.first
   rescue StandardError => err
     $stderr.print err
     $stderr.print err.backtrace
