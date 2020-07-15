@@ -34,7 +34,7 @@ class GroceryStoreUploadJob < ApplicationJob
           quality = row['quality'] ? row['quality'].to_i : default_quality
           gstore = GroceryStore.new(:name => row['name'], :address => row['address'], :quality => quality,
             :city => row['city'], :state => row['state'], :zip => row['zip'], :lat => row['latitude'], :long => row['longitude'])
-          Geocode::attempt_geocode_if_needed(gstore)
+          Geocode.new(gstore).attempt_geocode_if_needed
           if gstore.save
             number_sucessful += 1
             south = gstore.lat if gstore.lat < south

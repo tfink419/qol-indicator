@@ -1,4 +1,6 @@
 require_relative 'boot'
+require 'google-maps'
+require 'mapbox'
 
 require 'rails/all'
 
@@ -20,6 +22,13 @@ module QolIndicator
     config.middleware.use Rack::Deflater
 
     config.active_job.queue_adapter = :sidekiq
+
+    Mapbox.access_token = ENV["MAPBOX_TOKEN"]
+
+    Google::Maps.configure do |config|
+      config.authentication_mode = Google::Maps::Configuration::API_KEY
+      config.api_key = ENV["GOOGLE_KEY"]
+    end
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
