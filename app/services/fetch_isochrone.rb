@@ -15,7 +15,7 @@ class FetchIsochrone
       no_isochrones = @isochronable.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
       if no_isochrones
         isochrone = nil
-        with_retries(max_tries: 10, base_sleep_seconds: 15, max_sleep_seconds: 60, rescue: RestClient::Response) {
+        with_retries(max_tries: 10, base_sleep_seconds: 15, max_sleep_seconds: 60) {
           isochrone = Mapbox::Isochrone.isochrone(travel_type, "#{@isochronable.long},#{@isochronable.lat}", {contours_minutes: [distance], generalize: 25, polygons:true})
         }
         isochrones << {travel_type:travel_type, distance:distance, polygon:isochrone[0]['features'][0]['geometry']['coordinates'][0]}
