@@ -1,7 +1,6 @@
 require "retries"
 require 'mapbox'
 require 'mapbox-sdk'
-Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 
 class FetchIsochrone
   def initialize(isochronable)

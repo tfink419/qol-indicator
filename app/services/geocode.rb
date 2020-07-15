@@ -142,7 +142,9 @@ class Geocode
     else
       location = "#{@place.address}, #{@place.city}, #{STATE_ABBR_STATE_MAP[@place.state]}, #{@place.zip}"
     end
-    response = Google::Maps.geocode(location)
+    with_reties(max_tries: 3) {
+      response = Google::Maps.geocode(location)
+    }
     response.first
   rescue StandardError => err
     $stderr.print err
