@@ -1,8 +1,6 @@
 require 'geokit'
-require 'mapbox'
 require 'quality_map_image'
 
-Mapbox.access_token = ENV["MAPBOX_TOKEN"]
 ActiveRecord::Base.logger.level = 3 if Rails.env == 'production'
 Rails.logger.level = 3 if Rails.env == 'production'
 
