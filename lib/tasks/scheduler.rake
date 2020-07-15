@@ -28,13 +28,13 @@ task :scheduled_jobs => :environment do
   if scheduled_job
     StartPointRebuild.new(scheduled_job).start
     if Rails.env == 'production'
-      HerokuWorkersService.start
+      HerokuWorkersService.new.start
     else
       puts "Started Job"
     end
   elsif BuildHeatmapStatus.most_recent.nil?
     if Rails.env == 'production'
-      HerokuWorkersService.stop
+      HerokuWorkersService.new.stop
     else
       puts "Would Have Stopped Heroku"
     end
