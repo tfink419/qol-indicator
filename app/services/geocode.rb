@@ -1,10 +1,7 @@
-require 'mapbox'
-require 'mapbox-sdk'
-Mapbox.access_token = ENV["MAPBOX_TOKEN"]
-
+require 'google-maps'
 
 class Geocode
-  STATE_MAP = {
+  STATE_ABBR_STATE_MAP = {
     nil => "",
     "" => "",
     "AK" => "Alaska",
@@ -63,26 +60,90 @@ class Geocode
     "WV" => "West Virginia",
     "WY" => "Wyoming" 
   }
+
+  STATE_STATE_ABBR_MAP = {
+    nil => "",
+    "" => "",
+    "Alaska" => "AK",
+    "Alabama" => "AL",
+    "Arkansas" => "AR",
+    "American Samoa" => "AS",
+    "Arizona" => "AZ",
+    "California" => "CA",
+    "Colorado" => "CO",
+    "Connecticut" => "CT",
+    "District of Columbia" => "DC",
+    "Delaware" => "DE",
+    "Florida" => "FL",
+    "Georgia" => "GA",
+    "Guam" => "GU",
+    "Hawaii" => "HI",
+    "Iowa" => "IA",
+    "Idaho" => "ID",
+    "Illinois" => "IL",
+    "Indiana" => "IN",
+    "Kansas" => "KS",
+    "Kentucky" => "KY",
+    "Louisiana" => "LA",
+    "Massachusetts" => "MA",
+    "Maryland" => "MD",
+    "Maine" => "ME",
+    "Michigan" => "MI",
+    "Minnesota" => "MN",
+    "Missouri" => "MO",
+    "Mississippi" => "MS",
+    "Montana" => "MT",
+    "North Carolina" => "NC",
+    "North Dakota" => "ND",
+    "Nebraska" => "NE",
+    "New Hampshire" => "NH",
+    "New Jersey" => "NJ",
+    "New Mexico" => "NM",
+    "Nevada" => "NV",
+    "New York" => "NY",
+    "Ohio" => "OH",
+    "Oklahoma" => "OK",
+    "Oregon" => "OR",
+    "Pennsylvania" => "PA",
+    "Puerto Rico" => "PR",
+    "Rhode Island" => "RI",
+    "South Carolina" => "SC",
+    "South Dakota" => "SD",
+    "Tennessee" => "TN",
+    "Texas" => "TX",
+    "Utah" => "UT",
+    "Virginia" => "VA",
+    "Virgin Islands" => "VI",
+    "Vermont" => "VT",
+    "Washington" => "WA",
+    "Wisconsin" => "WI",
+    "West Virginia" => "WV",
+    "Wyoming" => "WY" 
+  }
+  def initialize(place)
+    @place = place
+  end
   
-  def self.attempt_geocode_if_needed(place)
-    unless place.valid?
-      if place.only_coordinates_invalid?
-        geocoded = geocode(place.address, place.city, place.state, place.zip)
-        parse_geocode(place, geocoded) if geocoded
+  def attempt_geocode_if_needed
+    unless @place.valid?
+      if @place.only_coordinates_invalid?
+        @geocoded = geocode
+        parse_geocode if @geocoded
+        puts @place.as_json
       end
     end
   end
 
-  def self.geocode(address, city, state, zip)
-    if zip.nil?
-      location = "#{address}, #{city}, #{STATE_MAP[state]}"
-    elsif city.nil? or city.empty?
-      location = "#{address}, #{zip}"
+  def geocode
+    if @place.zip.nil?
+      location = "#{@place.address}, #{@place.city}, #{STATE_ABBR_STATE_MAP[@place.state]}"
+    elsif @place.city.nil? or @place.city.empty?
+      location = "#{@place.address}, #{@place.zip}"
     else
-      location = "#{address}, #{city}, #{STATE_MAP[state]}, #{zip}"
+      location = "#{@place.address}, #{@place.city}, #{STATE_ABBR_STATE_MAP[@place.state]}, #{@place.zip}"
     end
-    response = Mapbox::Geocoder.geocode_forward(location, { country:'US', types:['address']})
-    response[0]["features"][0]
+    response = Google::Maps.geocode(location)
+    response.first
   rescue StandardError => err
     $stderr.print err
     $stderr.print err.backtrace
@@ -91,28 +152,14 @@ class Geocode
 
   private
 
-  def self.parse_context(geocoded)
-    geocoded["context"].each do |context|
-      if context["id"].include? "postcode"
-        geocoded["postalCode"] = context["text"]
-      elsif context["id"].include? "place"
-        geocoded["city"] = context["text"]
-      elsif context["id"].include? "region"
-        geocoded["state"] = context["short_code"][3..-1]
-      end
-    end
-  end
-
-  def self.parse_geocode(place, geocoded)
-    parse_context(geocoded)
-    return if geocoded['relevance'] < 0.75 # Bad geocode
-    place.lat = geocoded['center'][1]
-    place.long = geocoded['center'][0]
-    if place.zip.nil?
-      place.zip = geocoded['postalCode']
-    elsif place.city.nil? or place.city.empty?
-      place.city = geocoded['city']
-      place.state = geocoded['state']
+  def parse_geocode
+    @place.lat = @geocoded.latitude
+    @place.long = @geocoded.longitude
+    if @place.zip.nil?
+      @place.zip = @geocoded.components["postal_code"].first
+    elsif @place.city.nil? or @place.city.empty?
+      @place.city = @geocoded.components["locality"].first
+      @place.state = STATE_STATE_ABBR_MAP[@geocoded.components['administrative_area_level_1'].first]
     end
   end
 end

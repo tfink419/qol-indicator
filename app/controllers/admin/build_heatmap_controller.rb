@@ -11,6 +11,7 @@ class Admin::BuildHeatmapController < ApplicationController
     rebuild:params[:rebuild], south_west:south_west_int, north_east:north_east_int,
     transit_type_low:1, transit_type_high:GroceryStore::NUM_TRANSIT_TYPES)
     BuildHeatmapJob.perform_later(build_status)
+    HerokuWorkersService.start
     render json: {
       status: 0,
       message: 'Heatmap Build Job Initialized',

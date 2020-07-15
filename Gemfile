@@ -75,3 +75,5 @@ gem 'quality_map_image', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@gith
 gem "retries"
 
 gem 'platform-api'
+
+gem 'google-maps'
