@@ -62,6 +62,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         puts 'Heatmap Points'
         state = 'heatmap-points'
         while true # see towards bottom of loop
+          # TODO: Change to calc lat in chunks of 10 or 100
           (transit_type_low..transit_type_high).each do |transit_type|
             long = south_west_int[1]
             new_heatmaps = []
