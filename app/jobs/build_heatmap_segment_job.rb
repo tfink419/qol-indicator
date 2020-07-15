@@ -45,7 +45,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
         puts 'Isochrones State...'
         GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
           current += 1
-          gstore.fetch_isochrone_polygons(transit_type_low, transit_type_high)
+          FetchIsochrone.new(gstore).fetch(transit_type_low, transit_type_high)
         end
 
         # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)

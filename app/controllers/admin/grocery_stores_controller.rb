@@ -34,6 +34,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore = GroceryStore.new(grocery_store_params)
     Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
+      IsochronableChanged.new(gstore).record
       gstore.rebuild_points_near(true)
       render :json =>  {
         :status => 0,
@@ -46,6 +47,7 @@ class Admin::GroceryStoresController < ApplicationController
 
   def destroy
     gstore = GroceryStore.find(params[:id])
+    IsochronableChanged.new(gstore).record(true)
     gstore.destroy!
 
     render :json => { 
@@ -59,6 +61,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore.assign_attributes(grocery_store_params)
     Geocode.attempt_geocode_if_needed(gstore)
     if gstore.save
+      IsochronableChanged.new(gstore).record
       render :json =>  {
         :status => 0,
         :grocery_store => gstore

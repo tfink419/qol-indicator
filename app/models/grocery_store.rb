@@ -25,18 +25,7 @@ class GroceryStore < ApplicationRecord
     self.state = self.state.upcase
   end
 
-  after_update do
-    if self.quality_previously_changed?
-      self.rebuild_points_near
-    elsif self.lat_previously_changed? || self.long_previously_changed?
-      puts "coord changed"
-    end
-  end
-
-  before_destroy do
-    puts "Before Destroy"
-    self.rebuild_points_near
-  end
+  NUM_TRANSIT_TYPES = 9
 
   after_destroy do
     # can not use dependent destroy because it destroys before
@@ -74,28 +63,6 @@ class GroceryStore < ApplicationRecord
     where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (lat-extra_length).round(3), (lat+extra_length).round(3), (long-extra_length).round(3), (long+extra_length+0.1).round(3)])
   }
 
-  def fetch_isochrone_polygons(transit_type_low, transit_type_high)
-    isochrones = []
-    tries = 0
-    (transit_type_low..transit_type_high).each do |transit_type|
-      travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-      no_isochrones = self.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
-      if no_isochrones
-        isochrone = Mapbox::Isochrone.isochrone(travel_type, "#{self.long},#{self.lat}", {contours_minutes: [distance], generalize: 25, polygons:true})
-        isochrones << {travel_type:travel_type, distance:distance, polygon:isochrone[0]['features'][0]['geometry']['coordinates'][0]}
-      end
-    rescue StandardError => err
-      # I wish I could be more exact but Mapbox API throws a StandardError
-      if tries <= 5
-        sleep 15
-        retry
-      end
-      pp err
-      pp err.backtrace
-    end
-    self.isochrone_polygons.create(isochrones)
-  end
-
   def valid_location?
     LocationValidator::valid_location?(city, state, zip)
   end
@@ -107,23 +74,6 @@ class GroceryStore < ApplicationRecord
       return false unless self.errors[attribute_name].blank?
     end
     true
-  end
-
-  def rebuild_points_near(new_store = false)
-    self.fetch_isochrone_polygons(1, 9) if new_store
-    puts "Rebuilding Points"
-    (1..9).each do |transit_type|
-      travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-      isochrone = IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore', travel_type:travel_type, distance:distance).first
-      if isochrone
-        south_west_int = [(isochrone.south_bound.floor(1)*1000).round.to_i, (isochrone.west_bound.floor(1)*1000).round.to_i]
-        north_east_int = [(isochrone.north_bound.ceil(1)*1000).round.to_i, (isochrone.east_bound.ceil(1)*1000).round.to_i]
-        build_status = BuildHeatmapStatus.create(state:'initialized', percent:100,
-        rebuild:true, south_west:south_west_int, north_east:north_east_int,
-        transit_type_low:transit_type, transit_type_high:transit_type)
-        BuildHeatmapJob.set(wait: ((transit_type-1)*15).seconds).perform_later(build_status)
-      end
-    end
   end
 
   def self.furthest_south_west

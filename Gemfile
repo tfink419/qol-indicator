@@ -71,3 +71,7 @@ gem 'sidekiq', '~> 6.1.0'
 gem 'geokit', '~> 1.13.1'
 
 gem 'quality_map_image', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@github.com/tfink419/quality_map_image.git"
+
+gem "retries"
+
+gem 'platform-api'

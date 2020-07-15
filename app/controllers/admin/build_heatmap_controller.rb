@@ -9,7 +9,7 @@ class Admin::BuildHeatmapController < ApplicationController
     north_east_int = north_east.map { |val| (val*1000).round.to_i }
     build_status = BuildHeatmapStatus.create(state:'initialized', percent:100,
     rebuild:params[:rebuild], south_west:south_west_int, north_east:north_east_int,
-    transit_type_low:1, transit_type_high:9)
+    transit_type_low:1, transit_type_high:GroceryStore::NUM_TRANSIT_TYPES)
     BuildHeatmapJob.perform_later(build_status)
     render json: {
       status: 0,
