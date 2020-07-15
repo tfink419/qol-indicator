@@ -89,21 +89,8 @@ class HeatmapPoint < ApplicationRecord
     [south_west, north_east, QualityMapImage.get_image(south_west_int, north_east_int, step_int, grocery_store_points)]
   end
   
-  def rebuild_all_in_bounds(south_west, north_east)
-    south_west_int = [(south_west[0].floor(1)*1000).round.to_i, (south_west[1].floor(1)*1000).round.to_i]
-    north_east_int = [(north_east[0].ceil(1)*1000).round.to_i, (north_east[1].ceil(1)*1000).round.to_i]
-    (1..9).each do |transit_type|
-      travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
-      isochrone = IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore', travel_type:travel_type, distance:distance).first
-      build_status = BuildHeatmapStatus.create(state:'initialized', percent:100,
-      rebuild:true, south_west:south_west_int, north_east:north_east_int,
-      transit_type_low:transit_type, transit_type_high:transit_type)
-      BuildHeatmapJob.set(wait: ((transit_type-1)*15).seconds).perform_later(build_status)
-    end
-  end
-
   TRANSIT_TYPE_MAP = [
-    ['walking', 8], # shouldn't be used
+    [nil, nil], # shouldn't be used
     ['walking', 8],
     ['walking', 16],
     ['walking', 24],

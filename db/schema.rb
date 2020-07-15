@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_12_211507) do
+ActiveRecord::Schema.define(version: 2020_07_14_002910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -106,6 +106,15 @@ ActiveRecord::Schema.define(version: 2020_07_12_211507) do
     t.datetime "expires_at"
     t.index ["expires_at"], name: "index_password_resets_on_expires_at"
     t.index ["uuid"], name: "index_password_resets_on_uuid"
+  end
+
+  create_table "scheduled_point_rebuilds", force: :cascade do |t|
+    t.datetime "scheduled_time", null: false
+    t.integer "south_bounds", default: [], null: false, array: true
+    t.integer "west_bounds", default: [], null: false, array: true
+    t.integer "north_bounds", default: [], null: false, array: true
+    t.integer "east_bounds", default: [], null: false, array: true
+    t.index ["scheduled_time"], name: "index_scheduled_point_rebuilds_on_scheduled_time"
   end
 
   create_table "users", force: :cascade do |t|
