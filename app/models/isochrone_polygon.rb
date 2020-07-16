@@ -25,7 +25,7 @@ class IsochronePolygon < ApplicationRecord
     south = lat/1000.0
     west = long/1000.0
     if lat_height == 1 && long_width == 1
-      where(['south_bound <= ? AND ? <= north_bound  AND west_bound <= ? AND ? <= east_bound', south, south, west, west])
+      where(['south_bound <= ? AND ? <= north_bound AND west_bound <= ? AND ? <= east_bound', south, south, west, west])
     elsif lat_height == 1
       where(['south_bound <= ? AND ? <= north_bound AND ((west_bound <= ? AND ? <= east_bound) OR (west_bound <= ? AND ? <= east_bound) OR (? <= west_bound AND east_bound <= ?))', 
       south, west, west, east, east, west, east])
