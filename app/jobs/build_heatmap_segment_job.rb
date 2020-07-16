@@ -1,14 +1,14 @@
 require 'geokit'
 require 'quality_map_image'
 
-ActiveRecord::Base.logger.level = 3 if Rails.env == 'production'
-Rails.logger.level = 3 if Rails.env == 'production'
-
 class BuildHeatmapSegmentJob < ApplicationJob
   queue_as :build_heatmap_segment
   sidekiq_options retry: 0
 
   def perform(build_status)
+    return if build_status.state == 'complete'
+    Rails.logger = ActiveRecord::Base.logger = Sidekiq.logger
+    
     Signal.trap('INT') { throw SystemExit }
     Signal.trap('TERM') { throw SystemExit }
     segment = build_status.segment
@@ -63,14 +63,16 @@ class BuildHeatmapSegmentJob < ApplicationJob
         state = 'heatmap-points'
         while true # see towards bottom of loop
           # TODO: Change to calc lat in chunks of 10 or 100
+          lat_height = (lat == north_east_int[0]) ? 1 : BuildHeatmapJob::NUM_STEPS_PER_FUNCTION
           (transit_type_low..transit_type_high).each do |transit_type|
             long = south_west_int[1]
             new_heatmaps = []
             current_transit_type = transit_type
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             while long <= north_east_int[1]
+              long_width = (long == north_east_int[1]) ? 1 : BuildHeatmapJob::NUM_STEPS_PER_FUNCTION
               isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
-              .all_near_point_wide(lat, long)\
+              .all_near_point_fat(lat, long, lat_height-1, long_width-1)\
               .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)\
               .select('isochrone_polygons.polygon', 'grocery_stores.quality AS quality')\
               .map{ |isochrone|
@@ -81,25 +83,27 @@ class BuildHeatmapSegmentJob < ApplicationJob
               }
               # skip to next block if none found
               unless isochrones.blank?
-                qualities = QualityMapImage.quality_of_points(lat, long, 100, isochrones)
-                qualities.each{ |quality|
+                qualities = QualityMapImage.quality_of_points(lat, long, lat_height, long_width, isochrones)
+                this_lat = lat
+                this_long = long
+                new_heatmap_points = qualities.reduce([]) { |arr, quality|
                   if quality > 0
-                    begin
-                      HeatmapPoint.create(lat:lat, long:long, transit_type: transit_type, quality:quality)
-                    rescue
-                      # there was probably a race condition on current_lat and then this exact point
-                      # this is okay but not great
-                    end
+                    arr << [this_lat, this_long, transit_type, quality, HeatmapPoint.precision_of(this_lat, this_long)]
                   end
-                  long += step_int
+                  this_long += step_int
+                  if this_long%long_width == 0
+                    this_long -= step_int*long_width
+                    this_lat += step_int
+                  end
+                  arr
                 }
-              else
-                long += step_int*100
+                columns = [:lat, :long, :transit_type, :quality, :precision]
+                results = HeatmapPoint.import columns, new_heatmap_points, on_duplicate_key_ignore: true
               end
-              
+              long += step_int*long_width
             end
           end
-          lat = build_status.build_heatmap_status.reload.current_lat.to_i+step_int
+          lat = build_status.build_heatmap_status.reload.current_lat.to_i+step_int*BuildHeatmapJob::NUM_STEPS_PER_FUNCTION
           break unless lat <= north_east_int[0] # essentially while lat <= north_east_int[0]
           build_status.build_heatmap_status.update!(current_lat:lat)
           build_status.update!(current_lat:lat)

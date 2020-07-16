@@ -1,5 +1,3 @@
-Rails.logger.level = 3 if Rails.env == 'production'
-ActiveRecord::Base.logger.level = 3 if Rails.env == 'production'
 class BuildHeatmapJob < ApplicationJob
   queue_as :build_heatmap
   sidekiq_options retry: 0
@@ -8,14 +6,16 @@ class BuildHeatmapJob < ApplicationJob
   STEP_PRECISION=3
   STEP=(0.1**STEP_PRECISION).round(STEP_PRECISION) # 0.001
   STEP_INT=(STEP*1000).round.to_i # 1
+  NUM_STEPS_PER_FUNCTION = 100
 
   def perform(build_status, job_retry=false)
+    if build_status.id != BuildHeatmapStatus.most_recent.id
+      return BuildHeatmapJob.set(wait: 15.seconds).perform_later(build_status, job_retry)
+    end
+    Rails.logger = ActiveRecord::Base.logger = Sidekiq.logger    
     begin
       Signal.trap('INT') { throw SystemExit }
       Signal.trap('TERM') { throw SystemExit }
-      if build_status.id != BuildHeatmapStatus.most_recent.id
-        return BuildHeatmapJob.set(wait: 15.seconds).perform_later(build_status)
-      end
       job_retry ||= !(['initialized', 'received', 'branching'].include? build_status.state)
 
       build_status.update!(state:'received', percent:100)
@@ -34,10 +34,10 @@ class BuildHeatmapJob < ApplicationJob
           (1..NUM_SEGMENTS).each do |segment|
             build_segment_status = build_status.build_heatmap_segment_statuses.create(state:'initialized', percent:100, segment:segment, current_lat:lat)
             BuildHeatmapSegmentJob.perform_later(build_segment_status)
-            lat += STEP_INT
+            lat += STEP_INT*NUM_STEPS_PER_FUNCTION
           end
         end
-        build_status.update!(current_lat:lat-STEP_INT)
+        build_status.update!(current_lat:lat-STEP_INT*NUM_STEPS_PER_FUNCTION)
       end
 
       # in case its different due to an old build and a change in num_segments

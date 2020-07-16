@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: f4e2d9ee37ce0eef63a38a22e00b352773fd54d6
+  revision: ea35962f178ccc3c11a99a333fe10bc80888ffef
   specs:
-    quality_map_image (0.2.7)
+    quality_map_image (0.3.3)
 
 GEM
   remote: https://rubygems.org/
@@ -39,6 +39,8 @@ GEM
       activemodel (= 5.2.4.3)
       activesupport (= 5.2.4.3)
       arel (>= 9.0)
+    activerecord-import (1.0.5)
+      activerecord (>= 3.2)
     activestorage (5.2.4.3)
       actionpack (= 5.2.4.3)
       activerecord (= 5.2.4.3)
@@ -247,6 +249,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-import
   bcrypt (~> 3.1.7)
   bootsnap (>= 1.1.0)
   byebug

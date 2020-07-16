@@ -77,3 +77,5 @@ gem "retries"
 gem 'platform-api'
 
 gem 'google-maps'
+
+gem 'activerecord-import'
