@@ -47,7 +47,7 @@ export default ({groceryStoreId, open, isAdmin, onGroceryStoreChange}) => {
   const handleCloseDialogs = (groceryStoreChange) => {
     setCurrentDialogOpen(null);
     if(groceryStoreChange) {
-      onGroceryStoreChange();
+      onGroceryStoreChange(groceryStoreId);
     }
   }
 

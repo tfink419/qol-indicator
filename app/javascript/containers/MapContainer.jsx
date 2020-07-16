@@ -8,6 +8,7 @@ import { updateMapPreferences } from "../actions/map-preferences";
 
 import HeatmapLayer from './HeatmapLayer'
 import GroceryStoreLayer from './GroceryStoreLayer'
+import MapLegend from "../components/MapLegend";
 
 const loader = new Loader({
   apiKey: GOOGLE_KEY,
@@ -35,7 +36,7 @@ const startLocation = {
   northEast:[39.765, -104.927]
 }
 
-const MapContainer = ({mapPreferences, updateMapPreferences, isAdmin = false}) => {
+const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = false}) => {
   const classes = useStyles();
   let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
   let [map, setMap] = React.useState(null);
@@ -68,6 +69,10 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdmin = false}) =
         lat: currentLocation.center[0],
         lng: currentLocation.center[1]
       },
+      streetViewControl: false,
+      fullScreenControl: false,
+      mapTypeControl: false,
+      mapTypeId: 'roadmap',
       zoom: currentLocation.zoom,
       minZoom: 7,
       maxZoom: 16
@@ -86,7 +91,8 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdmin = false}) =
   return (
     <div className={classes.mapContainer} ref={mapRef}>
       <HeatmapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
-      <GroceryStoreLayer map={map} currentLocation={currentLocation} isAdmin={isAdmin} />
+      <GroceryStoreLayer map={map} currentLocation={currentLocation} isAdmin={isAdminLayer} />
+      { !isAdminLayer && <MapLegend map={map}/> }
     </div>
   )};
     

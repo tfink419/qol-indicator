@@ -24,6 +24,13 @@ export default ({ map, currentLocation, isAdmin }) => {
     });
   }
 
+  const removeAllMarkers = () => {
+    groceryStores.current.forEach(groceryStore => {
+      groceryStore.marker.setMap(null);
+      groceryStore.infoWindow.close();
+    });
+  }
+
   const loadMapData = React.useRef(_.throttle((map, currentLocation) => {
     if(!map) {
       return;
@@ -75,11 +82,12 @@ export default ({ map, currentLocation, isAdmin }) => {
           const onGroceryStoreChange = (id) => {
             justRetrievedGroceryStores.current = justRetrievedGroceryStores.current.filter(groceryStore => groceryStore != id);
             groceryStores.current = groceryStores.current.filter(groceryStore => {
-              if(groceryStore != id) {
+              if(groceryStore.groceryStore[0] == id) {
                 groceryStore.marker.setMap(null);
-                return true;
+                groceryStore.infoWindow.close();
+                return false;
               }
-              return false;
+              return true;
             });
             loadMapData(map, currentLocation)
           };
@@ -117,7 +125,7 @@ export default ({ map, currentLocation, isAdmin }) => {
       })
     }
     else {
-      groceryStores.current.forEach(groceryStore => groceryStore.marker.setMap(null));
+      removeAllMarkers();
     }
   }, 500)).current;
 
