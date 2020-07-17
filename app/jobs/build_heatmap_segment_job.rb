@@ -52,8 +52,8 @@ class BuildHeatmapSegmentJob < ApplicationJob
         build_status.update!(state:state, percent:percent);
         sleep(5) until build_status.reload.build_heatmap_status.state == 'heatmap-points'
 
-        south_west_int = build_status.build_heatmap_status.south_west
-        north_east_int =  build_status.build_heatmap_status.north_east
+        south_west_int = build_status.build_heatmap_status.south_west.map { |coord_part| coord_part.floor(1-BuildHeatmapJob::STEP_PRECISION) }
+        north_east_int = build_status.build_heatmap_status.north_east.map { |coord_part| coord_part.ceil(1-BuildHeatmapJob::STEP_PRECISION) }
 
         step_int = (BuildHeatmapJob::STEP*1000).round.to_i
 
