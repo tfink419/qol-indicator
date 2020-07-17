@@ -20,8 +20,8 @@ class BuildHeatmapJob < ApplicationJob
 
       build_status.update!(state:'received', percent:100)
 
-      south_west_int = build_status.south_west
-      north_east_int = build_status.north_east
+      south_west_int = build_status.south_west.map { |coord_part| coord_part.floor(1-STEP_PRECISION) }
+      north_east_int = build_status.north_east.map { |coord_part| coord_part.ceil(1-STEP_PRECISION) }
       if build_status.rebuild? && !job_retry
         HeatmapPoint.where(["lat BETWEEN ? AND ? AND long BETWEEN ? AND ? AND transit_type BETWEEN ? AND ?", south_west_int[0], 
         north_east_int[0], south_west_int[1], north_east_int[1], build_status.transit_type_low, build_status.transit_type_high]).delete_all
