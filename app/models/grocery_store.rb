@@ -77,11 +77,11 @@ class GroceryStore < ApplicationRecord
   end
 
   def self.furthest_south_west
-    [(GroceryStore.minimum(:lat)-0.3).floor(1), (GroceryStore.minimum(:long)-0.3).floor(1)]
+    [(GroceryStore.minimum(:lat)-0.3), (GroceryStore.minimum(:long)-0.3)]
   end
 
   def self.furthest_north_east
-    [(GroceryStore.maximum(:lat)+0.3).ceil(1), (GroceryStore.maximum(:long)+0.3).ceil(1)]
+    [(GroceryStore.maximum(:lat)+0.3), (GroceryStore.maximum(:long)+0.3)]
   end
 
   def public_attributes 
