@@ -24,7 +24,7 @@ class MapDataController < ApplicationController
 
     zoom = max_zoom if zoom.nil? || zoom > max_zoom
 
-    fixed_south_west, fixed_north_east, image = HeatmapPoint.generate_image(south_west, north_east, zoom, transit_type)
+    fixed_south_west, fixed_north_east, image = QualityMapService.new(south_west, north_east, zoom, transit_type).generate
 
     response.headers['Content-Range'] = "Coordinates #{fixed_south_west}-#{fixed_north_east}"
     send_data image
