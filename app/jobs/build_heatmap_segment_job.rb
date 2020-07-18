@@ -62,7 +62,6 @@ class BuildHeatmapSegmentJob < ApplicationJob
         puts 'Heatmap Points'
         state = 'heatmap-points'
         while true # see towards bottom of loop
-          # TODO: Change to calc lat in chunks of 10 or 100
           lat_height = (lat == north_east_int[0]) ? 1 : BuildHeatmapJob::NUM_STEPS_PER_FUNCTION
           (transit_type_low..transit_type_high).each do |transit_type|
             long = south_west_int[1]
@@ -108,6 +107,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
           build_status.build_heatmap_status.update!(current_lat:lat)
           build_status.update!(current_lat:lat)
         end
+        puts "Complete"
         state = 'complete'
         build_status.update!(percent:100, state:'complete')
       rescue => err
