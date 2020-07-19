@@ -63,7 +63,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_001745) do
 
   create_table "census_tracts", force: :cascade do |t|
     t.string "geoid", null: false
-    t.float "povery_percent", null: false
+    t.float "poverty_percent", null: false
     t.float "land_area", null: false
     t.integer "population", null: false
     t.float "population_density", null: false

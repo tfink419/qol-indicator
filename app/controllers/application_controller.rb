@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
   end
 
   def confirm_api_key
-    unless params[:key] and ApiKey.find_by_key(key)
+    unless params[:key] and ApiKey.find_by_key(params[:key])
       render :json => {:status => 403, :error => 'Admin Access Only'}, :status => 403
     end
   end

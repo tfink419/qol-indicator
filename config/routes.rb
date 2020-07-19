@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     resources 'admin/grocery_stores', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_grocery_stores'
     resources 'admin/users', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_users'
     resources 'admin/api_keys', :only => [:index, :create, :show, :destroy], :as => 'admin_api_keys'
+    post 'admin/census_tracts/import', :to => 'admin/census_tracts#import', :as => 'admin_census_tracts_import'
     post 'admin/build_heatmap', :to => 'admin/build_heatmap#build', :as => 'admin_build_heatmap'
     get 'admin/build_heatmap/status', :to => 'admin/build_heatmap#status_index', :as => 'admin_build_heatmap_status_index'
     get 'admin/build_heatmap/status/:id', :to => 'admin/build_heatmap#status_show', :as => 'admin_build_heatmap_status_show'
