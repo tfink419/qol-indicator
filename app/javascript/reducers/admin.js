@@ -9,6 +9,7 @@ const defaultTable = {
 const admin = (state = {
   users:{...defaultTable},
   groceryStores:{...defaultTable},
+  apiKeys: { ...defaultTable },
   csvUpload: {},
   buildHeatmapStatuses: {
     page:0,
@@ -38,6 +39,16 @@ const admin = (state = {
         groceryStores:{ 
           ...state.groceryStores,
           rows:action.groceryStores,
+          count:action.count,
+          loaded: true
+        }
+      }
+    case 'LOADED_API_KEYS':
+      return {
+        ...state,
+        apiKeys:{ 
+          ...state.apiKeys,
+          rows:action.apiKeys,
           count:action.count,
           loaded: true
         }
@@ -215,6 +226,49 @@ const admin = (state = {
         }
       }
 
+    case 'UPDATE_API_KEYS_ORDERDIR':
+      return {
+        ...state,
+        apiKeys: {
+          ...state.apiKeys,
+          orderDir:action.orderDir,
+          loaded: false
+        }
+      }
+    case 'UPDATE_API_KEYS_ORDER':
+      return {
+        ...state,
+        apiKeys: {
+          ...state.apiKeys,
+          order:action.order,
+          loaded: false
+        }
+      }
+    case 'UPDATE_API_KEYS_PAGE':
+      return {
+        ...state,
+        apiKeys: {
+          ...state.apiKeys,
+          page:action.page,
+          loaded: false
+        }
+      }
+    case 'UPDATE_API_KEYS_ROWSPERPAGE':
+    {
+      let {page} = state.apiKeys;
+      if(state.apiKeys.rowsPerPage != action.rowsPerPage) {
+        page = Math.floor(state.apiKeys.rowsPerPage/action.rowsPerPage*page);
+      }
+      return {
+        ...state,
+        apiKeys: {
+          ...state.apiKeys,
+          rowsPerPage:action.rowsPerPage,
+          page,
+          loaded: false
+        }
+      }
+    }
 
     case 'UPDATE_UPLOAD_CSV_STATUSES_PAGE':
       return {
@@ -280,6 +334,11 @@ const admin = (state = {
       return {
         ...state,
         groceryStores:{...defaultTable}
+      }
+    case 'CLEAR_API_KEYS':
+      return {
+        ...state,
+        apiKeys:{...defaultTable}
       }
     case 'USER_LOGOUT':
       return {

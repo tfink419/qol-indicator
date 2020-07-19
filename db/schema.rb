@@ -10,10 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_14_002910) do
+ActiveRecord::Schema.define(version: 2020_07_19_001745) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "api_keys", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_api_keys_on_key", unique: true
+    t.index ["user_id"], name: "index_api_keys_on_user_id"
+  end
 
   create_table "build_heatmap_segment_statuses", force: :cascade do |t|
     t.integer "build_heatmap_status_id"
@@ -38,6 +47,29 @@ ActiveRecord::Schema.define(version: 2020_07_14_002910) do
     t.integer "north_east", array: true
     t.integer "transit_type_low"
     t.integer "transit_type_high"
+  end
+
+  create_table "census_tract_polygons", force: :cascade do |t|
+    t.integer "census_tract_id", null: false
+    t.float "south_bound", null: false
+    t.float "north_bound", null: false
+    t.float "west_bound", null: false
+    t.float "east_bound", null: false
+    t.text "polygon", array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["census_tract_id"], name: "index_census_tract_polygons_on_census_tract_id", unique: true
+  end
+
+  create_table "census_tracts", force: :cascade do |t|
+    t.string "geoid", null: false
+    t.float "povery_percent", null: false
+    t.float "land_area", null: false
+    t.integer "population", null: false
+    t.float "population_density", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["geoid"], name: "index_census_tracts_on_geoid", unique: true
   end
 
   create_table "grocery_store_upload_statuses", force: :cascade do |t|
@@ -74,8 +106,8 @@ ActiveRecord::Schema.define(version: 2020_07_14_002910) do
     t.float "quality", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["transit_type", "lat", "long", "precision"], name: "index_heatmap_points_on_type_lat_long_prec", unique: true
     t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long", unique: true
-    t.index ["transit_type", "precision", "lat", "long"], name: "index_heatmap_points_on_type_prec_lat_long", unique: true
   end
 
   create_table "isochrone_polygons", force: :cascade do |t|

@@ -8,10 +8,11 @@ class Admin::UsersController < ApplicationController
     offset = page*limit
     order = params[:order]
     dir = params[:dir]
+    users, user_count = IndexQuery.new(User).index(limit, offset, order, dir)
     render :json => { 
       :status => 0, 
-      :users => User.offset(offset).limit(limit).clean_order(order, dir),
-      :user_count => User.count
+      :users => users,
+      :user_count => user_count
     }
   end
 

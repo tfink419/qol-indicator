@@ -10,11 +10,9 @@ class Admin::GroceryStoresController < ApplicationController
     dir = params[:dir]
     search = params[:search]
     if search.nil? or search.blank? or search.length == 1
-      gstores = GroceryStore.offset(offset).limit(limit).clean_order(order, dir)
-      count = GroceryStore.count
+      gstores, count = IndexQuery.new(GroceryStore).index(limit, offset, order, dir)
     else
-      count = GroceryStore.search(search).count
-      gstores = GroceryStore.search(search).offset(offset).limit(limit).clean_order(order, dir)
+      gstores, count = IndexQuery.new(GroceryStore.search(search)).index(limit, offset, order, dir)
     end
     render :json => { 
       :status => 0, 

@@ -1,4 +1,3 @@
-require 'geokit'
 require 'quality_map_image'
 
 class BuildHeatmapSegmentJob < ApplicationJob
@@ -70,7 +69,7 @@ class BuildHeatmapSegmentJob < ApplicationJob
             travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
             while long <= north_east_int[1]
               long_width = (long == north_east_int[1]) ? 1 : BuildHeatmapJob::NUM_STEPS_PER_FUNCTION
-              isochrones = IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id')\
+              isochrones = PolygonQuery.new(IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id'))\
               .all_near_point_fat(lat, long, lat_height-1, long_width-1)\
               .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)\
               .select('isochrone_polygons.polygon', 'grocery_stores.quality AS quality')\

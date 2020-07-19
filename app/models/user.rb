@@ -13,6 +13,7 @@ class User < ApplicationRecord
     :uniqueness => true
 
   has_many :password_resets, dependent: :destroy
+  has_many :api_keys, dependent: :destroy
   has_one :map_preferences, dependent: :destroy
 
   before_validation do
