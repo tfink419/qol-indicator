@@ -356,3 +356,52 @@ export const getGroceryStore = (groceryStoreId) => {
   .then(response => response.json())
   .then(handleResponse)
 }
+
+
+
+export const getAdminApiKeys = (page, rowsPerPage, sortOrder, dir) => {
+  let url = "/api/admin/api_keys",
+    params = { limit: rowsPerPage, page, order: sortOrder, dir:dir.toUpperCase() };
+  // Turn object into http params
+  url += paramify(params);
+
+  return fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const getAdminApiKey = (apiKey) => {
+  return fetch('/api/admin/api_keys/'+apiKey, { 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const postAdminApiKey = (apiKey) => {
+  return fetch('/api/admin/api_keys', { method:'POST', body: JSON.stringify({apiKey}), 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
+export const deleteAdminApiKey = (apiKey) => {
+  let url = "/api/admin/api_keys/"+apiKey;
+
+  return fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}

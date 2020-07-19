@@ -5,6 +5,7 @@ import { Drawer, CssBaseline, List, Divider, Collapse,
 import PeopleIcon from '@material-ui/icons/People';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import MapIcon from '@material-ui/icons/Map';
+import KeyIcon from '@material-ui/icons/VpnKey';
 import BuildIcon from '@material-ui/icons/Build';
 import GroceryStoreIcon from '@material-ui/icons/LocalGroceryStore';
 import { useLocation, useHistory } from 'react-router-dom'
@@ -59,6 +60,10 @@ const AdminNav = ({buildHeatmapStatuses}) => {
           <ListItem onClick={() => history.push('/admin/users')} selected={currentPath === '/admin/users'} button>
             <ListItemIcon><PeopleIcon /></ListItemIcon>
             <ListItemText primary={'Users'} />
+          </ListItem>
+          <ListItem onClick={() => history.push('/admin/api-keys')} selected={currentPath === '/admin/api-keys'} button>
+            <ListItemIcon><KeyIcon /></ListItemIcon>
+            <ListItemText primary={'Api Keys'} />
           </ListItem>
 
           <ListItem onClick={() => history.push('/admin/grocery_stores')} selected={currentPath === '/admin/grocery_stores'} button>

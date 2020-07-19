@@ -130,3 +130,33 @@ export const csvProcessing = (fileType, fileName) => ({
 export const csvDone = () => ({
   type: 'CSV_DONE'
 })
+
+export const loadedApiKeys = (apiKeys, count) => ({
+  type: 'LOADED_API_KEYS',
+  apiKeys,
+  count
+})
+
+export const clearApiKeys = () => ({
+  type: 'CLEAR_API_KEYS'
+})
+
+export const updateApiKeysOrderDir = (orderDir) => ({
+  type:'UPDATE_API_KEYS_ORDERDIR',
+  orderDir
+})
+
+export const updateApiKeysOrder = (order) => ({
+  type:'UPDATE_API_KEYS_ORDER',
+  order
+})
+
+export const updateApiKeysPage = (page) => ({
+  type:'UPDATE_API_KEYS_PAGE',
+  page
+})
+
+export const updateApiKeysRowsPerPage = (rowsPerPage) => ({
+  type:'UPDATE_API_KEYS_ROWSPERPAGE',
+  rowsPerPage
+})

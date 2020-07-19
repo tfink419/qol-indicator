@@ -44,6 +44,7 @@ class GroceryStore < ApplicationRecord
       order("#{attr} #{dir}")
     end
   }
+
   scope :search, lambda { |query| 
     search_query = "%#{query.gsub(/[^\w ]/,'')}%"
     where(['grocery_stores.name ILIKE ? or grocery_stores.address ILIKE ?', search_query, search_query])

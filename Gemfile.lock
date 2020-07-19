@@ -1,8 +1,9 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: d17a6f05fc759084888e2170be131c658fbac5d8
+  revision: e1ca5051442959a2f0aebe8eb381a27202f484f9
+  branch: libvips
   specs:
-    quality_map_image (0.3.5)
+    quality_map_image (0.4.0)
 
 GEM
   remote: https://rubygems.org/

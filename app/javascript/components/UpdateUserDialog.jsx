@@ -36,7 +36,7 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
       setOriginalUsername('Username');
       setUserErrors({});
       
-      getUser(userId).then(response => {
+      getAdminUser(userId).then(response => {
         setLoading(false);
         setUser(response.user)
         setOriginalUsername(response.user.username);
@@ -51,7 +51,7 @@ const UpdateUserDialog = ({currentUserId, open, userId, onClose, flashMessage, u
   const handleUpdate = () => {
     setUserErrors({});
     setLoading(true)
-    putUser(user)
+    putAdminUser(user)
     .then(response => {
       setLoading(false)
       onClose(true);

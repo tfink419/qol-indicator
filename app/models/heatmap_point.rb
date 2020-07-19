@@ -12,9 +12,9 @@ class HeatmapPoint < ApplicationRecord
     if zoom > 11
       true_where_in_coordinate_range(south_west, north_east)
     elsif zoom > 7
-      where(['precision <= ?', zoom-5]).true_where_in_coordinate_range(south_west, north_east)
+      true_where_in_coordinate_range(south_west, north_east).where(['precision <= ?', zoom-5])
     else
-      where(['precision <= ?', 2]).true_where_in_coordinate_range(south_west, north_east)
+      true_where_in_coordinate_range(south_west, north_east).where(['precision <= ?', 2])
     end
   }
 
