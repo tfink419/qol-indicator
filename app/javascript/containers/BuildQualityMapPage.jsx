@@ -14,7 +14,7 @@ const STATE_MAP = {
   'branching': 'Branching Into Parellel Sidekiq\'s',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'isochrones-complete': 'Finished Isochrone Polygons, Waiting For Others',
-  'quality_map-points': 'Building QualityMap Points',
+  'quality_map-points': 'Building Quality Map Points',
   'complete': 'Completed'
 }
 
@@ -111,7 +111,7 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
       {loaded && current &&
         <React.Fragment>
           <Typography variant="h5">
-            Currently Building QualityMap
+            Currently Building Quality Map
           </Typography>
           <Typography variant="subtitle1">
             Current State: <strong>{STATE_MAP[current.state]}</strong>

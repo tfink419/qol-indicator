@@ -1,4 +1,4 @@
-class IsochronePolygon < Polygon
+class IsochronePolygon < ApplicationRecord
   validates_with IsochronePolygonValidator
   validates :distance, :presence => true
   validates :travel_type, :presence => true

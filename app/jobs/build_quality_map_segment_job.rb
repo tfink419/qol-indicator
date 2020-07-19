@@ -86,7 +86,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 this_long = long
                 new_grocery_store_quality_map_points = qualities.reduce([]) { |arr, quality|
                   if quality > 0
-                    arr << [this_lat, this_long, transit_type, quality, GroceryStoreQualityMapPoint.precision_of(this_lat, this_long)]
+                    arr << [this_lat, this_long, transit_type, quality, MapPointService.precision_of(this_lat, this_long)]
                   end
                   this_long += step_int
                   if this_long%long_width == 0

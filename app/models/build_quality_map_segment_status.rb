@@ -6,7 +6,7 @@ class BuildQualityMapSegmentStatus < ApplicationRecord
   validates :state, :presence => true,
   :inclusion => { :in => VALID_STATES, :message => 'is not a valid state.' }
   
-  belongs_to :parent_status, foreign_key: "build_quality_map_id", class_name: "BuildQualityMapStatus"
+  belongs_to :parent_status, foreign_key: "build_quality_map_status_id", class_name: "BuildQualityMapStatus"
 
   def complete?
     error || state == 'complete'

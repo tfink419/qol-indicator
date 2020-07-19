@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_064022) do
   end
 
   create_table "build_quality_map_segment_statuses", force: :cascade do |t|
-    t.integer "build_heatmap_status_id"
+    t.integer "build_quality_map_status_id"
     t.float "percent"
     t.string "state"
     t.text "error"
