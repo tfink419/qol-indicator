@@ -4,6 +4,6 @@ staging:
 production:
   :concurrency: 1
 :queues:
-  - build_heatmap
-  - build_heatmap_segment
+  - build_quality_map
+  - build_quality_map_segment
   - grocery_store_upload

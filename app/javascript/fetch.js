@@ -180,8 +180,8 @@ export const deleteAdminGroceryStore = (groceryStoreId) => {
   .then(handleResponse)
 }
 
-export const getAdminBuildHeatmapStatuses = (page, rowsPerPage) => {
-  let url = "/api/admin/build_heatmap/status",
+export const getAdminBuildQualityMapStatuses = (page, rowsPerPage) => {
+  let url = "/api/admin/build_quality_map/status",
     params = { limit: rowsPerPage, page };
   url += paramify(params)
   return fetch(url, {
@@ -216,8 +216,8 @@ export const getAdminGroceryStoreUploadCsvStatus = (id) => {
   .then(handleResponse)
 }
 
-export const getAdminBuildHeatmapStatus = (id) => {
-  return fetch("/api/admin/build_heatmap/status/"+id, {
+export const getAdminBuildQualityMapStatus = (id) => {
+  return fetch("/api/admin/build_quality_map/status/"+id, {
     method:'GET', 
     headers: {
       'Accept': 'application/json'
@@ -226,8 +226,8 @@ export const getAdminBuildHeatmapStatus = (id) => {
   .then(handleResponse)
 }
 
-export const postAdminBuildHeatmap = (rebuild) => {
-  return fetch('/api/admin/build_heatmap?rebuild='+rebuild, {
+export const postAdminBuildQualityMap = (rebuild) => {
+  return fetch('/api/admin/build_quality_map?rebuild='+rebuild, {
     method:'POST', 
     headers: {
       'Accept': 'application/json'
@@ -237,8 +237,8 @@ export const postAdminBuildHeatmap = (rebuild) => {
 }
 
 
-export const getMapDataHeatmap = (southWest, northEast, zoom, transit_type, abortSignal) => {
-  let url = "/map_data/heatmap",
+export const getMapDataQualityMap = (southWest, northEast, zoom, transit_type, abortSignal) => {
+  let url = "/map_data/quality_map",
     params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom};
   if(transit_type) {
     params.transit_type = transit_type;

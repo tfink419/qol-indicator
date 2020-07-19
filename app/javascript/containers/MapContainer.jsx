@@ -6,7 +6,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { getMapPreferences } from '../fetch'
 import { updateMapPreferences } from "../actions/map-preferences";
 
-import HeatmapLayer from './HeatmapLayer'
+import QualityMapLayer from './QualityMapLayer'
 import GroceryStoreLayer from './GroceryStoreLayer'
 import MapLegend from "../components/MapLegend";
 
@@ -90,7 +90,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = fals
 
   return (
     <div className={classes.mapContainer} ref={mapRef}>
-      <HeatmapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
+      <QualityMapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
       <GroceryStoreLayer map={map} currentLocation={currentLocation} isAdmin={isAdminLayer} />
       { !isAdminLayer && <MapLegend map={map}/> }
     </div>

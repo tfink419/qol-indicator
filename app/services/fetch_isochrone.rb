@@ -11,7 +11,7 @@ class FetchIsochrone
     isochrones = []
     tries = 0
     (transit_type_low..transit_type_high).each do |transit_type|
-      travel_type, distance = HeatmapPoint::TRANSIT_TYPE_MAP[transit_type]
+      travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
       no_isochrones = @isochronable.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
       if no_isochrones
         isochrone = nil

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_19_001745) do
+ActiveRecord::Schema.define(version: 2020_07_19_064022) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_001745) do
     t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
 
-  create_table "build_heatmap_segment_statuses", force: :cascade do |t|
+  create_table "build_quality_map_segment_statuses", force: :cascade do |t|
     t.integer "build_heatmap_status_id"
     t.float "percent"
     t.string "state"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_001745) do
     t.float "current_lat"
   end
 
-  create_table "build_heatmap_statuses", force: :cascade do |t|
+  create_table "build_quality_map_statuses", force: :cascade do |t|
     t.float "percent"
     t.string "state"
     t.text "error"
@@ -72,6 +72,18 @@ ActiveRecord::Schema.define(version: 2020_07_19_001745) do
     t.index ["geoid"], name: "index_census_tracts_on_geoid", unique: true
   end
 
+  create_table "grocery_store_quality_map_points", force: :cascade do |t|
+    t.integer "transit_type", null: false
+    t.integer "precision", null: false
+    t.integer "lat", null: false
+    t.integer "long", null: false
+    t.float "quality", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transit_type", "lat", "long", "precision"], name: "index_grocery_store_quality_points_on_type_lat_long_prec", unique: true
+    t.index ["transit_type", "lat", "long"], name: "index_grocery_store_quality_points_on_type_lat_long", unique: true
+  end
+
   create_table "grocery_store_upload_statuses", force: :cascade do |t|
     t.float "percent"
     t.string "state"
@@ -96,18 +108,6 @@ ActiveRecord::Schema.define(version: 2020_07_19_001745) do
     t.datetime "updated_at", null: false
     t.index ["lat", "long"], name: "index_grocery_stores_on_lat_and_long"
     t.index ["long"], name: "index_grocery_stores_on_long"
-  end
-
-  create_table "heatmap_points", force: :cascade do |t|
-    t.integer "transit_type", null: false
-    t.integer "precision", null: false
-    t.integer "lat", null: false
-    t.integer "long", null: false
-    t.float "quality", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["transit_type", "lat", "long", "precision"], name: "index_heatmap_points_on_type_lat_long_prec", unique: true
-    t.index ["transit_type", "lat", "long"], name: "index_heatmap_points_on_type_lat_long", unique: true
   end
 
   create_table "isochrone_polygons", force: :cascade do |t|

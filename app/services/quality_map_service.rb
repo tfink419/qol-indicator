@@ -7,7 +7,7 @@ class QualityMapService
   end
 
   def generate
-    grocery_store_points = HeatmapPoint.where(transit_type: @transit_type)\
+    grocery_store_points = GroceryStoreQualityMapPoint.where(transit_type: @transit_type)\
     .where_in_coordinate_range(@south_west, @north_east, @zoom)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
 
@@ -29,7 +29,7 @@ class QualityMapService
     im = QualityMapImage.get_image(south_west_int, north_east_int, step_int, grocery_store_points)
     puts "Image generation took #{Time.now-before} seconds"
 
-    [@south_west, @north_east, im]
+    [@south_west.map{|pos| pos+step/2}, @north_east.map{|pos| pos+step/2}, im]
   end
 
   def self.zoom_to_precision_step(zoom)

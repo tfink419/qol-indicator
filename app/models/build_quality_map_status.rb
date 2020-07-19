@@ -1,11 +1,11 @@
-class BuildHeatmapStatus < ApplicationRecord
-  VALID_STATES = ['initialized', 'received', 'branching', 'isochrones', 'heatmap-points', 'complete']
+class BuildQualityMapStatus < ApplicationRecord
+  VALID_STATES = ['initialized', 'received', 'branching', 'isochrones', 'quality_map-points', 'complete']
 
   validates :percent, :presence => true
   validates :state, :presence => true,
     :inclusion => { :in => VALID_STATES, :message => 'is not a valid state.' }
 
-  has_many :build_heatmap_segment_statuses, dependent: :destroy
+  has_many :segment_statuses, dependent: :destroy, foreign_key: "build_quality_map_id", class_name: "BuildQualityMapSegmentStatus"
 
   def self.most_recent
     last_not_error_and_not_initialized = where(error: nil).where.not(state:["intialized", "complete"]).first

@@ -1,6 +1,6 @@
 require 'quality_map_image'
 
-class HeatmapPoint < ApplicationRecord
+class GroceryStoreQualityMapPoint < ApplicationRecord
   validates :transit_type, :presence => true, uniqueness: { scope: [:lat, :long], message: 'not a unique transit type at lat and long.' }
   validates :lat, :presence => true
   validates :long, :presence => true

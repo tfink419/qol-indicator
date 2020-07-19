@@ -1,7 +1,7 @@
 import React from "react";
 import _ from 'lodash';
 
-import { getMapDataHeatmap } from '../fetch'
+import { getMapDataQualityMap } from '../fetch'
 
 export default ({ map, currentLocation, mapPreferences }) => {
   const prevAbortController = React.useRef(null)
@@ -17,7 +17,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
     }
     let controller = new AbortController();
     prevAbortController.current = controller;
-    getMapDataHeatmap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
+    getMapDataQualityMap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
     .then(({responseBlob, southWest, northEast}) => {
       let north = northEast[0], south = southWest[0],
         west = southWest[1], east = northEast[1];
@@ -28,9 +28,9 @@ export default ({ map, currentLocation, mapPreferences }) => {
       }
 
       let imageBounds = { north, south, east, west };
-      let heatmapOverlay = new google.maps.GroundOverlay(url, imageBounds);
-      heatmapOverlay.setMap(map);
-      prevOverlay.current = heatmapOverlay;
+      let qualityMapOverlay = new google.maps.GroundOverlay(url, imageBounds);
+      qualityMapOverlay.setMap(map);
+      prevOverlay.current = qualityMapOverlay;
     })
     .catch(error => {
       if(error.name != 'AbortError') {
