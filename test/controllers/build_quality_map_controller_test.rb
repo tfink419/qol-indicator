@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BuildHeatmapSegmentStatusTest < ActiveSupport::TestCase
+class BuildQualityMapControllerTest < ActionDispatch::IntegrationTest
   # test "the truth" do
   #   assert true
   # end

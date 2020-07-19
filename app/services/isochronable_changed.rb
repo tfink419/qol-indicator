@@ -15,12 +15,12 @@ class IsochronableChanged
   def queue_rebuild
     FetchIsochrone.new(@isochronable).fetch(1, @isochronable.class::NUM_TRANSIT_TYPES) if @isochronable.isochrone_polygons.none?
     isochrones = IsochronePolygon.where(isochronable_id:@isochronable.id, isochronable_type:@isochronable.class.name)\
-    .filter { |a| HeatmapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) }
-    .sort { |a, b| HeatmapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) <=> HeatmapPoint::TRANSIT_TYPE_MAP.index([b.travel_type, b.distance]) }
+    .filter { |a| GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) }
+    .sort { |a, b| GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) <=> GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([b.travel_type, b.distance]) }
 
     next_job = ScheduledPointRebuild.get_next_job
     just_created = next_job.south_bounds.blank?
-    (0...HeatmapPoint::TRANSIT_TYPE_MAP.length-1).each do |trans_ind|
+    (0...GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.length-1).each do |trans_ind|
       if just_created
         next_job.south_bounds << (isochrones[trans_ind].south_bound*1000).round
         next_job.west_bounds << (isochrones[trans_ind].west_bound*1000).round

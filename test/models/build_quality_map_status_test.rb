@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BuildHeatmapSegmentJobTest < ActiveJob::TestCase
+class BuildQualityMapStatusTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

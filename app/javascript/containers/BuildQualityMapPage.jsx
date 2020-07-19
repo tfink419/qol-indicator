@@ -5,8 +5,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box, Checkbox, FormControlLabel } from '@material-ui/core'
 
 import { flashMessage } from '../actions/messages'
-import { setBuildHeatmapStatusReloadIntervalId, loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage } from '../actions/admin'
-import { getAdminBuildHeatmapStatuses, getAdminBuildHeatmapStatus, postAdminBuildHeatmap } from '../fetch'
+import { setBuildQualityMapStatusReloadIntervalId, loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQualityMapStatusesPage, updateBuildQualityMapStatusesRowsPerPage } from '../actions/admin'
+import { getAdminBuildQualityMapStatuses, getAdminBuildQualityMapStatus, postAdminBuildQualityMap } from '../fetch'
 
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',
@@ -14,21 +14,21 @@ const STATE_MAP = {
   'branching': 'Branching Into Parellel Sidekiq\'s',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'isochrones-complete': 'Finished Isochrone Polygons, Waiting For Others',
-  'heatmap-points': 'Building Heatmap Points',
+  'quality_map-points': 'Building QualityMap Points',
   'complete': 'Completed'
 }
 
-const BuildHeatmapPage = ({ setBuildHeatmapStatusReloadIntervalId, buildHeatmapStatuses, flashMessage, 
-loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapStatusesPage, updateBuildHeatmapStatusesRowsPerPage }) => {
+const BuildQualityMapPage = ({ setBuildQualityMapStatusReloadIntervalId, buildQualityMapStatuses, flashMessage, 
+loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQualityMapStatusesPage, updateBuildQualityMapStatusesRowsPerPage }) => {
   let [rebuild, setRebuild] = React.useState(false);
-  const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildHeatmapStatuses;
+  const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildQualityMapStatuses;
 
-  const handleBuildHeatmap = (event) => {
+  const handleBuildQualityMap = (event) => {
     event.preventDefault();
-    postAdminBuildHeatmap(rebuild)
+    postAdminBuildQualityMap(rebuild)
     .then((response) => {
       flashMessage('info', response.message);
-      loadBuildHeatmapStatuses(true);
+      loadBuildQualityMapStatuses(true);
     })
     .catch(error => {
       if(error.status == 400 || error.status == 403) 
@@ -38,27 +38,27 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
     })
   }
 
-  const loadBuildHeatmapStatuses = (force) => {
+  const loadBuildQualityMapStatuses = (force) => {
     if(!loaded || force) {
-      getAdminBuildHeatmapStatuses(page, rowsPerPage).then(response => {
+      getAdminBuildQualityMapStatuses(page, rowsPerPage).then(response => {
         if(response.status == 0) {
-          loadedBuildHeatmapStatuses(response.build_heatmap_statuses.all, response.build_heatmap_status_count, response.build_heatmap_statuses.current)
+          loadedBuildQualityMapStatuses(response.build_quality_map_statuses.all, response.build_quality_map_status_count, response.build_quality_map_statuses.current)
         }
       })
     }
   }
   
-  const reloadCurrentBuildHeatmapStatus = () => {
-    getAdminBuildHeatmapStatus(current.id).then(response => {
+  const reloadCurrentBuildQualityMapStatus = () => {
+    getAdminBuildQualityMapStatus(current.id).then(response => {
       if(response.status == 0) {
-        loadedCurrentBuildHeatmapStatus(response.build_heatmap_status)
+        loadedCurrentBuildQualityMapStatus(response.build_quality_map_status)
       }
     })
   }
   
   const clearStatusReloadInterval = () => {
     clearInterval(reloadIntervalId);
-    setBuildHeatmapStatusReloadIntervalId(null);
+    setBuildQualityMapStatusReloadIntervalId(null);
   }
 
   const calcEta = () => {
@@ -85,33 +85,33 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
     return etaString.join(' ');
   }
   
-  React.useEffect(loadBuildHeatmapStatuses, [page, rowsPerPage]);
+  React.useEffect(loadBuildQualityMapStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
     if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
-      loadedCurrentBuildHeatmapStatus(null);
-      loadBuildHeatmapStatuses(true);
+      loadedCurrentBuildQualityMapStatus(null);
+      loadBuildQualityMapStatuses(true);
       if(current.error) {
         flashMessage('error', current.error);
       }
     }
     if(!reloadIntervalId && current) {
-      setBuildHeatmapStatusReloadIntervalId(setInterval(reloadCurrentBuildHeatmapStatus, 5000))
+      setBuildQualityMapStatusReloadIntervalId(setInterval(reloadCurrentBuildQualityMapStatus, 5000))
     }
     else if(reloadIntervalId && !current) {
       clearInterval(reloadIntervalId);
-      setBuildHeatmapStatusReloadIntervalId(null);
+      setBuildQualityMapStatusReloadIntervalId(null);
     }
   }, [current]);
   
   return (
     <Paper>
-      <Typography variant="h3">Build Heatmap</Typography>
+      <Typography variant="h3">Build Quality Map</Typography>
       { !loaded && <CircularProgress/>}
       {loaded && current &&
         <React.Fragment>
           <Typography variant="h5">
-            Currently Building Heatmap
+            Currently Building QualityMap
           </Typography>
           <Typography variant="subtitle1">
             Current State: <strong>{STATE_MAP[current.state]}</strong>
@@ -129,7 +129,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
               </Typography>
             </Box>
           </Box>
-          { current.build_heatmap_segment_statuses && _.sortBy(current.build_heatmap_segment_statuses, 'segment').map(segment_status => (
+          { current.segment_statuses && _.sortBy(current.segment_statuses, 'segment').map(segment_status => (
             <React.Fragment key={segment_status.id}>
               <Typography variant="subtitle1">
                 Segment #{segment_status.segment}
@@ -137,7 +137,7 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
               <Typography variant="subtitle2">
                 Current State: <strong>{STATE_MAP[segment_status.state]}</strong>
               </Typography>
-              { segment_status.state == 'heatmap-points' && (
+              { segment_status.state == 'quality_map-points' && (
                 <Typography variant="subtitle2">
                   Current Lat: <strong>{segment_status.current_lat/1000.0}</strong>
                 </Typography>
@@ -158,16 +158,16 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
       }
       {loaded && !current &&
         <React.Fragment>
-          <Typography variant="body1">This will Build the Heatmap</Typography>
+          <Typography variant="body1">This will Build the QualityMap</Typography>
           <FormControlLabel
             control={<Checkbox checked={rebuild} onChange={(e) => setRebuild(e.target.checked)} name="rebuild" />}
             label="Rebuild"
           />
-          <form onSubmit={handleBuildHeatmap}>
+          <form onSubmit={handleBuildQualityMap}>
             <Button type="submit"
               color="primary"
               variant="contained">
-              Build Heatmap
+              Build Quality Map
             </Button>
           </form>
         </React.Fragment>
@@ -177,16 +177,16 @@ loadedBuildHeatmapStatuses, loadedCurrentBuildHeatmapStatus, updateBuildHeatmapS
 }
 
 const mapStateToProps = state => ({
-  buildHeatmapStatuses: state.admin.buildHeatmapStatuses
+  buildQualityMapStatuses: state.admin.buildQualityMapStatuses
 })
 
 const mapDispatchToProps = {
   flashMessage,
-  setBuildHeatmapStatusReloadIntervalId,
-  loadedBuildHeatmapStatuses,
-  loadedCurrentBuildHeatmapStatus,
-  updateBuildHeatmapStatusesPage,
-  updateBuildHeatmapStatusesRowsPerPage
+  setBuildQualityMapStatusReloadIntervalId,
+  loadedBuildQualityMapStatuses,
+  loadedCurrentBuildQualityMapStatus,
+  updateBuildQualityMapStatusesPage,
+  updateBuildQualityMapStatusesRowsPerPage
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BuildHeatmapPage)
+export default connect(mapStateToProps, mapDispatchToProps)(BuildQualityMapPage)

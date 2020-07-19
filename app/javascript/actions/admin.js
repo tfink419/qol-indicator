@@ -14,11 +14,11 @@ export const updatedGroceryStores = () => ({
   type: 'UPDATED_GROCERY_STORES'
 })
 
-export const loadedBuildHeatmapStatuses = (buildHeatmapStatuses, count, currentBuildHeatmapStatus) => ({
+export const loadedBuildQualityMapStatuses = (buildQualityMapStatuses, count, currentBuildQualityMapStatus) => ({
   type: 'LOADED_BUILD_HEATMAP_STATUSES',
-  buildHeatmapStatuses,
+  buildQualityMapStatuses,
   count,
-  currentBuildHeatmapStatus
+  currentBuildQualityMapStatus
 })
 
 export const loadedUploadCsvStatuses = (uploadCsvStatuses, count, currentUploadCsvStatus) => ({
@@ -28,9 +28,9 @@ export const loadedUploadCsvStatuses = (uploadCsvStatuses, count, currentUploadC
   currentUploadCsvStatus
 })
 
-export const loadedCurrentBuildHeatmapStatus = (currentBuildHeatmapStatus) => ({
+export const loadedCurrentBuildQualityMapStatus = (currentBuildQualityMapStatus) => ({
   type: 'LOADED_CURRENT_BUILD_HEATMAP_STATUS',
-  currentBuildHeatmapStatus
+  currentBuildQualityMapStatus
 })
 
 export const loadedCurrentUploadCsvStatus = (currentUploadCsvStatus) => ({
@@ -38,7 +38,7 @@ export const loadedCurrentUploadCsvStatus = (currentUploadCsvStatus) => ({
   currentUploadCsvStatus
 })
 
-export const setBuildHeatmapStatusReloadIntervalId = (reloadIntervalId) => ({
+export const setBuildQualityMapStatusReloadIntervalId = (reloadIntervalId) => ({
   type: 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID',
   reloadIntervalId
 })
@@ -101,12 +101,12 @@ export const updateGroceryStoresSearchField = (searchField) => ({
   searchField
 })
 
-export const updateBuildHeatmapStatusesPage = (page) => ({
+export const updateBuildQualityMapStatusesPage = (page) => ({
   type:'UPDATE_BUILD_HEATMAP_STATUSES_PAGE',
   page
 })
 
-export const updateBuildHeatmapStatusesRowsPerPage = (rowsPerPage) => ({
+export const updateBuildQualityMapStatusesRowsPerPage = (rowsPerPage) => ({
   type:'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE',
   rowsPerPage
 })

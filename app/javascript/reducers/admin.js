@@ -11,7 +11,7 @@ const admin = (state = {
   groceryStores:{...defaultTable},
   apiKeys: { ...defaultTable },
   csvUpload: {},
-  buildHeatmapStatuses: {
+  buildQualityMapStatuses: {
     page:0,
     rowsPerPage:10,
     loaded: false
@@ -64,20 +64,20 @@ const admin = (state = {
     case 'LOADED_BUILD_HEATMAP_STATUSES':
       return {
         ...state,
-        buildHeatmapStatuses:{ 
-          ...state.buildHeatmapStatuses,
-          rows:action.buildHeatmapStatuses,
+        buildQualityMapStatuses:{ 
+          ...state.buildQualityMapStatuses,
+          rows:action.buildQualityMapStatuses,
           count:action.count,
-          current:action.currentBuildHeatmapStatus,
+          current:action.currentBuildQualityMapStatus,
           loaded: true
         }
       }
     case 'LOADED_CURRENT_BUILD_HEATMAP_STATUS':
       return {
         ...state,
-        buildHeatmapStatuses:{ 
-          ...state.buildHeatmapStatuses,
-          current:action.currentBuildHeatmapStatus,
+        buildQualityMapStatuses:{ 
+          ...state.buildQualityMapStatuses,
+          current:action.currentBuildQualityMapStatus,
           loaded: true
         }
       }
@@ -203,22 +203,22 @@ const admin = (state = {
     case 'UPDATE_BUILD_HEATMAP_STATUSES_PAGE':
       return {
         ...state,
-        buildHeatmapStatuses: {
-          ...state.buildHeatmapStatuses,
+        buildQualityMapStatuses: {
+          ...state.buildQualityMapStatuses,
           page:action.page,
           loaded: false
         }
       }
     case 'UPDATE_BUILD_HEATMAP_STATUSES_ROWSPERPAGE':
       {
-        let {page} = state.buildHeatmapStatuses;
-        if(state.buildHeatmapStatuses.rowsPerPage != action.rowsPerPage) {
-          page = Math.floor(state.buildHeatmapStatuses.rowsPerPage/action.rowsPerPage*page);
+        let {page} = state.buildQualityMapStatuses;
+        if(state.buildQualityMapStatuses.rowsPerPage != action.rowsPerPage) {
+          page = Math.floor(state.buildQualityMapStatuses.rowsPerPage/action.rowsPerPage*page);
         }
         return {
           ...state,
-          buildHeatmapStatuses: {
-            ...state.buildHeatmapStatuses,
+          buildQualityMapStatuses: {
+            ...state.buildQualityMapStatuses,
             rowsPerPage:action.rowsPerPage,
             page,
             loaded: false
@@ -298,8 +298,8 @@ const admin = (state = {
     case 'SET_BUILD_HEATMAP_STATUS_RELOAD_INTERVAL_ID':
       return {
         ...state,
-        buildHeatmapStatuses: {
-          ...state.buildHeatmapStatuses,
+        buildQualityMapStatuses: {
+          ...state.buildQualityMapStatuses,
           reloadIntervalId: action.reloadIntervalId
         }
       }

@@ -40,9 +40,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const AdminNav = ({buildHeatmapStatuses}) => {
+const AdminNav = ({buildQualityMapStatuses}) => {
   const currentPath = useLocation().pathname;
-  const currentBuildHeatmapStatus = buildHeatmapStatuses.current;
+  const currentBuildQualityMapStatus = buildQualityMapStatuses.current;
   const classes = useStyles();
   let history = useHistory();
 
@@ -84,11 +84,11 @@ const AdminNav = ({buildHeatmapStatuses}) => {
             <ListItemIcon><MapIcon /></ListItemIcon>
             <ListItemText primary={'Administrate Map'} />
           </ListItem>
-          <ListItem onClick={() => history.push('/admin/build-heatmap')} selected={currentPath === '/admin/build-heatmap'} button>
+          <ListItem onClick={() => history.push('/admin/build-quality_map')} selected={currentPath === '/admin/build-quality_map'} button>
             <ListItemIcon><BuildIcon /></ListItemIcon>
-            <ListItemText primary={'Build Heatmap'} />
+            <ListItemText primary={'Build Quality Map'} />
             <ListItemSecondaryAction>
-              { currentBuildHeatmapStatus 
+              { currentBuildQualityMapStatus 
                 && <CircularProgress size={25}/>
               }
             </ListItemSecondaryAction>
@@ -100,7 +100,7 @@ const AdminNav = ({buildHeatmapStatuses}) => {
 }
 
 const mapStateToProps = state => ({
-  buildHeatmapStatuses: state.admin.buildHeatmapStatuses
+  buildQualityMapStatuses: state.admin.buildQualityMapStatuses
 })
 
 

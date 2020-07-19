@@ -12,9 +12,9 @@ Rails.application.routes.draw do
     resources 'admin/users', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_users'
     resources 'admin/api_keys', :only => [:index, :create, :show, :destroy], :as => 'admin_api_keys'
     post 'admin/census_tracts/import', :to => 'admin/census_tracts#import', :as => 'admin_census_tracts_import'
-    post 'admin/build_heatmap', :to => 'admin/build_heatmap#build', :as => 'admin_build_heatmap'
-    get 'admin/build_heatmap/status', :to => 'admin/build_heatmap#status_index', :as => 'admin_build_heatmap_status_index'
-    get 'admin/build_heatmap/status/:id', :to => 'admin/build_heatmap#status_show', :as => 'admin_build_heatmap_status_show'
+    post 'admin/build_quality_map', :to => 'admin/build_quality_map#build', :as => 'admin_build_quality_map'
+    get 'admin/build_quality_map/status', :to => 'admin/build_quality_map#status_index', :as => 'admin_build_quality_map_status_index'
+    get 'admin/build_quality_map/status/:id', :to => 'admin/build_quality_map#status_show', :as => 'admin_build_quality_map_status_show'
   end
   sidekiq_web_constraint = lambda do |request|
     request.session[:user_id] and User.find(request.session[:user_id]).admin?
@@ -32,7 +32,7 @@ Rails.application.routes.draw do
   get 'user/self', :to => 'user_self#show', :as => 'show_user_self'
   put 'user/self', :to => 'user_self#update'
   patch 'user/self', :to => 'user_self#update', :as => 'update_user_self'
-  get 'map_data/heatmap', :to => 'map_data#get_heatmap_image', :as => 'map_data_get_heatmap_image'
+  get 'map_data/quality_map', :to => 'map_data#get_quality_map_image', :as => 'map_data_get_quality_map_image'
   get 'map_data/grocery_stores', :to => 'map_data#get_grocery_stores', :as => 'map_data_get_grocery_stores'
 
   # Public Routes

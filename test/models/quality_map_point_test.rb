@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class HeatmapPointTest < ActiveSupport::TestCase
+class GroceryStoreQualityMapPointTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
