@@ -42,7 +42,7 @@ class Admin::BuildQualityMapController < ApplicationController
     else
       render json: {
         status: 0,
-        build_quality_map_status: BuildQualityMapStatus.find(params[:id]).as_json(:include => :build_quality_map_segment_statuses)
+        build_quality_map_status: BuildQualityMapStatus.find(params[:id]).as_json(:include => :segment_statuses)
       }
     end
   end

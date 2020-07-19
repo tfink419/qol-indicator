@@ -7,14 +7,16 @@ class QualityMapService
   end
 
   def generate
-    grocery_store_points = GroceryStoreQualityMapPoint.where(transit_type: @transit_type)\
+    before = Time.now
+    grocery_store_points = MapPointService.new(GroceryStoreQualityMapPoint.where(transit_type: @transit_type))\
     .where_in_coordinate_range(@south_west, @north_east, @zoom)\
     .order(:lat, :long).pluck(:lat, :long, :quality)
+    puts "Query took #{Time.now-before} seconds"
 
     precision, step = self.class.zoom_to_precision_step(@zoom)
 
-    extra_long = (@north_east[1]-@south_west[1])*0.3
-    extra_lat = (@north_east[0]-@south_west[0])*0.3
+    extra_long = (@north_east[1]-@south_west[1])*0.2
+    extra_lat = (@north_east[0]-@south_west[0])*0.2
     extra_lat = step if extra_lat < step
     extra_long = step if extra_long < step
     @south_west = [self.class.to_nearest_precision(@south_west[0]-extra_lat,precision), self.class.to_nearest_precision(@south_west[1]-extra_long,precision)]

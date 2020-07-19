@@ -5,7 +5,7 @@ class BuildQualityMapStatus < ApplicationRecord
   validates :state, :presence => true,
     :inclusion => { :in => VALID_STATES, :message => 'is not a valid state.' }
 
-  has_many :segment_statuses, dependent: :destroy, foreign_key: "build_quality_map_id", class_name: "BuildQualityMapSegmentStatus"
+  has_many :segment_statuses, dependent: :destroy, foreign_key: "build_quality_map_status_id", class_name: "BuildQualityMapSegmentStatus"
 
   def self.most_recent
     last_not_error_and_not_initialized = where(error: nil).where.not(state:["intialized", "complete"]).first

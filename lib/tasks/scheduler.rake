@@ -7,7 +7,7 @@ task :redo_jobs => :environment do
       puts 'Retrying Build Quality Map Job'
       BuildQualityMapJob.perform_later(job_status, true)
     end
-    job_status.build_quality_map_segment_statuses.each do |segment_status|
+    job_status.segment_statuses.each do |segment_status|
       if !segment_status.complete? && segment_status.updated_at < 15.minutes.ago
         puts "Retrying Build Quality Map Segment #{segment_status.segment} Job"
         BuildQualityMapSegmentJob.perform_later(segment_status)
