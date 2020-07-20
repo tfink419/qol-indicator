@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_19_064022) do
+ActiveRecord::Schema.define(version: 2020_07_20_002126) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_064022) do
     t.integer "north_east", array: true
     t.integer "transit_type_low"
     t.integer "transit_type_high"
+    t.string "point_type"
   end
 
   create_table "census_tract_polygons", force: :cascade do |t|
@@ -59,6 +60,14 @@ ActiveRecord::Schema.define(version: 2020_07_19_064022) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["census_tract_id"], name: "index_census_tract_polygons_on_census_tract_id", unique: true
+  end
+
+  create_table "census_tract_poverty_map_points", force: :cascade do |t|
+    t.integer "precision", null: false
+    t.integer "lat", null: false
+    t.integer "long", null: false
+    t.float "value", null: false
+    t.index ["lat", "long", "precision"], name: "index_census_tract_poverty_points_on_lat_long_prec", unique: true
   end
 
   create_table "census_tracts", force: :cascade do |t|
@@ -77,9 +86,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_064022) do
     t.integer "precision", null: false
     t.integer "lat", null: false
     t.integer "long", null: false
-    t.float "quality", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.float "value", null: false
     t.index ["transit_type", "lat", "long", "precision"], name: "index_grocery_store_quality_points_on_type_lat_long_prec", unique: true
     t.index ["transit_type", "lat", "long"], name: "index_grocery_store_quality_points_on_type_lat_long", unique: true
   end
@@ -146,6 +153,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_064022) do
     t.integer "west_bounds", default: [], null: false, array: true
     t.integer "north_bounds", default: [], null: false, array: true
     t.integer "east_bounds", default: [], null: false, array: true
+    t.string "point_type"
     t.index ["scheduled_time"], name: "index_scheduled_point_rebuilds_on_scheduled_time"
   end
 

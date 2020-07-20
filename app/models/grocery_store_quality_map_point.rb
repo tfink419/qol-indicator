@@ -4,7 +4,7 @@ class GroceryStoreQualityMapPoint < ApplicationRecord
   validates :transit_type, :presence => true, uniqueness: { scope: [:lat, :long], message: 'not a unique transit type at lat and long.' }
   validates :lat, :presence => true
   validates :long, :presence => true
-  validates :quality, :presence => true
+  validates :value, :presence => true
   validates :precision, :presence => true
 
   before_validation do

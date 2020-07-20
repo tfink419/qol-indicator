@@ -36,20 +36,46 @@ class BuildQualityMapSegmentJob < ApplicationJob
         segment_low = segment_low.round
         transit_type_low = build_status.parent_status.transit_type_low
         transit_type_high = build_status.parent_status.transit_type_high
-        
-        current = 0
-        state = 'isochrones'
-        puts 'Isochrones State...'
-        GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
-          current += 1
-          FetchIsochrone.new(gstore).fetch(transit_type_low, transit_type_high)
+        point_type = build_status.parent_status.point_type
+
+        if point_type == 'GroceryStoreQualityMapPoint'
+          point_class = GroceryStoreQualityMapPoint
+          polygon_class = IsochronePolygon
+          parent_class = GroceryStore
+          parent_class_id = "isochronable_id"
+          quality_column_name = "quality"
+          quality_calc_method = "LogExpSum"
+          quality_calc_value = 1.7
+          include_transit_type = true
+          isochrone_type = true
+        elsif point_type == 'CensusTractPovertyMapPoint'
+          point_class = CensusTractPovertyMapPoint
+          polygon_class = CensusTractPolygon
+          parent_class = CensusTract
+          parent_class_id = "census_tract_id"
+          quality_column_name = "poverty_percent"
+          quality_calc_method = "First"
+          quality_calc_value = 0
+          include_transit_type = false
+          isochrone_type = false
         end
 
-        # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)
-        state = 'isochrones-complete'
-        percent = 100
-        build_status.update!(state:state, percent:percent);
-        sleep(5) until build_status.reload.parent_status.state == 'quality_map-points'
+        # Isochrone only points
+        if isochrone_type
+          current = 0
+          state = 'isochrones'
+          puts 'Isochrones State...'
+          GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
+            current += 1
+            FetchIsochrone.new(gstore).fetch(transit_type_low, transit_type_high)
+          end
+
+          # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)
+          state = 'isochrones-complete'
+          percent = 100
+          build_status.update!(state:state, percent:percent);
+          sleep(5) until build_status.reload.parent_status.state == 'quality-map-points'
+        end
 
         south_west_int = build_status.parent_status.south_west.map { |coord_part| coord_part.floor(1-BuildQualityMapJob::STEP_PRECISION) }
         north_east_int = build_status.parent_status.north_east.map { |coord_part| coord_part.ceil(1-BuildQualityMapJob::STEP_PRECISION) }
@@ -58,35 +84,31 @@ class BuildQualityMapSegmentJob < ApplicationJob
 
         lat = build_status.current_lat.to_i
 
-        puts 'QualityMap Points'
-        state = 'quality_map-points'
+        puts 'Quality Map Points'
+        state = 'quality-map-points'
         while true # see towards bottom of loop
           lat_height = (lat == north_east_int[0]) ? 1 : BuildQualityMapJob::NUM_STEPS_PER_FUNCTION
           (transit_type_low..transit_type_high).each do |transit_type|
             long = south_west_int[1]
             new_quality_maps = []
             current_transit_type = transit_type
-            travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+            travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type] if include_transit_type
             while long <= north_east_int[1]
               long_width = (long == north_east_int[1]) ? 1 : BuildQualityMapJob::NUM_STEPS_PER_FUNCTION
-              isochrones = PolygonQuery.new(IsochronePolygon.joins('INNER JOIN grocery_stores ON grocery_stores.id = isochrone_polygons.isochronable_id'))\
-              .all_near_point_fat(lat, long, lat_height-1, long_width-1)\
-              .where(isochronable_type:'GroceryStore', travel_type:travel_type, distance: distance)\
-              .select('isochrone_polygons.polygon', 'grocery_stores.quality AS quality')\
-              .map{ |isochrone|
-                [
-                  isochrone.polygon.map{ |coord| coord.map(&:to_f) },
-                  isochrone.quality
-                ]
-              }
+              polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name)\
+              .all_near_point_fat_with_parent(lat, long, lat_height, long_width, travel_type, distance)
               # skip to next block if none found
-              unless isochrones.blank?
-                qualities = QualityMapImage.quality_of_points(lat, long, lat_height, long_width, isochrones)
+              unless polygons.blank?
+                qualities = QualityMapImage.quality_of_points(lat, long, lat_height, long_width, polygons, quality_calc_method, quality_calc_value)
                 this_lat = lat
                 this_long = long
-                new_grocery_store_quality_map_points = qualities.reduce([]) { |arr, quality|
+                new_map_points = qualities.reduce([]) do |arr, quality|
                   if quality > 0
-                    arr << [this_lat, this_long, transit_type, quality, MapPointService.precision_of(this_lat, this_long)]
+                    if include_transit_type
+                      arr << [this_lat, this_long, transit_type, quality, MapPointService.precision_of(this_lat, this_long)]
+                    else
+                      arr << [this_lat, this_long, quality, MapPointService.precision_of(this_lat, this_long)]
+                    end
                   end
                   this_long += step_int
                   if this_long%long_width == 0
@@ -94,9 +116,13 @@ class BuildQualityMapSegmentJob < ApplicationJob
                     this_lat += step_int
                   end
                   arr
-                }
-                columns = [:lat, :long, :transit_type, :quality, :precision]
-                results = GroceryStoreQualityMapPoint.import columns, new_grocery_store_quality_map_points, on_duplicate_key_ignore: true
+                end
+                if include_transit_type
+                  columns = [:lat, :long, :transit_type, :value, :precision]
+                else
+                  columns = [:lat, :long, :value, :precision]
+                end
+                results = point_class.import columns, new_map_points, on_duplicate_key_ignore: true
               end
               long += step_int*long_width
             end
@@ -111,6 +137,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
         build_status.update!(percent:100, state:'complete')
       rescue => err
         state = 'error'
+        puts "Errored out"
         build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
       end
     }
@@ -120,7 +147,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
         GC.start
         if state == 'isochrones'
           percent = (100.0*current/gstore_count).round(2)
-        elsif state == 'quality_map-points'
+        elsif state == 'quality-map-points'
           percent = calc_grocery_store_quality_map_point_percent(current_transit_type, long, south_west_int, north_east_int, transit_type_low, transit_type_high)
         elsif state == 'complete' || state == 'error'
           exit

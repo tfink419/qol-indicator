@@ -18,7 +18,7 @@ class IsochronableChanged
     .filter { |a| GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) }
     .sort { |a, b| GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) <=> GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([b.travel_type, b.distance]) }
 
-    next_job = ScheduledPointRebuild.get_next_job
+    next_job = ScheduledPointRebuild.get_next_job(@isochronable.class)
     just_created = next_job.south_bounds.blank?
     (0...GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.length-1).each do |trans_ind|
       if just_created

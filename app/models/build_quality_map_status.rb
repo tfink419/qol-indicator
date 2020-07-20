@@ -1,5 +1,5 @@
 class BuildQualityMapStatus < ApplicationRecord
-  VALID_STATES = ['initialized', 'received', 'branching', 'isochrones', 'quality_map-points', 'complete']
+  VALID_STATES = ['initialized', 'received', 'branching', 'isochrones', 'quality-map-points', 'complete']
 
   validates :percent, :presence => true
   validates :state, :presence => true,

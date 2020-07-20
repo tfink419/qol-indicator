@@ -2,7 +2,7 @@ import React from "react";
 import _ from 'lodash';
 import { connect } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
-import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box, Checkbox, FormControlLabel } from '@material-ui/core'
+import { Typography, Paper, Input, Button, CircularProgress, LinearProgress, Box, Checkbox, FormControlLabel, Select, MenuItem } from '@material-ui/core'
 
 import { flashMessage } from '../actions/messages'
 import { setBuildQualityMapStatusReloadIntervalId, loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQualityMapStatusesPage, updateBuildQualityMapStatusesRowsPerPage } from '../actions/admin'
@@ -14,18 +14,19 @@ const STATE_MAP = {
   'branching': 'Branching Into Parellel Sidekiq\'s',
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'isochrones-complete': 'Finished Isochrone Polygons, Waiting For Others',
-  'quality_map-points': 'Building Quality Map Points',
+  'quality-map-points': 'Building Quality Map Points',
   'complete': 'Completed'
 }
 
 const BuildQualityMapPage = ({ setBuildQualityMapStatusReloadIntervalId, buildQualityMapStatuses, flashMessage, 
 loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQualityMapStatusesPage, updateBuildQualityMapStatusesRowsPerPage }) => {
   let [rebuild, setRebuild] = React.useState(false);
+  let [mapPointType, setMapPointType] = React.useState("GroceryStoreQualityMapPoint");
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildQualityMapStatuses;
 
   const handleBuildQualityMap = (event) => {
     event.preventDefault();
-    postAdminBuildQualityMap(rebuild)
+    postAdminBuildQualityMap(rebuild, mapPointType)
     .then((response) => {
       flashMessage('info', response.message);
       loadBuildQualityMapStatuses(true);
@@ -137,7 +138,7 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
               <Typography variant="subtitle2">
                 Current State: <strong>{STATE_MAP[segment_status.state]}</strong>
               </Typography>
-              { segment_status.state == 'quality_map-points' && (
+              { segment_status.state == 'quality-map-points' && (
                 <Typography variant="subtitle2">
                   Current Lat: <strong>{segment_status.current_lat/1000.0}</strong>
                 </Typography>
@@ -163,6 +164,10 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
             control={<Checkbox checked={rebuild} onChange={(e) => setRebuild(e.target.checked)} name="rebuild" />}
             label="Rebuild"
           />
+          <Select value={mapPointType}  onChange={(e) => setMapPointType(e.target.value)}>
+            <MenuItem value={"GroceryStoreQualityMapPoint"}>Grocery Store Quality</MenuItem>
+            <MenuItem value={"CensusTractPovertyMapPoint"}>Census Tract Poverty</MenuItem>
+          </Select>
           <form onSubmit={handleBuildQualityMap}>
             <Button type="submit"
               color="primary"

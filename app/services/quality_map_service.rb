@@ -9,8 +9,7 @@ class QualityMapService
   def generate
     before = Time.now
     grocery_store_points = MapPointService.new(GroceryStoreQualityMapPoint.where(transit_type: @transit_type))\
-    .where_in_coordinate_range(@south_west, @north_east, @zoom)\
-    .order(:lat, :long).pluck(:lat, :long, :quality)
+    .where_in_coordinate_range(@south_west, @north_east, @zoom)
     puts "Query took #{Time.now-before} seconds"
 
     precision, step = self.class.zoom_to_precision_step(@zoom)

@@ -1,5 +1,5 @@
 class BuildQualityMapSegmentStatus < ApplicationRecord
-  VALID_STATES = ['initialized', 'received', 'isochrones', 'isochrones-complete', 'quality_map-points', 'complete']
+  VALID_STATES = ['initialized', 'received', 'isochrones', 'isochrones-complete', 'quality-map-points', 'complete']
   validates :segment, :presence => true, uniqueness: { scope: :build_quality_map_status_id }
 
   validates :percent, :presence => true
@@ -13,14 +13,14 @@ class BuildQualityMapSegmentStatus < ApplicationRecord
   end
 
   def atleast_isochrones_state?
-    error || state == 'isochrones' || state == 'isochrones-complete' || state == 'quality_map-points' || state == 'complete'
+    error || state == 'isochrones' || state == 'isochrones-complete' || state == 'quality-map-points' || state == 'complete'
   end
 
   def atleast_isochrones_complete_state?
-    error || state == 'isochrones-complete' || state == 'quality_map-points' || state == 'complete'
+    error || state == 'isochrones-complete' || state == 'quality-map-points' || state == 'complete'
   end
 
   def atleast_quality_map_state?
-    error || state == 'quality_map-points'
+    error || state == 'quality-map-points'
   end
 end
