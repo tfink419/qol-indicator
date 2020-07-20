@@ -32,19 +32,6 @@ class GroceryStore < ApplicationRecord
     IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').delete_all
   end
 
-  scope :clean_order, lambda { |attr, dir| 
-    #ensure attr and dir are safe values to use by checking within an array of allowed values
-    attr = (GroceryStore.attribute_names.include? attr) ? attr : 'created_at'
-    dir.upcase!
-    dir = (%w(ASC DESC).include? dir) ? dir : 'ASC'
-    if ['name'].include? attr
-      # case insensitive sort
-      order(Arel.sql("lower(grocery_stores.#{attr}) #{dir}"))
-    else
-      order("#{attr} #{dir}")
-    end
-  }
-
   scope :search, lambda { |query| 
     search_query = "%#{query.gsub(/[^\w ]/,'')}%"
     where(['grocery_stores.name ILIKE ? or grocery_stores.address ILIKE ?', search_query, search_query])

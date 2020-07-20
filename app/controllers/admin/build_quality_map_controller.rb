@@ -7,14 +7,21 @@ class Admin::BuildQualityMapController < ApplicationController
     north_east = GroceryStore.furthest_north_east
     south_west_int = south_west.map { |val| (val*1000).round.to_i }
     north_east_int = north_east.map { |val| (val*1000).round.to_i }
+    point_type = params[:point_type]
+    point_type ||= "GroceryStoreQualityMapPoint"
+    if point_type == "GroceryStoreQualityMapPoint"
+      transit_type_high = GroceryStore::NUM_TRANSIT_TYPES
+    else
+      transit_type_high = 1
+    end
     build_status = BuildQualityMapStatus.create(state:'initialized', percent:100,
     rebuild:params[:rebuild], south_west:south_west_int, north_east:north_east_int,
-    transit_type_low:1, transit_type_high:GroceryStore::NUM_TRANSIT_TYPES)
+    transit_type_low:1, transit_type_high:GroceryStore::NUM_TRANSIT_TYPES, point_type:point_type)
     BuildQualityMapJob.perform_later(build_status)
     HerokuWorkersService.new.start if Rails.env == 'production'
     render json: {
       status: 0,
-      message: 'QualityMap Build Job Initialized',
+      message: 'Quality Map Build Job Initialized',
       build_quality_map_status:build_status
     }
   end

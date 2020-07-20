@@ -6,11 +6,14 @@ class MapPointService
   def where_in_coordinate_range(south_west, north_east, zoom)
     zoom = zoom.to_i
     if zoom > 11
-      true_where_in_coordinate_range(south_west, north_east)
+      true_where_in_coordinate_range(south_west, north_east)\
+      .order(:lat, :long).pluck(:lat, :long, :value)
     elsif zoom > 7
-      true_where_in_coordinate_range(south_west, north_east).where(['precision <= ?', zoom-5])
+      true_where_in_coordinate_range(south_west, north_east).where(['precision <= ?', zoom-5])\
+      .order(:lat, :long).pluck(:lat, :long, :value)
     else
-      true_where_in_coordinate_range(south_west, north_east).where(['precision <= ?', 2])
+      true_where_in_coordinate_range(south_west, north_east).where(['precision <= ?', 2])\
+      .order(:lat, :long).pluck(:lat, :long, :value)
     end
   end
 
@@ -44,6 +47,7 @@ class MapPointService
     extra_long = (north_east[1]-south_west[1])*0.2
     extra_lat = (north_east[0]-south_west[0])*0.2
     @map_point.where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', 
-      (south_west[0]-extra_lat)*1000, (north_east[0]+extra_lat)*1000, (south_west[1]-extra_long)*1000, (north_east[1]+extra_long)*1000])
+      (south_west[0]-extra_lat)*1000, (north_east[0]+extra_lat)*1000, 
+      (south_west[1]-extra_long)*1000, (north_east[1]+extra_long)*1000])\
   end
 end
