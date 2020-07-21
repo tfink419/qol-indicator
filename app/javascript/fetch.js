@@ -242,7 +242,7 @@ export const postAdminBuildQualityMap = (rebuild, mapPointType) => {
 
 export const getMapDataQualityMap = (southWest, northEast, zoom, mapPreferences, abortSignal) => {
   let url = "/map_data/quality_map",
-    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom, mapPreferences: JSON.stringify(mapPreferences)};
+    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom, map_preferences: JSON.stringify(mapPreferences)};
   // Turn object into http params
   url += paramify(params)
 
@@ -337,8 +337,8 @@ export const getMapPreferences = () => {
   .then(handleResponse)
 }
 
-export const putMapPreferences = (user) => {
-  return fetch('/map_preferences', { method:'PUT', body: JSON.stringify({map_preferences: filterUnwantedParams(user)}), 
+export const putMapPreferences = (mapPreferences) => {
+  return fetch('/map_preferences', { method:'PUT', body: JSON.stringify({map_preferences: filterUnwantedParams(mapPreferences)}), 
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
