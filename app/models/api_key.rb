@@ -7,7 +7,7 @@ class ApiKey < ApplicationRecord
   def self.generate(user_id)
     key = nil
     loop do
-      key = SecureRandom.alphanumeric(32)
+      key = SecureRandom.alphanumeric(40)
       break unless ApiKey.find_by_key(key)
     end
     self.create(user_id:user_id, key:key)

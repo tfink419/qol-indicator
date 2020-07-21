@@ -12,8 +12,8 @@ class MapPreferencesController < ApplicationController
   
   def update
     user = User.find(session[:user_id])
-    map_preferences = user.map_preferences
-    user.create_map_preferences unless map_preferences
+    map_preferences = MapPreferences.find_by_user_id(session[:user_id])
+    map_preferences ||= MapPreferences.create(user_id:session[:user_id])
     if map_preferences.update_attributes(map_preference_params)
       render :json =>  {
         :status => 0,
@@ -26,6 +26,7 @@ class MapPreferencesController < ApplicationController
   end
 
   def map_preference_params
-    params.require(:map_preferences).permit(:transit_type)
+    params.require(:map_preferences).permit(:grocery_store_quality_transit_type,:census_tract_poverty_low,
+    :census_tract_poverty_high,:grocery_store_quality_ratio,:census_tract_poverty_ratio)
   end
 end

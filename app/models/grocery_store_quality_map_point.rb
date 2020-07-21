@@ -25,6 +25,6 @@ class GroceryStoreQualityMapPoint < ApplicationRecord
     ['driving', 16],
     ['driving', 24]
   ]
-
-  private
+  LOW = 0
+  HIGH = 12.5
 end

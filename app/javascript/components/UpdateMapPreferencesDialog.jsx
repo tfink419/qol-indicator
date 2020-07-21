@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash'
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Slider, CircularProgress, Typography } from '@material-ui/core/';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid,
+Slider, CircularProgress, Typography, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core/';
 
 import { flashMessage } from '../actions/messages'
 import { updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences } from '../actions/map-preferences'
@@ -27,7 +28,7 @@ const useStyles = makeStyles({
   cancelButton: {
     color: 'green'
   },
-  markLabel:{
+  groceryStoreQualityMarkLabel:{
     marginLeft:'12.5%'
   }
 });
@@ -86,22 +87,59 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
       <Dialog open={true} disableBackdropClick={true} onClose={handleClose}>
         <DialogTitle>Update Your Map Preferences</DialogTitle>
         <DialogContent>
-          <form onSubmit={handleUpdate}>
-            <Typography id="grcoery-store-label" gutterBottom>
-              Grocery Store Proximity (minutes)
-            </Typography>
-            <Slider
-              classes={{markLabel:classes.markLabel}}
-              value={mapPreferences.preferences.transit_type}
-              onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, transit_type:val })}
-              step={1}
-              min={1}
-              max={9}
-              valueLabelDisplay="auto"
-              marks={transitTypeMarks}
-              valueLabelFormat={(val) => ((val-1)%3+1)*8}
-            />
-          </form>
+          <Typography gutterBottom>
+            Grocery Store Proximity (minutes)
+          </Typography>
+          <Slider
+            classes={{markLabel:classes.groceryStoreQualityMarkLabel}}
+            value={mapPreferences.preferences.grocery_store_quality_transit_type}
+            onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_quality_transit_type:val })}
+            step={1}
+            min={1}
+            max={9}
+            valueLabelDisplay="auto"
+            marks={transitTypeMarks}
+            valueLabelFormat={(val) => ((val-1)%3+1)*8}
+          />
+          <ExpansionPanel>
+            <ExpansionPanelSummary>
+              <Typography>Ratios</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Grocery Store Quality
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Slider
+                    value={mapPreferences.preferences.grocery_store_quality_ratio}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_quality_ratio:val })}
+                    step={1}
+                    min={0}
+                    max={100}
+                    valueLabelDisplay="auto"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Poverty Percent
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Slider
+                    value={mapPreferences.preferences.census_tract_poverty_ratio}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, census_tract_poverty_ratio:val })}
+                    step={1}
+                    min={0}
+                    max={100}
+                    valueLabelDisplay="auto"
+                  />
+                </Grid>
+              </Grid>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
           { loading && <CircularProgress className={classes.circularProgress} />}
         </DialogContent>
         <DialogActions>

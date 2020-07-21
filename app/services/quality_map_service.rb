@@ -1,23 +1,36 @@
 class QualityMapService
-  def initialize(south_west, north_east, zoom, transit_type)
+  def initialize(south_west, north_east, zoom, map_preferences)
     @south_west = south_west
     @north_east = north_east
     @zoom = zoom
-    @transit_type = transit_type
+    @map_preferences = map_preferences
   end
 
   def generate
-    before = Time.now
-    grocery_store_points = MapPointService.new(GroceryStoreQualityMapPoint.where(transit_type: @transit_type))\
-    .where_in_coordinate_range(@south_west, @north_east, @zoom)
-    puts "Query took #{Time.now-before} seconds"
+    sum = 0
+    sum += @map_preferences.grocery_store_quality_ratio
+    sum += @map_preferences.census_tract_poverty_ratio
+    normalized_grocery_store_quality_ratio = @map_preferences.grocery_store_quality_ratio/sum.to_f
+    normalized_census_tract_poverty_ratio = @map_preferences.census_tract_poverty_ratio/sum.to_f
+    points = []
+    if normalized_grocery_store_quality_ratio > 0
+      puts normalized_grocery_store_quality_ratio
+      before = Time.now
+      points << [GroceryStoreQualityMapPoint::LOW, GroceryStoreQualityMapPoint::HIGH,
+      normalized_grocery_store_quality_ratio, false, MapPointService.new(GroceryStoreQualityMapPoint.where(transit_type: @map_preferences.grocery_store_quality_transit_type)).where_in_coordinate_range(@south_west, @north_east, @zoom)]
+      puts "Query took #{Time.now-before} seconds"
+    end
+    if normalized_census_tract_poverty_ratio > 0
+      before = Time.now
+      points << [@map_preferences.census_tract_poverty_low, @map_preferences.census_tract_poverty_high, 
+      normalized_census_tract_poverty_ratio, true, MapPointService.new(CensusTractPovertyMapPoint).where_in_coordinate_range(@south_west, @north_east, @zoom)]
+      puts "Query took #{Time.now-before} seconds"
+    end
 
     precision, step = self.class.zoom_to_precision_step(@zoom)
 
-    extra_long = (@north_east[1]-@south_west[1])*0.2
-    extra_lat = (@north_east[0]-@south_west[0])*0.2
-    extra_lat = step if extra_lat < step
-    extra_long = step if extra_long < step
+    extra_long = (@north_east[1]-@south_west[1])*0.2+step
+    extra_lat = (@north_east[0]-@south_west[0])*0.2+step
     @south_west = [self.class.to_nearest_precision(@south_west[0]-extra_lat,precision), self.class.to_nearest_precision(@south_west[1]-extra_long,precision)]
     @north_east = [self.class.to_nearest_precision(@north_east[0]+extra_lat,precision), self.class.to_nearest_precision(@north_east[1]+extra_long,precision)]
 
@@ -27,7 +40,7 @@ class QualityMapService
     step_int = (step*1000).round.to_i
 
     before = Time.now
-    im = QualityMapImage.get_image(south_west_int, north_east_int, step_int, grocery_store_points)
+    im = QualityMapImage.get_image(south_west_int, north_east_int, step_int, points)
     puts "Image generation took #{Time.now-before} seconds"
 
     [@south_west.map{|pos| pos+step/2}, @north_east.map{|pos| pos+step/2}, im]
