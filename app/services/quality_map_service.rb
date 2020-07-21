@@ -8,21 +8,21 @@ class QualityMapService
 
   def generate
     sum = 0
-    sum += @map_preferences.grocery_store_quality_ratio
-    sum += @map_preferences.census_tract_poverty_ratio
-    normalized_grocery_store_quality_ratio = @map_preferences.grocery_store_quality_ratio/sum.to_f
-    normalized_census_tract_poverty_ratio = @map_preferences.census_tract_poverty_ratio/sum.to_f
+    sum += @map_preferences["grocery_store_quality_ratio"]
+    sum += @map_preferences["census_tract_poverty_ratio"]
+    normalized_grocery_store_quality_ratio = @map_preferences["grocery_store_quality_ratio"]/sum.to_f
+    normalized_census_tract_poverty_ratio = @map_preferences["census_tract_poverty_ratio"]/sum.to_f
     points = []
     if normalized_grocery_store_quality_ratio > 0
       puts normalized_grocery_store_quality_ratio
       before = Time.now
       points << [GroceryStoreQualityMapPoint::LOW, GroceryStoreQualityMapPoint::HIGH,
-      normalized_grocery_store_quality_ratio, false, MapPointService.new(GroceryStoreQualityMapPoint.where(transit_type: @map_preferences.grocery_store_quality_transit_type)).where_in_coordinate_range(@south_west, @north_east, @zoom)]
+      normalized_grocery_store_quality_ratio, false, MapPointService.new(GroceryStoreQualityMapPoint.where(transit_type: @map_preferences["grocery_store_quality_transit_type"])).where_in_coordinate_range(@south_west, @north_east, @zoom)]
       puts "Query took #{Time.now-before} seconds"
     end
     if normalized_census_tract_poverty_ratio > 0
       before = Time.now
-      points << [@map_preferences.census_tract_poverty_low, @map_preferences.census_tract_poverty_high, 
+      points << [@map_preferences["census_tract_poverty_low"], @map_preferences["census_tract_poverty_high"], 
       normalized_census_tract_poverty_ratio, true, MapPointService.new(CensusTractPovertyMapPoint).where_in_coordinate_range(@south_west, @north_east, @zoom)]
       puts "Query took #{Time.now-before} seconds"
     end
