@@ -12,7 +12,7 @@ class ScheduledPointRebuild < ApplicationRecord
   end
 
   def self.get_current_job(point_type)
-    self.find(scheduled_time:self.current_job_time, point_type:point_type)
+    self.find_by(scheduled_time:self.current_job_time, point_type:point_type)
   end
 
   def self.current_job_time

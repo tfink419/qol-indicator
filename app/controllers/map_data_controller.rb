@@ -16,7 +16,8 @@ class MapDataController < ApplicationController
     
     isochrones = []
 
-    transit_type = params[:transit_type] ? params[:transit_type] : User.find(session[:user_id]).map_preferences.transit_type
+    map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
+    map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
 
     max_zoom = (11-Math.log(north_east[1]-south_west[1], 2)).to_i
 
@@ -24,7 +25,7 @@ class MapDataController < ApplicationController
 
     zoom = max_zoom if zoom.nil? || zoom > max_zoom
 
-    fixed_south_west, fixed_north_east, image = QualityMapService.new(south_west, north_east, zoom, transit_type).generate
+    fixed_south_west, fixed_north_east, image = QualityMapService.new(south_west, north_east, zoom, map_preferences).generate
 
     response.headers['Content-Range'] = "Coordinates #{fixed_south_west}-#{fixed_north_east}"
     send_data image

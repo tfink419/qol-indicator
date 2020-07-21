@@ -17,7 +17,7 @@ export default ({ map, currentLocation, mapPreferences }) => {
     }
     let controller = new AbortController();
     prevAbortController.current = controller;
-    getMapDataQualityMap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.loaded ? mapPreferences.preferences.transit_type : null, controller.signal)
+    getMapDataQualityMap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.preferences, controller.signal)
     .then(({responseBlob, southWest, northEast}) => {
       let north = northEast[0], south = southWest[0],
         west = southWest[1], east = northEast[1];

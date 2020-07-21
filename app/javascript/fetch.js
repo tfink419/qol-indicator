@@ -240,12 +240,9 @@ export const postAdminBuildQualityMap = (rebuild, mapPointType) => {
 }
 
 
-export const getMapDataQualityMap = (southWest, northEast, zoom, transit_type, abortSignal) => {
+export const getMapDataQualityMap = (southWest, northEast, zoom, mapPreferences, abortSignal) => {
   let url = "/map_data/quality_map",
-    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom};
-  if(transit_type) {
-    params.transit_type = transit_type;
-  }
+    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom, mapPreferences: JSON.stringify(mapPreferences)};
   // Turn object into http params
   url += paramify(params)
 
