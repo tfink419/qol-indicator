@@ -3,17 +3,24 @@ class Admin::BuildQualityMapController < ApplicationController
   before_action :admin_only
 
   def build
-    south_west = GroceryStore.furthest_south_west
-    north_east = GroceryStore.furthest_north_east
-    south_west_int = south_west.map { |val| (val*1000).round.to_i }
-    north_east_int = north_east.map { |val| (val*1000).round.to_i }
     point_type = params[:point_type]
     point_type ||= "GroceryStoreQualityMapPoint"
     if point_type == "GroceryStoreQualityMapPoint"
       transit_type_high = GroceryStore::NUM_TRANSIT_TYPES
-    else
+      polygon_class_service = PolygonClassService.new(IsochronablePolygon.where(isochronable_type:'GroceryStore'))
+    elsif point_type == "CensusTractPovertyMapPoint"
+      polygon_class_service = PolygonClassService.new(CensusTractPolygon)
       transit_type_high = 1
+    else
+      return render json: {
+        status: 400,
+        message: 'Bad Point Type'
+      }, status: 400
     end
+    south_west = polygon_class_service.furthest_south_west
+    north_east = polygon_class_service.furthest_north_east
+    south_west_int = south_west.map { |val| (val*1000).round.to_i }
+    north_east_int = north_east.map { |val| (val*1000).round.to_i }
     build_status = BuildQualityMapStatus.create(state:'initialized', percent:100,
     rebuild:params[:rebuild], south_west:south_west_int, north_east:north_east_int,
     transit_type_low:1, transit_type_high:GroceryStore::NUM_TRANSIT_TYPES, point_type:point_type)
