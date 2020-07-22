@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 2154dd132706aabd2f8458f11443647cbb99d296
+  revision: 10d86660d7b0ec6456b16b73e5716c9259ffe2e8
   specs:
-    quality_map_image (0.4.2)
+    quality_map_image (0.5.0)
 
 GEM
   remote: https://rubygems.org/
@@ -55,7 +55,7 @@ GEM
     archive-zip (0.12.0)
       io-like (~> 0.3.0)
     arel (9.0.0)
-    bcrypt (3.1.13)
+    bcrypt (3.1.15)
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
@@ -203,7 +203,7 @@ GEM
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
     semantic_range (2.3.0)
-    sidekiq (6.1.0)
+    sidekiq (6.1.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)

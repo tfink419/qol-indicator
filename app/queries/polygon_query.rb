@@ -19,10 +19,10 @@ class PolygonQuery
     all_near_point_fat(lat, long, lat_height-1, long_width-1)\
     .joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}"))\
     .where(where_query)
-    .select(Arel.sql("#{@polygon_class.table_name}.polygon"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column} AS value"))\
+    .select(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column} AS value"))\
     .map{ |polygon|
       [
-        polygon.polygon.map{ |coord| coord.map(&:to_f) },
+        JSON.parse(polygon.geometry),
         polygon.value
       ]
     }

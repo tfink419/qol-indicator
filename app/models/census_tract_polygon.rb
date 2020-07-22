@@ -1,5 +1,5 @@
 class CensusTractPolygon < ApplicationRecord
-  validates :polygon, exclusion: { in: [nil], message: 'can\'t be nil' }
+  validates :geometry, exclusion: { in: [nil], message: 'can\'t be nil' }
   validates :south_bound, presence: true
   validates :north_bound, presence: true
   validates :west_bound, presence: true

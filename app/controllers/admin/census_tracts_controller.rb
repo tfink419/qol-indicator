@@ -9,9 +9,9 @@ class Admin::CensusTractsController < ApplicationController
       census_tracts = params.require(:census_tracts).map do |census_tract|
         census_tract.permit!
         census_tract = census_tract.to_hash
-        north_bound, east_bound, south_bound, west_bound = PolygonService.get_bounds(census_tract["polygon"])
+        north_bound, east_bound, south_bound, west_bound = PolygonService.get_bounds(census_tract["geometry"])
         census_tract_polygon = {
-          polygon:census_tract["polygon"],
+          geometry:census_tract["geometry"],
           north_bound: north_bound,
           east_bound: east_bound,
           south_bound: south_bound,
