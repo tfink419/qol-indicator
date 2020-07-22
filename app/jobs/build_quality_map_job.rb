@@ -42,6 +42,7 @@ class BuildQualityMapJob < ApplicationJob
         end
       end
       build_status.update!(state:'branching', percent:100)
+      puts "Branching"
       # dont reset lat and try workers if this is a retry and lat already exists
       unless job_retry && build_status.current_lat
         lat = south_west_int[0]
