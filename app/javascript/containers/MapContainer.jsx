@@ -91,7 +91,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = fals
   return (
     <div className={classes.mapContainer} ref={mapRef}>
       <QualityMapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
-      <GroceryStoreLayer map={map} currentLocation={currentLocation} isAdmin={isAdminLayer} />
+      <GroceryStoreLayer map={map} currentLocation={currentLocation} mapPreferences={mapPreferences} isAdmin={isAdminLayer} />
       { !isAdminLayer && <MapLegend map={map}/> }
     </div>
   )};

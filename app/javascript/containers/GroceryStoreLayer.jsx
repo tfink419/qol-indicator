@@ -10,7 +10,7 @@ const MAX_STORES_TO_HOLD = 10000;
 
 const ICON_BASE_URL = 'https://my-qoli-icons.s3-us-west-1.amazonaws.com/';
 
-export default ({ map, currentLocation, isAdmin }) => {
+export default ({ map, currentLocation, isAdmin, mapPreferences }) => {
   const groceryStores = React.useRef([]);
   const justRetrievedGroceryStores = React.useRef([]);
   const store = useStore();
@@ -31,7 +31,7 @@ export default ({ map, currentLocation, isAdmin }) => {
     });
   }
 
-  const loadMapData = React.useRef(_.throttle((map, currentLocation) => {
+  const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences) => {
     if(!map) {
       return;
     }
@@ -40,7 +40,7 @@ export default ({ map, currentLocation, isAdmin }) => {
     }
     let controller = new AbortController();
     prevAbortController.current = controller;
-    if(currentLocation.zoom > 10) {
+    if(mapPreferences.preferences.grocery_store_quality_ratio > 0 && currentLocation.zoom > 10) {
       getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
       .then(response => {
         justRetrievedGroceryStores.current = [];
@@ -129,7 +129,7 @@ export default ({ map, currentLocation, isAdmin }) => {
     }
   }, 500)).current;
 
-  React.useEffect(() => loadMapData(map, currentLocation), [map, currentLocation])
+  React.useEffect(() => loadMapData(map, currentLocation, mapPreferences), [map, currentLocation, mapPreferences])
 
   return (
     <div/>
