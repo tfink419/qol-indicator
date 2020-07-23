@@ -43,7 +43,7 @@ class QualityMapService
     im = QualityMapImage.get_image(south_west_int, north_east_int, step_int, points)
     puts "Image generation took #{Time.now-before} seconds"
 
-    [@south_west.map{|pos| pos+step/2}, @north_east.map{|pos| pos+step/2}, im]
+    [@south_west.map{|pos| pos-step/2}, @north_east.map{|pos| pos-step/2}, im]
   end
 
   def self.zoom_to_precision_step(zoom)
