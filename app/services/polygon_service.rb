@@ -16,8 +16,7 @@ class PolygonService
     east_bound = -9999
     south_bound = 9999
     north_bound = -9999
-    parsed = JSON.parse(geometry) rescue geometry
-    parsed.each do |polygon|
+    geometry.each do |polygon|
       #geometry contains 1..n polygons
       polygon.each do |coordinates|
         #polygon contains 1 outer polygon path and 0..n holes

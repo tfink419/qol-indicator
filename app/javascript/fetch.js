@@ -262,6 +262,21 @@ export const getMapDataQualityMap = (southWest, northEast, zoom, mapPreferences,
   })
 }
 
+export const getMapDataPoint = (lat, long, mapPreferences, abortSignal) => {
+  let url = "/map_data/point",
+    params = { lat, long, map_preferences: JSON.stringify(mapPreferences)};
+  // Turn object into http params
+  url += paramify(params)
+
+  return fetch(url, {
+    signal: abortSignal,
+    headers: {
+      'Accept': 'application/json'
+  }})
+  .then(response => response.json())
+  .then(handleResponse)
+}
+
 export const getMapDataGroceryStores = (southWest, northEast, abortSignal) => {
   let url = "/map_data/grocery_stores",
     params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast) };

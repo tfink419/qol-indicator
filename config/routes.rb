@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   patch 'user/self', :to => 'user_self#update', :as => 'update_user_self'
   get 'map_data/quality_map', :to => 'map_data#get_quality_map_image', :as => 'map_data_get_quality_map_image'
   get 'map_data/grocery_stores', :to => 'map_data#get_grocery_stores', :as => 'map_data_get_grocery_stores'
+  get 'map_data/point', :to => 'map_data#get_point_data', :as => 'map_data_get_point_data'
 
   # Public Routes
   get 'register', :to => 'app#index', :as => 'register'

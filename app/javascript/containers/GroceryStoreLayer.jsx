@@ -1,16 +1,19 @@
 import React from "react";
 import ReactDOM from 'react-dom'
+import { connect } from 'react-redux'
 import _ from 'lodash';
 import { Provider, useStore } from 'react-redux'
+
 import GroceryStorePopup from '../components/GroceryStorePopup';
 
+import { infoWindowOpened } from '../actions/info-windows'
 import { getMapDataGroceryStores } from '../fetch';
 
 const MAX_STORES_TO_HOLD = 10000;
 
 const ICON_BASE_URL = 'https://my-qoli-icons.s3-us-west-1.amazonaws.com/';
 
-export default ({ map, currentLocation, isAdmin, mapPreferences }) => {
+const GroceryStoreLayer = ({ map, currentLocation, isAdmin, mapPreferences, infoWindows }) => {
   const groceryStores = React.useRef([]);
   const justRetrievedGroceryStores = React.useRef([]);
   const store = useStore();
@@ -23,6 +26,13 @@ export default ({ map, currentLocation, isAdmin, mapPreferences }) => {
       }
     });
   }
+
+  const closeAllWindows = () => {
+    groceryStores.current.forEach((groceryStore) => {
+      groceryStore.infoWindow.close();
+    });
+  }
+
 
   const removeAllMarkers = () => {
     groceryStores.current.forEach(groceryStore => {
@@ -129,9 +139,25 @@ export default ({ map, currentLocation, isAdmin, mapPreferences }) => {
     }
   }, 500)).current;
 
+  React.useEffect(() => {
+    if(infoWindows.activeInfoWindow && infoWindows.activeInfoWindow.windowInfoType == 'grocery-store') {
+      closeAllWindows();
+    }
+  }, [infoWindows])
+
   React.useEffect(() => loadMapData(map, currentLocation, mapPreferences), [map, currentLocation, mapPreferences])
 
   return (
     <div/>
   );
 }
+
+const mapStateToProps = state => ({
+  infoWindows: state.infoWindows
+})
+
+const mapDispatchToProps = {
+  infoWindowOpened
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(GroceryStoreLayer)

@@ -45,4 +45,26 @@ class MapDataController < ApplicationController
     }
   end
 
+  def get_point_data
+    lat = params[:lat]
+    long = params[:long]
+    unless lat and long
+      return render :json => {
+        status: 400,
+        message: 'Lat and Long must exist'
+      }, status: 400
+    end
+
+    map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
+    map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
+    quality, data = QualityService.new(lat, long, map_preferences).get_quality_data
+    render :json => {
+      status: 0,
+      quality: quality,
+      data: data,
+      lat: (lat.to_f*1000).round/1000.0,
+      long: (long.to_f*1000).round/1000.0
+    }
+  end
+
 end

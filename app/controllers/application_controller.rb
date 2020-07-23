@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
     $stderr.print err.backtrace
     render :json => { 
       :status => 500,
-      :error => 'Unknown error occured',
+      :error => 'Unknown error occurred',
       :error_details => err
     }, :status => 500
   end

@@ -64,6 +64,9 @@ class GroceryStore < ApplicationRecord
     true
   end
 
+  QUALITY_CALC_METHOD = 'LogExpSum'
+  QUALITY_CALC_VALUE = 1.7
+
   def public_attributes 
     {
       :id => id,

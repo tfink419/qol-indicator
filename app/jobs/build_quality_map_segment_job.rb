@@ -44,8 +44,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
           parent_class = GroceryStore
           parent_class_id = "isochronable_id"
           quality_column_name = "quality"
-          quality_calc_method = "LogExpSum"
-          quality_calc_value = 1.7
+          quality_calc_method = GroceryStore::QUALITY_CALC_METHOD
+          quality_calc_value = GroceryStore::QUALITY_CALC_VALUE
           include_transit_type = true
           isochrone_type = true
         elsif point_type == 'CensusTractPovertyMapPoint'
@@ -54,8 +54,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
           parent_class = CensusTract
           parent_class_id = "census_tract_id"
           quality_column_name = "poverty_percent"
-          quality_calc_method = "First"
-          quality_calc_value = 0
+          quality_calc_method = CensusTract::QUALITY_CALC_METHOD
+          quality_calc_value = CensusTract::QUALITY_CALC_VALUE
           include_transit_type = false
           isochrone_type = false
         end
@@ -92,7 +92,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
             long = south_west_int[1]
             new_quality_maps = []
             current_transit_type = transit_type
-            travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type] if include_transit_type
+            if point_type == 'GroceryStoreQualityMapPoint'
+              travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+            end
             while long <= north_east_int[1]
               long_width = (long == north_east_int[1]) ? 1 : BuildQualityMapJob::NUM_STEPS_PER_FUNCTION
               polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name)\

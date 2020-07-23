@@ -39,15 +39,17 @@ const startLocation = {
 const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = false}) => {
   const classes = useStyles();
   let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
+  const currentLocationRef = React.useRef(currentLocation);
   let [map, setMap] = React.useState(null);
-  const mapRef = React.useRef(null);
+  const mapRef = React.useState(map);
+  const mapContainer = React.useRef(null);
 
-  const handleMapMove = (map) => {
-    let center = map.getCenter();
-    let bounds = map.getBounds();
-    setCurrentLocation({
+  const handleMapMove = () => {
+    let center = mapRef.current.getCenter();
+    let bounds = mapRef.current.getBounds();
+    setCurrentLocation(currentLocationRef.current = {
       center: [center.lat().toFixed(3), center.lng().toFixed(3)],
-      zoom: map.getZoom().toFixed(2),
+      zoom: mapRef.current.getZoom().toFixed(2),
       southWest: [bounds.getSouthWest().lat(), bounds.getSouthWest().lng()],
       northEast: [bounds.getNorthEast().lat(), bounds.getNorthEast().lng()]
     });
@@ -80,16 +82,16 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = fals
     loader
     .load()
     .then(() => {
-      let mapTemp = new window.google.maps.Map(mapRef.current, mapOptions);
-      setMap(mapTemp);
-      mapTemp.addListener('bounds_changed', () => handleMapMove(mapTemp))
+      let _map = new window.google.maps.Map(mapContainer.current, mapOptions);
+      setMap(mapRef.current = _map);
+      _map.addListener('bounds_changed', () => handleMapMove());
     })
   }
 
   React.useEffect(loadMap, [])
 
   return (
-    <div className={classes.mapContainer} ref={mapRef}>
+    <div className={classes.mapContainer} ref={mapContainer}>
       <QualityMapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
       <GroceryStoreLayer map={map} currentLocation={currentLocation} mapPreferences={mapPreferences} isAdmin={isAdminLayer} />
       { !isAdminLayer && <MapLegend map={map}/> }

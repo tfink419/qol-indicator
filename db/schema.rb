@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_22_012038) do
+ActiveRecord::Schema.define(version: 2020_07_23_003939) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,7 +56,7 @@ ActiveRecord::Schema.define(version: 2020_07_22_012038) do
     t.float "north_bound", null: false
     t.float "west_bound", null: false
     t.float "east_bound", null: false
-    t.string "geometry", null: false
+    t.json "geometry", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["census_tract_id"], name: "index_census_tract_polygons_on_census_tract_id", unique: true
@@ -128,7 +128,7 @@ ActiveRecord::Schema.define(version: 2020_07_22_012038) do
     t.float "north_bound", null: false
     t.float "west_bound", null: false
     t.float "east_bound", null: false
-    t.string "geometry", null: false
+    t.json "geometry", null: false
     t.index ["isochronable_type", "isochronable_id", "travel_type"], name: "index_iso_polys_on_poly_assoc_and_travel_type"
     t.index ["isochronable_type", "travel_type", "distance", "south_bound", "north_bound", "west_bound", "east_bound"], name: "index_isochrone_polygons_on_bounds_and_type"
   end
