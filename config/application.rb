@@ -27,7 +27,7 @@ module QolIndicator
 
     Google::Maps.configure do |config|
       config.authentication_mode = Google::Maps::Configuration::API_KEY
-      config.api_key = ENV["GOOGLE_KEY"]
+      config.api_key = ENV["GOOGLE_SERVER_KEY"]
     end
 
     # Settings in config/environments/* take precedence over those specified here.

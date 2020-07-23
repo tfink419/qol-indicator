@@ -11,7 +11,7 @@ import GroceryStoreLayer from './GroceryStoreLayer'
 import MapLegend from "../components/MapLegend";
 
 const loader = new Loader({
-  apiKey: GOOGLE_KEY,
+  apiKey: GOOGLE_WEB_KEY,
   version: "weekly",
   libraries: ["places"]
 });
