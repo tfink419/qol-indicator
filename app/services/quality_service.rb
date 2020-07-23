@@ -48,7 +48,7 @@ class QualityService
       elsif inner_quality > @map_preferences["census_tract_poverty_high"]
         inner_quality = @map_preferences["census_tract_poverty_high"]
       end
-      inner_quality = @map_preferences["census_tract_poverty_high"]-inner_quality-@map_preferences["census_tract_poverty_low"]
+      inner_quality = @map_preferences["census_tract_poverty_high"]-inner_quality
       inner_quality = 100.to_f/(@map_preferences["census_tract_poverty_high"]-@map_preferences["census_tract_poverty_low"])*inner_quality
       quality += inner_quality*normalized_census_tract_poverty_ratio
       data[:census_tract] = CensusTract.find(results[1][0])&.public_attributes if results
