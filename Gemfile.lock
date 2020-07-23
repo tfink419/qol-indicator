@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: f9a4551329c48b2c1a11796ec17145b80d340f14
+  revision: aedf4b924d7a79f30a206c2850d801333459a4a2
   specs:
-    quality_map_image (0.5.1)
+    quality_map_image (0.5.2)
 
 GEM
   remote: https://rubygems.org/
@@ -57,7 +57,7 @@ GEM
     arel (9.0.0)
     bcrypt (3.1.15)
     bindex (0.8.1)
-    bootsnap (1.4.6)
+    bootsnap (1.4.7)
       msgpack (~> 1.0)
     builder (3.2.4)
     byebug (11.1.3)
