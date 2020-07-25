@@ -70,9 +70,14 @@ class GroceryStoreUploadJob < ApplicationJob
           north_east = [(north+0.3).ceil(1), (east+0.3).ceil(1)]
           south_west_int = south_west.map { |val| (val*1000).round.to_i }
           north_east_int = north_east.map { |val| (val*1000).round.to_i }
-          build_status = BuildQualityMapStatus.create(state:'initialized', percent:100,
-          rebuild:true, south_west:south_west_int, north_east:north_east_int,
-          transit_type_low:1, transit_type_high:9)
+          build_status = BuildQualityMapStatus.create(
+            state:'initialized',
+            percent:100,
+            south_west:south_west_int,
+            north_east:north_east_int,
+            transit_type_low:1,
+            transit_type_high:9
+          )
           BuildQualityMapJob.perform_later(build_status)
         end
 

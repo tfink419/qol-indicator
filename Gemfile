@@ -68,7 +68,7 @@ gem 'httplog'
 # gem 'resque'
 gem 'sidekiq', '~> 6.1.0'
 
-gem 'quality_map_image', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@github.com/tfink419/quality_map_image.git"#, :branch => "libvips"
+gem 'quality_map_image', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@github.com/tfink419/quality_map_image.git", :branch => "data-as-image"
 
 gem "retries"
 

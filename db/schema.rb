@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_23_003939) do
+ActiveRecord::Schema.define(version: 2020_07_25_015658) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 2020_07_23_003939) do
     t.datetime "updated_at", null: false
     t.integer "segment"
     t.float "current_lat"
+    t.integer "current_lat_sector"
   end
 
   create_table "build_quality_map_statuses", force: :cascade do |t|
@@ -42,12 +43,12 @@ ActiveRecord::Schema.define(version: 2020_07_23_003939) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "current_lat"
-    t.boolean "rebuild"
-    t.integer "south_west", array: true
-    t.integer "north_east", array: true
+    t.float "south_west", array: true
+    t.float "north_east", array: true
     t.integer "transit_type_low"
     t.integer "transit_type_high"
     t.string "point_type"
+    t.integer "current_lat_sector"
   end
 
   create_table "census_tract_polygons", force: :cascade do |t|
@@ -62,14 +63,6 @@ ActiveRecord::Schema.define(version: 2020_07_23_003939) do
     t.index ["census_tract_id"], name: "index_census_tract_polygons_on_census_tract_id", unique: true
   end
 
-  create_table "census_tract_poverty_map_points", force: :cascade do |t|
-    t.integer "precision", null: false
-    t.integer "lat", null: false
-    t.integer "long", null: false
-    t.float "value", null: false
-    t.index ["lat", "long", "precision"], name: "index_census_tract_poverty_points_on_lat_long_prec", unique: true
-  end
-
   create_table "census_tracts", force: :cascade do |t|
     t.string "geoid", null: false
     t.float "poverty_percent", null: false
@@ -79,16 +72,6 @@ ActiveRecord::Schema.define(version: 2020_07_23_003939) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["geoid"], name: "index_census_tracts_on_geoid", unique: true
-  end
-
-  create_table "grocery_store_quality_map_points", force: :cascade do |t|
-    t.integer "transit_type", null: false
-    t.integer "precision", null: false
-    t.integer "lat", null: false
-    t.integer "long", null: false
-    t.float "value", null: false
-    t.index ["transit_type", "lat", "long", "precision"], name: "index_grocery_store_quality_points_on_type_lat_long_prec", unique: true
-    t.index ["transit_type", "lat", "long"], name: "index_grocery_store_quality_points_on_type_lat_long", unique: true
   end
 
   create_table "grocery_store_upload_statuses", force: :cascade do |t|
@@ -153,10 +136,10 @@ ActiveRecord::Schema.define(version: 2020_07_23_003939) do
 
   create_table "scheduled_point_rebuilds", force: :cascade do |t|
     t.datetime "scheduled_time", null: false
-    t.integer "south_bounds", default: [], null: false, array: true
-    t.integer "west_bounds", default: [], null: false, array: true
-    t.integer "north_bounds", default: [], null: false, array: true
-    t.integer "east_bounds", default: [], null: false, array: true
+    t.float "south_bounds", default: [], null: false, array: true
+    t.float "west_bounds", default: [], null: false, array: true
+    t.float "north_bounds", default: [], null: false, array: true
+    t.float "east_bounds", default: [], null: false, array: true
     t.string "point_type"
     t.index ["scheduled_time"], name: "index_scheduled_point_rebuilds_on_scheduled_time"
   end

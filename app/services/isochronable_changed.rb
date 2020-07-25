@@ -22,15 +22,15 @@ class IsochronableChanged
     just_created = next_job.south_bounds.blank?
     (0...GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.length-1).each do |trans_ind|
       if just_created
-        next_job.south_bounds << (isochrones[trans_ind].south_bound*1000).round
-        next_job.west_bounds << (isochrones[trans_ind].west_bound*1000).round
-        next_job.north_bounds << (isochrones[trans_ind].north_bound*1000).round
-        next_job.east_bounds << (isochrones[trans_ind].east_bound*1000).round
+        next_job.south_bounds << isochrones[trans_ind].south_bound
+        next_job.west_bounds << isochrones[trans_ind].west_bound
+        next_job.north_bounds << isochrones[trans_ind].north_bound
+        next_job.east_bounds << isochrones[trans_ind].east_bound
       else
-        next_job.south_bounds[trans_ind] = [next_job.south_bounds[trans_ind], (isochrones[trans_ind].south_bound*1000).round].min
-        next_job.west_bounds[trans_ind] = [next_job.west_bounds[trans_ind], (isochrones[trans_ind].west_bound*1000).round].min
-        next_job.north_bounds[trans_ind] = [next_job.north_bounds[trans_ind], (isochrones[trans_ind].north_bound*1000).round].max
-        next_job.east_bounds[trans_ind] = [next_job.east_bounds[trans_ind], (isochrones[trans_ind].east_bound*1000).round].max
+        next_job.south_bounds[trans_ind] = isochrones[trans_ind].south_bound if isochrones[trans_ind].south_bound < next_job.south_bounds[trans_ind]
+        next_job.west_bounds[trans_ind] = isochrones[trans_ind].west_bound if isochrones[trans_ind].west_bound < next_job.west_bounds[trans_ind]
+        next_job.north_bounds[trans_ind] = isochrones[trans_ind].north_bound if isochrones[trans_ind].north_bound > next_job.north_bounds[trans_ind]
+        next_job.east_bounds[trans_ind] = isochrones[trans_ind].east_bound if isochrones[trans_ind].east_bound > next_job.east_bounds[trans_ind]
       end
     end
     next_job.save

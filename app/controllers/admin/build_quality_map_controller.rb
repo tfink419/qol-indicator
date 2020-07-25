@@ -7,7 +7,7 @@ class Admin::BuildQualityMapController < ApplicationController
     point_type ||= "GroceryStoreQualityMapPoint"
     if point_type == "GroceryStoreQualityMapPoint"
       transit_type_high = GroceryStore::NUM_TRANSIT_TYPES
-      polygon_class_service = PolygonClassService.new(IsochronablePolygon.where(isochronable_type:'GroceryStore'))
+      polygon_class_service = PolygonClassService.new(IsochronePolygon.where(isochronable_type:'GroceryStore'))
     elsif point_type == "CensusTractPovertyMapPoint"
       polygon_class_service = PolygonClassService.new(CensusTractPolygon)
       transit_type_high = 1
@@ -19,11 +19,14 @@ class Admin::BuildQualityMapController < ApplicationController
     end
     south_west = polygon_class_service.furthest_south_west
     north_east = polygon_class_service.furthest_north_east
-    south_west_int = south_west.map { |val| (val*1000).round.to_i }
-    north_east_int = north_east.map { |val| (val*1000).round.to_i }
-    build_status = BuildQualityMapStatus.create(state:'initialized', percent:100,
-    rebuild:params[:rebuild], south_west:south_west_int, north_east:north_east_int,
-    transit_type_low:1, transit_type_high:GroceryStore::NUM_TRANSIT_TYPES, point_type:point_type)
+    build_status = BuildQualityMapStatus.create(state:'initialized',
+      percent:100,
+      south_west:south_west,
+      north_east:north_east,
+      transit_type_low:1,
+      transit_type_high:GroceryStore::NUM_TRANSIT_TYPES,
+      point_type:point_type
+    )
     BuildQualityMapJob.perform_later(build_status)
     HerokuWorkersService.new.start if Rails.env == 'production'
     render json: {

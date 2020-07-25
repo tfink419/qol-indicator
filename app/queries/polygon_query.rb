@@ -7,7 +7,7 @@ class PolygonQuery
     @is_isochronable_type = (@parent_id_column == 'isochronable_id')
   end
 
-  def all_near_point_fat_with_parent(lat, long, lat_height, long_width, travel_type, distance)
+  def all_near_bounds_with_parent(south, west, north, east, travel_type, distance)
     where_query = {}
     if @is_isochronable_type
       where_query[:isochronable_type] = @parent_class.name
@@ -16,10 +16,10 @@ class PolygonQuery
       where_query[:travel_type] = travel_type
       where_query[:distance] = distance
     end
-    all_near_point_fat(lat, long, lat_height-1, long_width-1)\
-    .joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}"))\
-    .where(where_query)
-    .pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column}"))
+    all_near_bounds(south, west, north, east).
+    joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
+    where(where_query).
+    pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column}"))
   end
   
   def all_near_point_with_parent_and_ids(lat, long, travel_type, distance)
@@ -31,10 +31,10 @@ class PolygonQuery
     where_query[:travel_type] = travel_type
     where_query[:distance] = distance
   end
-  all_near_point(lat, long)\
-  .joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}"))\
-  .where(where_query)
-  .pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column}"), Arel.sql("#{@parent_class.table_name}.id"))
+  all_near_point(lat, long).
+  joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
+  where(where_query).
+  pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column}"), Arel.sql("#{@parent_class.table_name}.id"))
 end
 
   def all_near_point(lat, long)
@@ -43,17 +43,13 @@ end
     @polygon_class.where(['south_bound <= ? AND ? <= north_bound AND west_bound <= ? AND ? <= east_bound', lat, lat, long, long])
   end
 
-  def all_near_point_fat(lat, long, lat_height, long_width)
-    east = (long+long_width-1)/1000.0
-    north = (lat+lat_height-1)/1000.0
-    south = lat/1000.0
-    west = long/1000.0
-    if lat_height == 0 && long_width == 0
+  def all_near_bounds(south, west, north, east)
+    if north == south && east == west
       @polygon_class.where(['south_bound <= ? AND ? <= north_bound AND west_bound <= ? AND ? <= east_bound', south, south, west, west])
-    elsif lat_height == 0
+    elsif north == south
       @polygon_class.where(['south_bound <= ? AND ? <= north_bound AND ((west_bound <= ? AND ? <= east_bound) OR (west_bound <= ? AND ? <= east_bound) OR (? <= west_bound AND east_bound <= ?))', 
       south, south, west, west, east, east, west, east])
-    elsif long_width == 0
+    elsif east == west
       @polygon_class.where(['((south_bound <= ? AND ? <= north_bound) OR (south_bound <= ? AND ? <= north_bound) OR (? <= south_bound AND north_bound <= ?)) AND west_bound <= ? AND ? <= east_bound', 
       south, south, north, north, south, north, west, west])
     else

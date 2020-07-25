@@ -20,13 +20,12 @@ const STATE_MAP = {
 
 const BuildQualityMapPage = ({ setBuildQualityMapStatusReloadIntervalId, buildQualityMapStatuses, flashMessage, 
 loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQualityMapStatusesPage, updateBuildQualityMapStatusesRowsPerPage }) => {
-  let [rebuild, setRebuild] = React.useState(false);
   let [mapPointType, setMapPointType] = React.useState("GroceryStoreQualityMapPoint");
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildQualityMapStatuses;
 
   const handleBuildQualityMap = (event) => {
     event.preventDefault();
-    postAdminBuildQualityMap(rebuild, mapPointType)
+    postAdminBuildQualityMap(mapPointType)
     .then((response) => {
       flashMessage('info', response.message);
       loadBuildQualityMapStatuses(true);
@@ -140,7 +139,7 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
               </Typography>
               { segment_status.state == 'quality-map-points' && (
                 <Typography variant="subtitle2">
-                  Current Lat: <strong>{segment_status.current_lat/1000.0}</strong>
+                  Current Lat: <strong>{segment_status.current_lat}</strong>
                 </Typography>
               )}
               <Box display="flex" alignItems="center">
@@ -160,10 +159,6 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
       {loaded && !current &&
         <React.Fragment>
           <Typography variant="body1">This will Build the QualityMap</Typography>
-          <FormControlLabel
-            control={<Checkbox checked={rebuild} onChange={(e) => setRebuild(e.target.checked)} name="rebuild" />}
-            label="Rebuild"
-          />
           <Select value={mapPointType}  onChange={(e) => setMapPointType(e.target.value)}>
             <MenuItem value={"GroceryStoreQualityMapPoint"}>Grocery Store Quality</MenuItem>
             <MenuItem value={"CensusTractPovertyMapPoint"}>Census Tract Poverty</MenuItem>

@@ -226,9 +226,9 @@ export const getAdminBuildQualityMapStatus = (id) => {
   .then(handleResponse)
 }
 
-export const postAdminBuildQualityMap = (rebuild, mapPointType) => {
+export const postAdminBuildQualityMap = (mapPointType) => {
   let url = '/api/admin/build_quality_map',
-    params = { rebuild, point_type: mapPointType };
+    params = { point_type: mapPointType };
   url += paramify(params);
   return fetch(url, {
     method:'POST', 

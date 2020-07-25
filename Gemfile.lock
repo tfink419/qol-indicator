@@ -1,8 +1,9 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: aedf4b924d7a79f30a206c2850d801333459a4a2
+  revision: bd6f0e479346e94faa8cd239ac271143a01f5064
+  branch: data-as-image
   specs:
-    quality_map_image (0.5.2)
+    quality_map_image (0.6.0)
 
 GEM
   remote: https://rubygems.org/
@@ -102,7 +103,7 @@ GEM
     httplog (1.4.3)
       rack (>= 1.0)
       rainbow (>= 2.0.0)
-    i18n (1.8.4)
+    i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     io-like (0.3.1)
     jbuilder (2.10.0)
