@@ -20,8 +20,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
     segment_low = (segment-1)*segment_part
     segment_low += 1 unless segment == 1
     segment_low = segment_low.round
-    @transit_type_low = build_status.parent_status.transit_type_low
-    @transit_type_high = build_status.parent_status.transit_type_high
+    transit_type_low = build_status.parent_status.transit_type_low
+    transit_type_high = build_status.parent_status.transit_type_high
     point_type = build_status.parent_status.point_type
 
     case point_type
@@ -56,7 +56,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
           before = Time.now
           build_status.update!(percent:(100.0*current/gstore_count).round(2), state:@state)
         end
-        FetchIsochrone.new(gstore).fetch(@transit_type_low, @transit_type_high)
+        FetchIsochrone.new(gstore).fetch(transit_type_low, transit_type_high)
       end
 
       # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)
@@ -80,13 +80,12 @@ class BuildQualityMapSegmentJob < ApplicationJob
     build_status.update!(percent:0, state:@state, updated_at:Time.now)
     while true # see towards bottom of loop
       puts "Lat Sector: #{@lat_sector}"
-      (@transit_type_low..@transit_type_high).each do |transit_type|
-        new_quality_maps = []
-        @current_transit_type = transit_type
-        if point_type == 'GroceryStoreQualityMapPoint'
-          travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
-        end
-        while current_sector.lng_sector <= @north_east_sector.lng_sector
+      while current_sector.lng_sector <= @north_east_sector.lng_sector
+        (transit_type_low..transit_type_high).each do |transit_type|
+          new_quality_maps = []
+          if point_type == 'GroceryStoreQualityMapPoint'
+            travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+          end
           polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name).
           all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)
           # skip to next block if none found
@@ -115,14 +114,14 @@ class BuildQualityMapSegmentJob < ApplicationJob
               value_image
             )
           end
-          current_sector = current_sector.next_lng_sector
-          @lng_sector = current_sector.lng_sector
-          build_status.update!(
-            current_lat:current_sector.south,
-            current_lat_sector:@lat_sector,
-            percent:calc_grocery_store_quality_map_point_percent
-          )
         end
+        current_sector = current_sector.next_lng_sector
+        @lng_sector = current_sector.lng_sector
+        build_status.update!(
+          current_lat:current_sector.south,
+          current_lat_sector:@lat_sector,
+          percent:calc_grocery_store_quality_map_point_percent
+        )
       end
       @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
       break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
@@ -154,9 +153,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
   private
 
   def calc_grocery_store_quality_map_point_percent
-    num_transit_types = (@transit_type_high-@transit_type_low+1).to_f
-    (((@lng_sector-@south_west_sector.lng_sector).to_f/
-      (@north_east_sector.lng_sector-@south_west_sector.lng_sector+1).to_f/
-      num_transit_types+(@current_transit_type-@transit_type_low).to_f/num_transit_types)*100).round(3)
+    ((@lng_sector-@south_west_sector.lng_sector).to_f/
+      (@north_east_sector.lng_sector-@south_west_sector.lng_sector+1).to_f*100).round(3)
   end
 end

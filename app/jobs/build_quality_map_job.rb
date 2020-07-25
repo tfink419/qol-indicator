@@ -70,7 +70,15 @@ class BuildQualityMapJob < ApplicationJob
 
       until build_status.reload.segment_statuses.all? { |segment_status| segment_status.error ||  segment_status.state == 'complete' } 
         sleep(5)
-        build_status.update!(percent:calc_total_quality_map_percent(build_status, num_segments_this_build, south_west_sector, north_east_sector), updated_at:Time.now)
+        build_status.update!(
+          percent:calc_total_quality_map_percent(
+            build_status,
+            num_segments_this_build,
+            south_west_sector,
+            north_east_sector
+            ),
+          updated_at:Time.now
+        )
       end
       return if error_found(build_status)
       puts "Complete"
@@ -98,7 +106,11 @@ class BuildQualityMapJob < ApplicationJob
     long_percent = build_status.segment_statuses.sum { |segment_status|
       segment_status.atleast_quality_map_state? ? (segment_status.percent/num_segments) : 0 # 0 if not yet in the right state
     }
-    lat_percent_per_step = (1.0 / (north_east_sector.lat_sector-south_west_sector.lat_sector+1))
-    (((build_status.current_lat_sector-south_west_sector.lat_sector)/(north_east_sector.lat_sector-south_west_sector.lat_sector+1)+long_percent*lat_percent_per_step)*100).round(3)
+    lat_percent_per_step = (0.01 / (north_east_sector.lat_sector-south_west_sector.lat_sector+1))
+    ((
+      (build_status.current_lat_sector-south_west_sector.lat_sector).to_f/
+        (north_east_sector.lat_sector-south_west_sector.lat_sector+1)+
+        long_percent*lat_percent_per_step)*
+        100).round(3)
   end
 end
