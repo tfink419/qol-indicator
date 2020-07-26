@@ -18,8 +18,8 @@ class BuildQualityMapJob < ApplicationJob
       build_status.update!(state:'received', percent:100)
       point_type = build_status.point_type.constantize
 
-      south_west_sector = MapSector.new(QualityImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.south_west))
-      north_east_sector = MapSector.new(QualityImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.north_east))
+      south_west_sector = MapSector.new(DataImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.south_west))
+      north_east_sector = MapSector.new(DataImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.north_east))
       build_status.update!(state:'branching', percent:100)
       puts "Branching"
       # dont reset lat and try workers if this is a retry and lat already exists

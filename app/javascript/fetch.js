@@ -240,9 +240,9 @@ export const postAdminBuildQualityMap = (mapPointType) => {
 }
 
 
-export const getMapDataQualityMap = (southWest, northEast, zoom, mapPreferences, abortSignal) => {
+export const getMapDataQualityMap = (latSector, lngSector, zoom, mapPreferences, abortSignal) => {
   let url = "/map_data/quality_map",
-    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), zoom, map_preferences: JSON.stringify(mapPreferences)};
+    params = { lat_sector: latSector, lng_sector: lngSector, zoom, map_preferences: JSON.stringify(mapPreferences)};
   // Turn object into http params
   url += paramify(params)
 
@@ -253,12 +253,7 @@ export const getMapDataQualityMap = (southWest, northEast, zoom, mapPreferences,
   }})
   .then(response => {
     let range = response.headers.get('Content-Range');
-    let bounds = range.match(/Coordinates (\[.+\])-(\[.+\])/)
-    return response.blob().then(responseBlob => ({
-      responseBlob,
-      southWest: bounds && JSON.parse(bounds[1]),
-      northEast: bounds && JSON.parse(bounds[2])
-    }))
+    return response.blob()
   })
 }
 

@@ -66,11 +66,11 @@ class BuildQualityMapSegmentJob < ApplicationJob
       sleep(5) until build_status.reload.parent_status.state == 'quality-map-points'
     end
 
-    @south_west_sector = MapSector.new(QualityImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.parent_status.south_west))
-    @north_east_sector = MapSector.new(QualityImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.parent_status.north_east))
-    image_service = QualityImageService.new(point_class::SHORT_NAME, @south_west_sector.zoom)
+    @south_west_sector = MapSector.new(DataImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.parent_status.south_west))
+    @north_east_sector = MapSector.new(DataImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.parent_status.north_east))
+    image_service = DataImageService.new(point_class::SHORT_NAME, @south_west_sector.zoom)
     current_sector = MapSector.from_sectors(
-      QualityImageService::DATA_CHUNK_SIZE,
+      DataImageService::DATA_CHUNK_SIZE,
       build_status.current_lat_sector,
       @south_west_sector.lng_sector
     )
@@ -92,10 +92,10 @@ class BuildQualityMapSegmentJob < ApplicationJob
           unless polygons.blank?
             value_image = QualityMapImage.quality_of_points_image(
               MapPoint::STEP_INVERT,
-              current_sector.south,
-              current_sector.west,
-              QualityImageService::DATA_CHUNK_SIZE,
-              QualityImageService::DATA_CHUNK_SIZE,
+              current_sector.south_step,
+              current_sector.west_step,
+              DataImageService::DATA_CHUNK_SIZE,
+              DataImageService::DATA_CHUNK_SIZE,
               polygons,
               point_class::SCALE,
               parent_class::QUALITY_CALC_METHOD,
@@ -107,7 +107,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 transit_type
               end
             end
-            image_service.save_quality_image(
+            image_service.save(
               added_params,
               current_sector.lat_sector,
               current_sector.lng_sector,
@@ -126,7 +126,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
       break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
       current_sector = MapSector.from_sectors(
-        QualityImageService::DATA_CHUNK_SIZE,
+        DataImageService::DATA_CHUNK_SIZE,
         @lat_sector,
         @south_west_sector.lng_sector
       )

@@ -5,12 +5,13 @@ import { connect } from 'react-redux'
 
 import { getMapDataQualityMap, getMapDataPoint } from '../fetch'
 import { infoWindowOpened } from '../actions/info-windows'
+import { getSectors, getSectorBounds } from '../models/map-sector'
 
 import PointDataPopup from '../components/PointDataPopup'
 
 const QualityMapLayer = ({ map, currentLocation, mapPreferences, infoWindowOpened, infoWindows }) => {
-  const prevAbortController = React.useRef(null)
-  const prevOverlay = React.useRef(null)
+  const prevAbortControllers = React.useRef([])
+  const prevOverlays = React.useRef([])
   const mapPreferencesRef = React.useRef(mapPreferences)
   const mapRef = React.useRef(map)
   let currentPointDataInfoWindowRef = React.useRef(null);
@@ -37,31 +38,30 @@ const QualityMapLayer = ({ map, currentLocation, mapPreferences, infoWindowOpene
     if(!map) {
       return;
     }
-    if(prevAbortController.current) {
-      prevAbortController.current.abort();
-    }
-    let controller = new AbortController();
-    prevAbortController.current = controller;
-    getMapDataQualityMap(currentLocation.southWest, currentLocation.northEast, currentLocation.zoom, mapPreferences.preferences, controller.signal)
-    .then(({responseBlob, southWest, northEast}) => {
-      let north = northEast[0], south = southWest[0],
-        west = southWest[1], east = northEast[1];
-      let url = URL.createObjectURL(responseBlob);
+    let zoom = currentLocation.zoom-4;
+    prevAbortControllers.current.forEach(abortController => abortController.abort());
+    prevOverlays.current.forEach(overlay => overlay.setMap(null));
+    prevAbortControllers.current = [];
+    prevOverlays.current = [];
 
-      if(prevOverlay.current) {
-        prevOverlay.current.setMap(null);
-      }
-
-      let imageBounds = { north, south, east, west };
-      let qualityMapOverlay = new google.maps.GroundOverlay(url, imageBounds);
-      qualityMapOverlay.addListener('click', handleClick);
-      qualityMapOverlay.setMap(map);
-      prevOverlay.current = qualityMapOverlay;
-    })
-    .catch(error => {
-      if(error.name != 'AbortError') {
-        throw error;
-      }
+    getSectors(currentLocation.southWest, currentLocation.northEast, zoom).forEach(sector =>{
+      let controller = new AbortController();
+      prevAbortControllers.current.push(controller);
+      getMapDataQualityMap(sector[0], sector[1], zoom, mapPreferences.preferences, controller.signal)
+      .then(responseBlob => {
+        console.log(responseBlob)
+        let url = URL.createObjectURL(responseBlob);
+        let bounds = getSectorBounds(sector[0], sector[1], zoom);
+        let qualityMapOverlay = new google.maps.GroundOverlay(url, bounds);
+        qualityMapOverlay.addListener('click', handleClick);
+        qualityMapOverlay.setMap(map);
+        prevOverlays.current.push(qualityMapOverlay);
+      })
+      .catch(error => {
+        if(error.name != 'AbortError') {
+          throw error;
+        }
+      });
     })
   }, 1000)).current;
 

@@ -25,7 +25,7 @@ export const qualityMarks = [
   },
   {
     value: 3,
-    label: 'Gas Station',
+    label: 'Convenience Store',
   },
   {
     value: 6,

@@ -4,13 +4,13 @@ require 'json'
 class MapDataController < ApplicationController
   before_action :confirm_logged_in
   def get_quality_map_image
-    south_west = JSON.parse(params[:south_west])
-    north_east = JSON.parse(params[:north_east])
+    lat_sector = JSON.parse(params[:lat_sector])
+    lng_sector = JSON.parse(params[:lng_sector])
 
-    if south_west.nil? || south_west[0].nil? || south_west[1].nil? || north_east.nil? || north_east[0].nil? || north_east[1].nil?
+    if lat_sector.blank? || lng_sector.blank?
       render :json => {
         status: 400,
-        message: 'South-West and North-East bounds must exist'
+        message: 'Sectors must exist'
       }, status: 400
     end
     
@@ -19,16 +19,16 @@ class MapDataController < ApplicationController
     map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
     map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
 
-    max_zoom = (11-Math.log(north_east[1]-south_west[1], 2)).to_i
+    zoom = params[:zoom].to_i
 
-    zoom = params[:zoom]&.to_i
+    if zoom > 10
+      zoom = 10
+    end
+    if zoom < 10
+      zoom = 10
+    end
 
-    zoom = max_zoom if zoom.nil? || zoom > max_zoom
-
-    fixed_south_west, fixed_north_east, image = QualityMapService.new(south_west, north_east, zoom, map_preferences).generate
-
-    response.headers['Content-Range'] = "Coordinates #{fixed_south_west}-#{fixed_north_east}"
-    send_data image
+    send_data QualityMapService.new(lat_sector, lng_sector, zoom, map_preferences).generate
   end
 
   def get_grocery_stores

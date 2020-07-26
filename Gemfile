@@ -77,3 +77,5 @@ gem 'platform-api'
 gem 'google-maps'
 
 gem 'activerecord-import'
+
+gem 'aws-sdk-s3'

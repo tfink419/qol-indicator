@@ -50,6 +50,14 @@ class MapSector
     @south_west_point.lng.to_f
   end
 
+  def south_step
+    @south_west_point.lat.step
+  end
+
+  def west_step
+    @south_west_point.lng.step
+  end
+
   def north
     @north_east_point.lat.to_f
   end
