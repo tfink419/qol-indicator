@@ -32,8 +32,8 @@ export const getSectorBounds = (lat_sector, lng_sector, zoom) => {
   return {
     south:(lat_sector-MAX/amount)*amount/STEP_INVERT,
     west:(lng_sector-MAX/amount)*amount/STEP_INVERT,
-    north:((lat_sector-MAX/amount)*amount+(SECTOR_SIZE+0.2)*scale)/STEP_INVERT,
-    east:((lng_sector-MAX/amount)*amount+(SECTOR_SIZE+0.2)*scale)/STEP_INVERT
+    north:(lat_sector+1-MAX/amount)*amount/STEP_INVERT,
+    east:(lng_sector+1-MAX/amount)*amount/STEP_INVERT
   }
 }
 
