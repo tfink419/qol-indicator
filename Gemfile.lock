@@ -1,9 +1,9 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 1705195f119d3a96709591efd2adf66e250b10c0
+  revision: f7e401c9f31d083ed9c208b65baa3bd58308bb5f
   branch: data-as-image
   specs:
-    quality_map_image (0.6.4)
+    quality_map_image (0.6.3)
 
 GEM
   remote: https://rubygems.org/
