@@ -16,7 +16,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
     job_retry ||= build_status.created_at < 15.minutes.ago
     build_status.update!(percent:@percent, state:@state)
     puts "Segment #{segment}"
-    @gstore_count = segment_part = (GroceryStore.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
+    gstore_count = segment_part = (GroceryStore.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
     segment_low = (segment-1)*segment_part
     segment_low += 1 unless segment == 1
     segment_low = segment_low.round
@@ -45,16 +45,16 @@ class BuildQualityMapSegmentJob < ApplicationJob
 
     # Isochrone only points
     if isochrone_type
-      @current = 0
+      current = 0
       @state = 'isochrones'
       build_status.update!(percent:0, state:@state)
       puts 'Isochrones State...'
       before = Time.now
       GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
-        @current += 1
+        current += 1
         if Time.now-before > 5
           before = Time.now
-          build_status.update!(percent:(100.0*@current/gstore_count).round(2), state:@state)
+          build_status.update!(percent:(100.0*current/gstore_count).round(2), state:@state)
         end
         FetchIsochrone.new(gstore).fetch(transit_type_low, transit_type_high)
       end
