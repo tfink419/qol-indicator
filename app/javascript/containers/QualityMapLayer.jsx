@@ -49,7 +49,6 @@ const QualityMapLayer = ({ map, currentLocation, mapPreferences, infoWindowOpene
       prevAbortControllers.current.push(controller);
       getMapDataQualityMap(sector[0], sector[1], zoom, mapPreferences.preferences, controller.signal)
       .then(responseBlob => {
-        console.log(responseBlob)
         let url = URL.createObjectURL(responseBlob);
         let bounds = getSectorBounds(sector[0], sector[1], zoom);
         let qualityMapOverlay = new google.maps.GroundOverlay(url, bounds);

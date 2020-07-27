@@ -46,3 +46,4 @@ yarn-debug.log*
 
 .ruby-version
 .env
+quality_map_image_data
