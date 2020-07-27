@@ -1,7 +1,7 @@
 class QualityService
   def initialize(lat, long, map_preferences)
-    @lat = (lat.to_f*1000).round
-    @long = (long.to_f*1000).round
+    @lat = lat.to_f
+    @long = long.to_f
     @map_preferences = map_preferences
   end
 
