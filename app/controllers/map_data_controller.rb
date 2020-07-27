@@ -46,8 +46,8 @@ class MapDataController < ApplicationController
   end
 
   def get_point_data
-    lat = params[:lat]
-    long = params[:long]
+    lat = params[:lat].to_f
+    long = params[:long].to_f
     unless lat and long
       return render :json => {
         status: 400,
@@ -62,8 +62,8 @@ class MapDataController < ApplicationController
       status: 0,
       quality: quality,
       data: data,
-      lat: (lat.to_f*1000).round/1000.0,
-      long: (long.to_f*1000).round/1000.0
+      lat:lat.round(4),
+      long:long.round(4)
     }
   end
 
