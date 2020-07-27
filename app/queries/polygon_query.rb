@@ -38,8 +38,6 @@ class PolygonQuery
 end
 
   def all_near_point(lat, long)
-    lat = lat/1000.0
-    long = long/1000.0
     @polygon_class.where(['south_bound <= ? AND ? <= north_bound AND west_bound <= ? AND ? <= east_bound', lat, lat, long, long])
   end
 
