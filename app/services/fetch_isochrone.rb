@@ -18,7 +18,7 @@ class FetchIsochrone
         with_retries(max_tries: 10, base_sleep_seconds: 15, max_sleep_seconds: 60) {
           isochrone = Mapbox::Isochrone.isochrone(travel_type, "#{@isochronable.long},#{@isochronable.lat}", {contours_minutes: [distance], generalize: 25, polygons:true})
         }
-        isochrones << {travel_type:travel_type, distance:distance, geometry:'['+IsochronePolygon.extract_geo_from_mapbox(isochrone)+']'}
+        isochrones << {travel_type:travel_type, distance:distance, geometry:[IsochronePolygon.extract_geo_from_mapbox(isochrone)]}
       end
     end
     @isochronable.isochrone_polygons.create(isochrones)
