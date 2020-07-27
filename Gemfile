@@ -9,8 +9,6 @@ gem 'rails', '~> 5.2.4', '>= 5.2.4.3'
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
@@ -68,7 +66,7 @@ gem 'httplog'
 # gem 'resque'
 gem 'sidekiq', '~> 6.1.0'
 
-gem 'quality_map_image', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@github.com/tfink419/quality_map_image.git", :branch => "travis-yml"
+gem 'quality_map_image', git: "https://#{ENV['GITHUB_TOKEN']}:x-oauth-basic@github.com/tfink419/quality_map_image.git", :branch => "data-as-image"
 
 gem "retries"
 

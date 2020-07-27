@@ -1,0 +1,77 @@
+version: '3'
+services:
+  postgres-db:
+    image: postgres:12.3
+    volumes:
+      - ./tmp/postgres-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: secure_database
+      POSTGRES_USER: myqoli
+  redis-db:
+    image: redis
+    volumes:
+      - ./tmp/redis-db:/var/lib/redis/data
+    environment:
+      REDIS_PASSWORD: password
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p $PORT -b '0.0.0.0'"
+    volumes:
+      - .:/usr/src/app
+    environment:
+      URL: ${URL}
+      EMAIL: ${EMAIL}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      MAPBOX_TOKEN: ${MAPBOX_TOKEN}
+      GOOGLE_WEB_KEY: ${GOOGLE_WEB_KEY}
+      GOOGLE_SERVER_KEY: ${GOOGLE_SERVER_KEY}
+      GOOGLE_PROD_WEB_KEY: ${GOOGLE_PROD_WEB_KEY}
+      HEROKU_TOKEN: ${HEROKU_TOKEN}
+      QUALITY_MAP_IMAGE_DATA_PATH: ${QUALITY_MAP_IMAGE_DATA_PATH}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PORT: ${PORT}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - postgres-db
+      - redis-db
+  workers:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    command: bundle exec sidekiq
+    environment:
+      URL: ${URL}
+      EMAIL: ${EMAIL}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      MAPBOX_TOKEN: ${MAPBOX_TOKEN}
+      GOOGLE_WEB_KEY: ${GOOGLE_WEB_KEY}
+      GOOGLE_SERVER_KEY: ${GOOGLE_SERVER_KEY}
+      GOOGLE_PROD_WEB_KEY: ${GOOGLE_PROD_WEB_KEY}
+      HEROKU_TOKEN: ${HEROKU_TOKEN}
+      QUALITY_MAP_IMAGE_DATA_PATH: ${QUALITY_MAP_IMAGE_DATA_PATH}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PORT: ${PORT}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - postgres-db
+      - redis-db

@@ -26,14 +26,15 @@ ActiveRecord::Schema.define(version: 2020_07_25_015658) do
 
   create_table "build_quality_map_segment_statuses", force: :cascade do |t|
     t.integer "build_quality_map_status_id"
+    t.integer "segment"
     t.float "percent"
     t.string "state"
     t.text "error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "segment"
     t.float "current_lat"
     t.integer "current_lat_sector"
+    t.index ["build_quality_map_status_id", "segment"], name: "index_build_heatmap_segment_statuses_on_parent_id"
   end
 
   create_table "build_quality_map_statuses", force: :cascade do |t|
@@ -105,13 +106,13 @@ ActiveRecord::Schema.define(version: 2020_07_25_015658) do
     t.bigint "isochronable_id", null: false
     t.string "travel_type", null: false
     t.integer "distance", null: false
+    t.json "geometry", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "south_bound", null: false
     t.float "north_bound", null: false
     t.float "west_bound", null: false
     t.float "east_bound", null: false
-    t.json "geometry", null: false
     t.index ["isochronable_type", "isochronable_id", "travel_type"], name: "index_iso_polys_on_poly_assoc_and_travel_type"
     t.index ["isochronable_type", "travel_type", "distance", "south_bound", "north_bound", "west_bound", "east_bound"], name: "index_isochrone_polygons_on_bounds_and_type"
   end
