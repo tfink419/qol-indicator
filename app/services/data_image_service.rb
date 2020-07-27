@@ -32,7 +32,7 @@ class DataImageService
     if USE_AWS_S3
       @s3_client.put_object(bucket: @bucket, key: "#{dir}/#{filename}", body:data)
     else
-      dir = "#{Rails.root}/#{dir}"
+      dir = "#{Rails.root}/quality_map_image_data/#{dir}"
       FileUtils.mkdir_p dir
       File.open("#{dir}/#{filename}", 'wb') { |f| f.write(data) }
     end
@@ -47,7 +47,7 @@ class DataImageService
         key: "#{dir}/#{filename}", 
       }).body.read rescue nil
     else
-      dir = "#{Rails.root}/#{dir}"
+      dir = "#{Rails.root}/quality_map_image_data/#{dir}"
       file_path = "#{dir}/#{filename}"
       File.read(file_path) if(File.exist?(file_path))
     end

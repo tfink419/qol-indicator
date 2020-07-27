@@ -14,6 +14,6 @@ class GroceryStoreQualityMapPoint < MapPoint
   ]
   LOW = 0
   HIGH = 12.5
-  SCALE = 200000000
+  SCALE = 42000000
   SHORT_NAME = 'grocery-store-quality'
 end
