@@ -1,7 +1,11 @@
 build:
   docker:
     web: Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     worker: Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
 run:
   web: bundle exec rails s -p $PORT
 run:
