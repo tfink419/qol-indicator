@@ -6,5 +6,7 @@ build:
     GITHUB_TOKEN: 73ffea6d2717db8d148ae94727a2da6073e9aded
 run:
   web: bundle exec puma -C config/puma.rb
-run:
-  worker: bundle exec sidekiq
+  worker:
+    command:
+      - bundle exec sidekiq
+    image: web
