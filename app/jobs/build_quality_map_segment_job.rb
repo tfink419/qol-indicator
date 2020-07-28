@@ -71,71 +71,71 @@ class BuildQualityMapSegmentJob < ApplicationJob
     )
     @lat_sector = current_sector.lat_sector
     puts 'Quality Map Points'
-    # build_status.update!(percent:0, state:'quality-map-points', updated_at:Time.now)
-    # while true # see towards bottom of loop
-    #   puts "Lat Sector: #{@lat_sector}"
-    #   while current_sector.lng_sector <= @north_east_sector.lng_sector
-    #     (transit_type_low..transit_type_high).each do |transit_type|
-    #       new_quality_maps = []
-    #       if point_type == 'GroceryStoreQualityMapPoint'
-    #         travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
-    #       end
-    #       polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name).
-    #       all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)
-    #       # skip to next block if none found
-    #       unless polygons.blank?
-    #         value_image = QualityMapImage.quality_of_points_image(
-    #           MapPoint::STEP_INVERT,
-    #           current_sector.south_step,
-    #           current_sector.west_step,
-    #           DataImageService::DATA_CHUNK_SIZE,
-    #           DataImageService::DATA_CHUNK_SIZE,
-    #           polygons,
-    #           point_class::SCALE,
-    #           parent_class::QUALITY_CALC_METHOD,
-    #           parent_class::QUALITY_CALC_VALUE
-    #         )
-    #         added_params = extra_params.map do |param|
-    #           case param
-    #           when :transit_type
-    #             transit_type
-    #           end
-    #         end
-    #         image_service.save(
-    #           added_params,
-    #           current_sector.lat_sector,
-    #           current_sector.lng_sector,
-    #           value_image
-    #         )
-    #         puts "After image save"
-    #       end
-    #     end
-    #     current_sector = current_sector.next_lng_sector
-    #     @lng_sector = current_sector.lng_sector
-    #     build_status.update!(
-    #       current_lat:current_sector.south,
-    #       current_lat_sector:@lat_sector,
-    #       percent:calc_grocery_store_quality_map_point_percent
-    #     )
-    #   end
-    #   @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
-    #   break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
-    #   current_sector = MapSector.from_sectors(
-    #     DataImageService::DATA_CHUNK_SIZE,
-    #     @lat_sector,
-    #     @south_west_sector.lng_sector
-    #   )
-    #   @lng_sector = current_sector.lng_sector
-    #   build_status.parent_status.update!(
-    #     current_lat:current_sector.south,
-    #     current_lat_sector:@lat_sector
-    #   )
-    #   build_status.update!(
-    #     current_lat:current_sector.south,
-    #     current_lat_sector:@lat_sector,
-    #     percent:calc_grocery_store_quality_map_point_percent
-    #   )
-    # end
+    build_status.update!(percent:0, state:'quality-map-points', updated_at:Time.now)
+    while true # see towards bottom of loop
+      puts "Lat Sector: #{@lat_sector}"
+      while current_sector.lng_sector <= @north_east_sector.lng_sector
+        (transit_type_low..transit_type_high).each do |transit_type|
+          new_quality_maps = []
+          if point_type == 'GroceryStoreQualityMapPoint'
+            travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+          end
+          polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name).
+          all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)
+          # skip to next block if none found
+          unless polygons.blank?
+            value_image = QualityMapImage.quality_of_points_image(
+              MapPoint::STEP_INVERT,
+              current_sector.south_step,
+              current_sector.west_step,
+              DataImageService::DATA_CHUNK_SIZE,
+              DataImageService::DATA_CHUNK_SIZE,
+              polygons,
+              point_class::SCALE,
+              parent_class::QUALITY_CALC_METHOD,
+              parent_class::QUALITY_CALC_VALUE
+            )
+            added_params = extra_params.map do |param|
+              case param
+              when :transit_type
+                transit_type
+              end
+            end
+            image_service.save(
+              added_params,
+              current_sector.lat_sector,
+              current_sector.lng_sector,
+              value_image
+            )
+            puts "After image save"
+          end
+        end
+        current_sector = current_sector.next_lng_sector
+        @lng_sector = current_sector.lng_sector
+        build_status.update!(
+          current_lat:current_sector.south,
+          current_lat_sector:@lat_sector,
+          percent:calc_grocery_store_quality_map_point_percent
+        )
+      end
+      @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
+      break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
+      current_sector = MapSector.from_sectors(
+        DataImageService::DATA_CHUNK_SIZE,
+        @lat_sector,
+        @south_west_sector.lng_sector
+      )
+      @lng_sector = current_sector.lng_sector
+      build_status.parent_status.update!(
+        current_lat:current_sector.south,
+        current_lat_sector:@lat_sector
+      )
+      build_status.update!(
+        current_lat:current_sector.south,
+        current_lat_sector:@lat_sector,
+        percent:calc_grocery_store_quality_map_point_percent
+      )
+    end
     puts "Building Initial Points Complete"
     build_status.update!(percent:100, state:'waiting-subsample')
     sleep(5) until build_status.reload.parent_status.state == 'subsample'
