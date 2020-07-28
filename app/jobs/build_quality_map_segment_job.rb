@@ -80,8 +80,10 @@ class BuildQualityMapSegmentJob < ApplicationJob
           if point_type == 'GroceryStoreQualityMapPoint'
             travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
           end
+          puts "Querying"
           polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name).
           all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)
+          puts "Retrieved query"
           # skip to next block if none found
           unless polygons.blank?
             value_image = QualityMapImage.quality_of_points_image(
@@ -107,7 +109,6 @@ class BuildQualityMapSegmentJob < ApplicationJob
               current_sector.lng_sector,
               value_image
             )
-            puts "After image save"
           end
         end
         current_sector = current_sector.next_lng_sector

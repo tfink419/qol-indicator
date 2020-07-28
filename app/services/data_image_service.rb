@@ -30,8 +30,8 @@ class DataImageService
     dir = "#{@zoom}/#{@map_point_type}/#{extra_details.join("/")}/#{lat_sector}".gsub(/[\/]+/, '/')
     filename = "#{lng_sector}.png"
     if USE_AWS_S3
-      puts "Sending to bucket"
-      @s3_client.put_object(bucket: @bucket, key: "#{dir}/#{filename}", body:data)
+#      @s3_client.put_object(bucket: @bucket, key: "#{dir}/#{filename}", body:data)
+      put "It would have normally saved"
     else
       puts "Saving file"
       dir = "#{Rails.root}/quality_map_image_data/#{dir}"
