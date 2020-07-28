@@ -1,9 +1,9 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 3e2c2f9a81cafc8962b920a833b3049ba96b42e3
+  revision: 74aa7c669c64f97569b69298ffd9bad496fdfd2a
   branch: data-as-image
   specs:
-    quality_map_image (0.7.2)
+    quality_map_image (0.7.3)
       gradient (~> 0.5.1)
       ruby-vips
 
