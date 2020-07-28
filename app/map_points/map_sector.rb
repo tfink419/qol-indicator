@@ -13,7 +13,7 @@ class MapSector
     scale = (2**(10-zoom))
     new(
       size,
-      MapPoint.from_steps(lat_sector*scale*size-MapPoint::MAX, lng_sector*scale*size-MapPoint::MAX),
+      MapPoint.from_steps(lat_sector*scale*size-MapPoint::PRECISION, lng_sector*scale*size-MapPoint::PRECISION),
       zoom
     )
   end
@@ -35,11 +35,11 @@ class MapSector
   end
 
   def lat_sector
-    @lat_sector ||= ((@south_west_point.lat.step+MapPoint::MAX)/(@size*@scale)).round
+    @lat_sector ||= ((@south_west_point.lat.step+MapPoint::PRECISION)/(@size*@scale)).round
   end
 
   def lng_sector
-    @lng_sector ||= ((@south_west_point.lng.step+MapPoint::MAX)/(@size*@scale)).round
+    @lng_sector ||= ((@south_west_point.lng.step+MapPoint::PRECISION)/(@size*@scale)).round
   end
 
   def south

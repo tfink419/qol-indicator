@@ -3,8 +3,6 @@ class MapPoint
   MAX_VALUE = 180.0 # The highest lat or long number possible
   STEP = MAX_VALUE/PRECISION
   STEP_INVERT = PRECISION/MAX_VALUE
-  MAX = MAX_VALUE*PRECISION
-  MIN = 0-MAX_VALUE*PRECISION
   SCALE = 1 # This is fine if the value being quantified is in whole numbers (e.g. population)
   attr_accessor :lat
   attr_accessor :lng

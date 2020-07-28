@@ -9,8 +9,8 @@ class MapPoint
     end
 
     def initialize(step)
-      step = step-MAX if step > MAX
-      step = MIN-step if step < MIN
+      step = step-PRECISION if step > PRECISION
+      step = PRECISON*2+step if step < 0-PRECISION
       @step = step.to_i
     end
 
@@ -31,7 +31,7 @@ class MapPoint
     end
 
     def floor(precision)
-      self.class.new((@step/precision)*precision)
+      self.class.new((@step/precision.to_f).floor*precision)
     end
 
     def ceil(precision)

@@ -1,9 +1,11 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: bb5550c5a7d55ac0ec938d4bc669f69671e5c674
+  revision: 127ffbc44d56fd42e00b5c47864bc8f2f52d4e77
   branch: data-as-image
   specs:
-    quality_map_image (0.6.6)
+    quality_map_image (0.6.8)
+      gradient (~> 0.5.1)
+      ruby-vips
 
 GEM
   remote: https://rubygems.org/
@@ -90,6 +92,7 @@ GEM
     chromedriver-helper (2.1.1)
       archive-zip (~> 0.10)
       nokogiri (~> 1.8)
+    color (1.8)
     concurrent-ruby (1.1.6)
     connection_pool (2.2.3)
     crass (1.0.6)
@@ -97,7 +100,7 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     erubi (1.9.0)
     erubis (2.7.0)
-    excon (0.75.0)
+    excon (0.76.0)
     execjs (2.7.0)
     ffi (1.13.1)
     globalid (0.4.2)
@@ -107,6 +110,9 @@ GEM
       httpclient (~> 2.7, >= 2.7.1)
       json (>= 1.7.5)
       ruby-hmac (~> 0.4.0)
+    gradient (0.5.1)
+      color (~> 1.8)
+      nokogiri (~> 1.6)
     hashie (3.6.0)
     heroics (0.1.1)
       erubis (~> 2.0)
@@ -204,6 +210,8 @@ GEM
       netrc (~> 0.8)
     retries (0.0.5)
     ruby-hmac (0.4.0)
+    ruby-vips (2.0.17)
+      ffi (~> 1.9)
     ruby_dep (1.5.0)
     rubyzip (2.3.0)
     selenium-webdriver (3.142.7)
