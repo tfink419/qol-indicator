@@ -31,7 +31,7 @@ class DataImageService
     filename = "#{lng_sector}.png"
     if USE_AWS_S3
 #      @s3_client.put_object(bucket: @bucket, key: "#{dir}/#{filename}", body:data)
-      put "It would have normally saved"
+      puts "It would have normally saved"
     else
       puts "Saving file"
       dir = "#{Rails.root}/quality_map_image_data/#{dir}"
