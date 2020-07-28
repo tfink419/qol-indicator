@@ -84,7 +84,7 @@ const AdminNav = ({buildQualityMapStatuses}) => {
             <ListItemIcon><MapIcon /></ListItemIcon>
             <ListItemText primary={'Administrate Map'} />
           </ListItem>
-          <ListItem onClick={() => history.push('/admin/build-quality_map')} selected={currentPath === '/admin/build-quality_map'} button>
+          <ListItem onClick={() => history.push('/admin/build-quality-map')} selected={currentPath === '/admin/build-quality-map'} button>
             <ListItemIcon><BuildIcon /></ListItemIcon>
             <ListItemText primary={'Build Quality Map'} />
             <ListItemSecondaryAction>

@@ -5,15 +5,17 @@ import { connect } from 'react-redux'
 
 import { getMapDataQualityMap, getMapDataPoint } from '../fetch'
 import { infoWindowOpened } from '../actions/info-windows'
-import { getSectors, getSectorBounds } from '../models/map-sector'
+import { getSectors, getSectorBounds, fixZoom } from '../models/map-sector'
 
 import PointDataPopup from '../components/PointDataPopup'
 
 const QualityMapLayer = ({ map, currentLocation, mapPreferences, infoWindowOpened, infoWindows }) => {
   const prevAbortControllers = React.useRef([])
   const prevOverlays = React.useRef([])
+  const loadedSectors = React.useRef([])
   const mapPreferencesRef = React.useRef(mapPreferences)
   const mapRef = React.useRef(map)
+  const prevZoom = React.useRef(currentLocation.zoom);
   let currentPointDataInfoWindowRef = React.useRef(null);
 
   const handleClick = (event) => {
@@ -38,29 +40,37 @@ const QualityMapLayer = ({ map, currentLocation, mapPreferences, infoWindowOpene
     if(!map) {
       return;
     }
-    let zoom = currentLocation.zoom-4;
-    prevAbortControllers.current.forEach(abortController => abortController.abort());
-    prevOverlays.current.forEach(overlay => overlay.setMap(null));
-    prevAbortControllers.current = [];
-    prevOverlays.current = [];
+    let zoom = fixZoom(currentLocation.zoom);
+    if(mapPreferencesRef.current.changedAndNotLoaded || prevZoom.current != zoom) {
+      loadedSectors.current = [];
+      prevOverlays.current.forEach(overlay => overlay.setMap(null));
+      prevOverlays.current = [];
+      prevAbortControllers.current.forEach(abortController => abortController.abort());
+      prevAbortControllers.current = [];
+    }
+    mapPreferencesRef.current.changedAndNotLoaded = false;
+    prevZoom.current = zoom;
 
     getSectors(currentLocation.southWest, currentLocation.northEast, zoom).forEach(sector =>{
-      let controller = new AbortController();
-      prevAbortControllers.current.push(controller);
-      getMapDataQualityMap(sector[0], sector[1], zoom, mapPreferences.preferences, controller.signal)
-      .then(responseBlob => {
-        let url = URL.createObjectURL(responseBlob);
-        let bounds = getSectorBounds(sector[0], sector[1], zoom);
-        let qualityMapOverlay = new google.maps.GroundOverlay(url, bounds);
-        qualityMapOverlay.addListener('click', handleClick);
-        qualityMapOverlay.setMap(map);
-        prevOverlays.current.push(qualityMapOverlay);
-      })
-      .catch(error => {
-        if(error.name != 'AbortError') {
-          throw error;
-        }
-      });
+      if(_.every(loadedSectors.current, (loadedSector) => (loadedSector[0] != sector[0] || loadedSector[1] != sector[1]))) {
+        loadedSectors.current.push(sector);
+        let controller = new AbortController();
+        prevAbortControllers.current.push(controller);
+        getMapDataQualityMap(sector[0], sector[1], zoom, mapPreferences.preferences, controller.signal)
+        .then(responseBlob => {
+          let url = URL.createObjectURL(responseBlob);
+          let bounds = getSectorBounds(sector[0], sector[1], zoom);
+          let qualityMapOverlay = new google.maps.GroundOverlay(url, bounds);
+          qualityMapOverlay.addListener('click', handleClick);
+          qualityMapOverlay.setMap(map);
+          prevOverlays.current.push(qualityMapOverlay);
+        })
+        .catch(error => {
+          if(error.name != 'AbortError') {
+            throw error;
+          }
+        });
+      }
     })
   }, 1000)).current;
 
@@ -73,6 +83,7 @@ const QualityMapLayer = ({ map, currentLocation, mapPreferences, infoWindowOpene
 
   React.useEffect(() => {
     mapPreferencesRef.current = mapPreferences
+    mapPreferencesRef.current = { ...mapPreferences, changedAndNotLoaded:true };
   }, [mapPreferences]);
   React.useEffect(() => {
     mapRef.current = map

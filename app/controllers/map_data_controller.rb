@@ -24,8 +24,8 @@ class MapDataController < ApplicationController
     if zoom > 10
       zoom = 10
     end
-    if zoom < 10
-      zoom = 10
+    if zoom < 1
+      zoom = 1
     end
 
     send_data QualityMapService.new(lat_sector, lng_sector, zoom, map_preferences).generate

@@ -33,7 +33,7 @@ export default ({match}) => {
       <Route path={`${match.path}/grocery_stores`} exact component={GroceryStoreTable}/>
       <Route path={`${match.path}/grocery_stores/upload`} exact component={GroceryStoreUploadForm}/>
       <Route path={`${match.path}/map`} exact component={AdminMapContainer}/>
-      <Route path={`${match.path}/build-quality_map`} exact component={BuildQualityMapPage}/>
+      <Route path={`${match.path}/build-quality-map`} exact component={BuildQualityMapPage}/>
     </div>
     <FlashNotice />
   </React.Fragment>
