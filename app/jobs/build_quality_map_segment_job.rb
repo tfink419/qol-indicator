@@ -84,21 +84,6 @@ class BuildQualityMapSegmentJob < ApplicationJob
           all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)
           # skip to next block if none found
           unless polygons.blank?
-            puts "*"*100
-            puts "Retrieving image, using #{polygons.length} polygons"
-            puts "Sending"
-
-            pp MapPoint::STEP_INVERT
-            pp current_sector.south_step
-            pp current_sector.west_step
-            pp DataImageService::DATA_CHUNK_SIZE
-            pp DataImageService::DATA_CHUNK_SIZE
-            pp point_class::SCALE
-            pp parent_class::QUALITY_CALC_METHOD
-            pp parent_class::QUALITY_CALC_VALUE
-
-
-            puts "*"*100
             value_image = QualityMapImage.quality_of_points_image(
               MapPoint::STEP_INVERT,
               current_sector.south_step,
