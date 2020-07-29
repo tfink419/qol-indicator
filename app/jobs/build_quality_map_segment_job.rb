@@ -80,12 +80,25 @@ class BuildQualityMapSegmentJob < ApplicationJob
           if point_type == 'GroceryStoreQualityMapPoint'
             travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
           end
-          puts "Querying"
           polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name).
           all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)
-          puts "Retrieved query"
           # skip to next block if none found
           unless polygons.blank?
+            puts "*"*100
+            puts "Retrieving image, using #{polygons.length} polygons"
+            puts "Sending"
+
+            pp MapPoint::STEP_INVERT
+            pp current_sector.south_step
+            pp current_sector.west_step
+            pp DataImageService::DATA_CHUNK_SIZE
+            pp DataImageService::DATA_CHUNK_SIZE
+            pp point_class::SCALE
+            pp parent_class::QUALITY_CALC_METHOD
+            pp parent_class::QUALITY_CALC_VALUE
+
+
+            puts "*"*100
             value_image = QualityMapImage.quality_of_points_image(
               MapPoint::STEP_INVERT,
               current_sector.south_step,
@@ -97,6 +110,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
               parent_class::QUALITY_CALC_METHOD,
               parent_class::QUALITY_CALC_VALUE
             )
+            puts "Image retrieved"
             added_params = extra_params.map do |param|
               case param
               when :transit_type
@@ -114,8 +128,6 @@ class BuildQualityMapSegmentJob < ApplicationJob
         current_sector = current_sector.next_lng_sector
         @lng_sector = current_sector.lng_sector
         build_status.update!(
-          current_lat:current_sector.south,
-          current_lat_sector:@lat_sector,
           percent:calc_grocery_store_quality_map_point_percent
         )
       end
