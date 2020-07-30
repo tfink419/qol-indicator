@@ -1,10 +1,10 @@
 const SECTOR_SIZE = 256;
-const PRECISION = Math.pow(2,19);
+const PRECISION = Math.pow(2,20);
 const MAX_VALUE = 180.0; //The highest lat or long number possible
 const STEP = MAX_VALUE/PRECISION;
 const STEP_INVERT = PRECISION/MAX_VALUE;
 export const getSectors = (southWest, northEast, zoom) => {
-  let scale = Math.pow(2,10-zoom);
+  let scale = Math.pow(2,11-zoom);
   let southWestSector = {
     latSector: coordFloorToSector(southWest[0], scale),
     lngSector: coordFloorToSector(southWest[1], scale)
@@ -23,7 +23,7 @@ export const getSectors = (southWest, northEast, zoom) => {
 }
 
 export const getSectorBounds = (lat_sector, lng_sector, zoom) => {
-  let scale = Math.pow(2,10-zoom);
+  let scale = Math.pow(2,11-zoom);
   let amount = SECTOR_SIZE*scale;
   return {
     south:(lat_sector-PRECISION/amount)*amount/STEP_INVERT,
@@ -44,9 +44,9 @@ const coordCeilToSector = (coord, scale) => {
 }
 
 export const fixZoom = zoom => {
-  zoom = zoom - 3;
-  if(zoom > 10) {
-    zoom = 10;
+  zoom = zoom - 2;
+  if(zoom > 11) {
+    zoom = 11;
   }
   if(zoom < 0) {
     zoom = 0;

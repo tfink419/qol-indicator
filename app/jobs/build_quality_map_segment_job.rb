@@ -89,13 +89,11 @@ class BuildQualityMapSegmentJob < ApplicationJob
               current_sector.south_step,
               current_sector.west_step,
               DataImageService::DATA_CHUNK_SIZE,
-              DataImageService::DATA_CHUNK_SIZE,
               polygons,
               point_class::SCALE,
               parent_class::QUALITY_CALC_METHOD,
               parent_class::QUALITY_CALC_VALUE
             )
-            puts "Image retrieved"
             added_params = extra_params.map do |param|
               case param
               when :transit_type

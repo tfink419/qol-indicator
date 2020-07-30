@@ -1,5 +1,5 @@
 class MapPoint
-  PRECISION = 2**19
+  PRECISION = 2**20
   MAX_VALUE = 180.0 # The highest lat or long number possible
   STEP = MAX_VALUE/PRECISION
   STEP_INVERT = PRECISION/MAX_VALUE
