@@ -146,7 +146,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
     @lng_sector = current_sector.lng_sector
 
     puts 'Subsampling'
-    (1..@south_west_sector.zoom-1).reverse_each do |zoom|
+    (0...@south_west_sector.zoom).reverse_each do |zoom|
       @south_west_sector = @south_west_sector.zoom_out
       @north_east_sector = @north_east_sector.zoom_out
       build_status.update!(
@@ -210,7 +210,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       end
 
       build_status.update!(percent:100, state:'waiting-subsample')
-      until zoom == 1 || (build_status.reload.parent_status.state == 'subsample' &&
+      until zoom == 0 || (build_status.reload.parent_status.state == 'subsample' &&
         build_status.parent_status.current_zoom == zoom-1)
         sleep(5)
       end

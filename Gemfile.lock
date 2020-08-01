@@ -1,6 +1,6 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 47cd777cb8c5adc4481eebb8fdc9cce208a6b9a0
+  revision: a5b13af334c1d6725ff48373551251391db4c929
   branch: data-as-image
   specs:
     quality_map_image (0.7.5)
@@ -59,7 +59,7 @@ GEM
       io-like (~> 0.3.0)
     arel (9.0.0)
     aws-eventstream (1.1.0)
-    aws-partitions (1.347.0)
+    aws-partitions (1.349.0)
     aws-sdk-core (3.104.3)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)

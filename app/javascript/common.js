@@ -44,3 +44,6 @@ export const defaultPreferences = {
   grocery_store_quality_ratio:50,
   census_tract_poverty_ratio:50
 };
+
+let infoWindowId = 0;
+export const incrementInfoWindowId = () => infoWindowId++

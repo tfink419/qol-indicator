@@ -1,7 +1,7 @@
 class MapSector
   attr_reader :zoom
 
-  def initialize(size, a_point, zoom = 11)
+  def initialize(size, a_point, zoom = 12)
     @size = size
     @south_west_point = a_point.floor(@size)
     @zoom = zoom
@@ -9,7 +9,7 @@ class MapSector
     @north_east_point = MapPoint.new(@south_west_point.lat+@size*@scale-1, @south_west_point.lng+@size*@scale-1)
   end
 
-  def self.from_sectors(size, lat_sector, lng_sector, zoom = 11)
+  def self.from_sectors(size, lat_sector, lng_sector, zoom = 12)
     scale = scale_from_zoom(zoom)
     new(
       size,
@@ -91,6 +91,6 @@ class MapSector
   private
 
   def self.scale_from_zoom(zoom)
-    (2**(11-zoom))
+    2**(12-zoom)
   end
 end

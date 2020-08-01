@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { CircularProgress, IconButton, makeStyles } from '@material-ui/core/';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -6,7 +7,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import DeleteDialog from './DeleteDialog'
 import UpdateGroceryStoreDialog from './UpdateGroceryStoreDialog'
 
-import { getGroceryStore, deleteAdminGroceryStore } from 'fetch';
+import { deleteAdminGroceryStore } from 'fetch';
 
 const cityZipPrint = (city, state, zip) => {
   if(!city && state && zip) {
@@ -29,20 +30,9 @@ const useStyles = makeStyles({
   }
 });
 
-export default ({groceryStoreId, open, isAdmin, onGroceryStoreChange}) => {
+const GroceryStorePopup = ({data, user, onGroceryStoreChange}) => {
   const classes = useStyles();
-  let [groceryStore, setGroceryStore] = React.useState(null);
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
-
-  const loadGroceryStore = () => {
-    if(open) {
-      setGroceryStore(null);
-      getGroceryStore(groceryStoreId)
-      .then(response => {
-        setGroceryStore(response.grocery_store);
-      });
-    }
-  }
 
   const handleCloseDialogs = (groceryStoreChange) => {
     setCurrentDialogOpen(null);
@@ -51,31 +41,24 @@ export default ({groceryStoreId, open, isAdmin, onGroceryStoreChange}) => {
     }
   }
 
-  const handleOpenDialog = (type, groceryStore) => {
-    setCurrentDialogOpen(type);
-  }
-
-  React.useEffect(loadGroceryStore, [open])
-
   return (
-      groceryStore ?
+      data ?
       <React.Fragment>
-        {groceryStore.name} <br/>
-        {groceryStore.address} <br/>
-        {cityZipPrint(groceryStore.city, groceryStore.state, groceryStore.zip)}
+        {data.grocery_store.name} <br/>
+        {data.grocery_store.address} <br/>
+        {cityZipPrint(data.grocery_store.city, data.grocery_store.state, data.grocery_store.zip)}
         <br />
-        {
-          isAdmin &&
+        {user.is_admin &&
           <React.Fragment>
-            <IconButton onClick={() => handleOpenDialog('update', groceryStore)}>
+            <IconButton onClick={() => setCurrentDialogOpen('update')}>
               <EditIcon className={classes.editIcon} />
             </IconButton>
-            <IconButton onClick={() => handleOpenDialog('delete', groceryStore)}>
+            <IconButton onClick={() => setCurrentDialogOpen('delete')}>
               <DeleteIcon className={classes.deleteIcon}/>
             </IconButton>
-            <DeleteDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} objectId={groceryStore.id} 
-              objectName={`${groceryStore.name} at ${groceryStore.address}`} objectType="Grocery Store"  deleteAction={deleteAdminGroceryStore} />
-            <UpdateGroceryStoreDialog open={currentDialogOpen == 'update'} onClose={handleCloseDialogs} groceryStoreId={groceryStore.id} />
+            <DeleteDialog open={currentDialogOpen == 'delete'} onClose={handleCloseDialogs} objectId={data.grocery_store.id} 
+              objectName={`${data.grocery_store.name} at ${data.grocery_store.address}`} objectType="Grocery Store"  deleteAction={deleteAdminGroceryStore} />
+            <UpdateGroceryStoreDialog open={currentDialogOpen == 'update'} onClose={handleCloseDialogs} groceryStoreId={data.grocery_store.id} />
           </React.Fragment>
         }
       </React.Fragment>
@@ -83,3 +66,9 @@ export default ({groceryStoreId, open, isAdmin, onGroceryStoreChange}) => {
       <CircularProgress/>
     )
 }
+
+const mapStateToProps = state => ({
+  user: state.user
+})
+
+export default connect(mapStateToProps) (GroceryStorePopup);

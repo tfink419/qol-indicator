@@ -21,8 +21,8 @@ class MapDataController < ApplicationController
 
     zoom = params[:zoom].to_i
 
-    if zoom > 11
-      zoom = 11
+    if zoom > 12
+      zoom = 12
     end
     if zoom < 1
       zoom = 1

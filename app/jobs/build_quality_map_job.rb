@@ -79,7 +79,7 @@ class BuildQualityMapJob < ApplicationJob
 
     return if error_found
 
-    (1...@south_west_sector.zoom).reverse_each do |zoom|
+    (0...@south_west_sector.zoom).reverse_each do |zoom|
       @south_west_sector = @south_west_sector.zoom_out
       @north_east_sector = @north_east_sector.zoom_out
       current_sector = @south_west_sector

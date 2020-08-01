@@ -6,40 +6,37 @@ import { Provider, useStore } from 'react-redux'
 
 import GroceryStorePopup from '../components/GroceryStorePopup';
 
-import { infoWindowOpened } from '../actions/info-windows'
-import { getMapDataGroceryStores } from '../fetch';
+import { incrementInfoWindowId } from '../common'
+import { infoWindowOpen, infoWindowLoaded } from '../actions/info-windows'
+import { getMapDataGroceryStores, getGroceryStore } from '../fetch';
 
 const MAX_STORES_TO_HOLD = 10000;
 
 const ICON_BASE_URL = 'https://my-qoli-icons.s3-us-west-1.amazonaws.com/';
 
-const GroceryStoreLayer = ({ map, currentLocation, isAdmin, mapPreferences, infoWindows }) => {
+const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpen, infoWindowLoaded, infoWindows }) => {
   const groceryStores = React.useRef([]);
   const justRetrievedGroceryStores = React.useRef([]);
   const store = useStore();
   const prevAbortController = React.useRef(null)
 
-  const closeOtherWindows = (groceryStoreId) => {
-    groceryStores.current.forEach((groceryStore) => {
-      if(groceryStore.groceryStore[0] != groceryStoreId) {
-        groceryStore.infoWindow.close();
-      }
-    });
-  }
-
-  const closeAllWindows = () => {
-    groceryStores.current.forEach((groceryStore) => {
-      groceryStore.infoWindow.close();
-    });
-  }
-
-
   const removeAllMarkers = () => {
     groceryStores.current.forEach(groceryStore => {
       groceryStore.marker.setMap(null);
-      groceryStore.infoWindow.close();
     });
   }
+
+  const onGroceryStoreChange = (id) => {
+    justRetrievedGroceryStores.current = justRetrievedGroceryStores.current.filter(groceryStore => groceryStore != id);
+    groceryStores.current = groceryStores.current.filter(groceryStore => {
+      if(groceryStore.groceryStore[0] == id) {
+        groceryStore.marker.setMap(null);
+        return false;
+      }
+      return true;
+    });
+    loadMapData(map, currentLocation)
+  };
 
   const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences) => {
     if(!map) {
@@ -83,34 +80,14 @@ const GroceryStoreLayer = ({ map, currentLocation, isAdmin, mapPreferences, info
             icon: icon
           });
 
-          let infoWindowPlaceholder = document.createElement('div');
-
-          let infoWindow = new window.google.maps.InfoWindow({
-            content: infoWindowPlaceholder
-          });
-
-          const onGroceryStoreChange = (id) => {
-            justRetrievedGroceryStores.current = justRetrievedGroceryStores.current.filter(groceryStore => groceryStore != id);
-            groceryStores.current = groceryStores.current.filter(groceryStore => {
-              if(groceryStore.groceryStore[0] == id) {
-                groceryStore.marker.setMap(null);
-                groceryStore.infoWindow.close();
-                return false;
-              }
-              return true;
-            });
-            loadMapData(map, currentLocation)
-          };
-          
           marker.addListener('click', () => {
-            infoWindow.open(map, marker);
-            ReactDOM.render(<Provider store={store}><GroceryStorePopup groceryStoreId={groceryStore[0]} open={true} isAdmin={isAdmin} onGroceryStoreChange={onGroceryStoreChange}/></Provider>, infoWindowPlaceholder);
-            closeOtherWindows(groceryStore[0]);
+            let id = incrementInfoWindowId();
+            infoWindowOpen('grocery-store', id, null, marker);
+            getGroceryStore(groceryStore[0])
+            .then(response => infoWindowLoaded(id, response));
           });
           
-          infoWindow.addListener('closeclick', () => ReactDOM.render(<div/>, infoWindowPlaceholder));
-
-          groceryStores.current.push({ marker, groceryStore, infoWindow });
+          groceryStores.current.push({ marker, groceryStore });
         })
         if(groceryStores.current.length > MAX_STORES_TO_HOLD) {
           let amountToDelete = groceryStores.current.length - MAX_STORES_TO_HOLD;
@@ -139,12 +116,6 @@ const GroceryStoreLayer = ({ map, currentLocation, isAdmin, mapPreferences, info
     }
   }, 500)).current;
 
-  React.useEffect(() => {
-    if(infoWindows.activeInfoWindow && infoWindows.activeInfoWindow.windowInfoType == 'grocery-store') {
-      closeAllWindows();
-    }
-  }, [infoWindows])
-
   React.useEffect(() => loadMapData(map, currentLocation, mapPreferences), [map, currentLocation, mapPreferences])
 
   return (
@@ -152,12 +123,9 @@ const GroceryStoreLayer = ({ map, currentLocation, isAdmin, mapPreferences, info
   );
 }
 
-const mapStateToProps = state => ({
-  infoWindows: state.infoWindows
-})
-
 const mapDispatchToProps = {
-  infoWindowOpened
+  infoWindowOpen,
+  infoWindowLoaded
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GroceryStoreLayer)
+export default connect(null, mapDispatchToProps)(GroceryStoreLayer)

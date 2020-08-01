@@ -6,9 +6,12 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { getMapPreferences } from '../fetch'
 import { updateMapPreferences } from "../actions/map-preferences";
 
+import InfoWindowManager from './InfoWindowManager'
 import QualityMapLayer from './QualityMapLayer'
 import GroceryStoreLayer from './GroceryStoreLayer'
 import MapLegend from "../components/MapLegend";
+import MapSearchBox from "../components/MapSearchBox";
+import { paramify } from '../fetch'
 
 const loader = new Loader({
   apiKey: GOOGLE_WEB_KEY,
@@ -36,10 +39,11 @@ const startLocation = {
   northEast:[39.765, -104.927]
 }
 
-const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = false}) => {
+const MapContainer = ({mapPreferences, user, updateMapPreferences}) => {
   const classes = useStyles();
   let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
   const currentLocationRef = React.useRef(currentLocation);
+  const mapPreferencesRef = React.useRef(mapPreferences);
   let [map, setMap] = React.useState(null);
   const mapRef = React.useState(map);
   const mapContainer = React.useRef(null);
@@ -76,7 +80,7 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = fals
       mapTypeControl: false,
       mapTypeId: 'roadmap',
       zoom: currentLocation.zoom,
-      minZoom: 7,
+      minZoom: 0,
       maxZoom: 16
     };
     loader
@@ -88,18 +92,25 @@ const MapContainer = ({mapPreferences, updateMapPreferences, isAdminLayer = fals
     })
   }
 
+  React.useEffect(() => {
+    mapPreferencesRef.current = mapPreferences;
+  }, [mapPreferences])
+
   React.useEffect(loadMap, [])
 
   return (
     <div className={classes.mapContainer} ref={mapContainer}>
       <QualityMapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
-      <GroceryStoreLayer map={map} currentLocation={currentLocation} mapPreferences={mapPreferences} isAdmin={isAdminLayer} />
-      { !isAdminLayer && <MapLegend map={map}/> }
+      <GroceryStoreLayer map={map} currentLocation={currentLocation} mapPreferences={mapPreferences} />
+      <MapSearchBox map={map} />
+      { !user.is_admin && <MapLegend map={map}/> }
+      <InfoWindowManager map={map} />
     </div>
   )};
     
 const mapStateToProps = state => ({
-  mapPreferences: state.mapPreferences
+  mapPreferences: state.mapPreferences,
+  user: state.user
 })
 
 const mapDispatchToProps = {
