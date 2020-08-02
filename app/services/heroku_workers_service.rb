@@ -5,11 +5,12 @@ class HerokuWorkersService
   HEROKU_PROC_NAME = 'worker'
   NUM_WORKERS = (ENV['NUM_HEATMAP_THREADS'] || 8).to_i + 1
 
-  def initialize
+  def initialize(num_workers = NUM_WORKERS)
+    @num_workers = num_workers
     @heroku = PlatformAPI.connect_oauth(ENV['HEROKU_TOKEN'])
   end
-  def start(num_workers = NUM_WORKERS)
-    @heroku.formation.update(HEROKU_APP_NAME, HEROKU_PROC_NAME, { quantity: num_workers })
+  def start
+    @heroku.formation.update(HEROKU_APP_NAME, HEROKU_PROC_NAME, { quantity: @num_workers })
   end
 
   def stop
