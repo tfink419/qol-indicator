@@ -15,14 +15,14 @@ class GroceryStore < ApplicationRecord
   validates :long, :presence => true, :inclusion => -180..180
   validates :zip, :inclusion => { :in => [*0..99999, nil], :message => 'is not a valid zip code.' }
 
-  validates :quality, :inclusion => 0..10
+  validates :food_quantity, :inclusion => 0..10
 
   has_many :isochrone_polygons, as: :isochronable
 
   before_validation do
-    self.address = self.address.strip.titleize
-    self.city = self.city.strip.titleize
-    self.state = self.state.upcase
+    self.address = self.address.strip.titleize if self.address
+    self.city = self.city.strip.titleize if self.city
+    self.state = self.state.upcase if self.state
   end
 
   NUM_TRANSIT_TYPES = 9
@@ -58,7 +58,16 @@ class GroceryStore < ApplicationRecord
   def only_coordinates_invalid?
     self.valid?
     self.attribute_names.each do |attribute_name|
-      next if attribute_name == 'lat' or attribute_name == 'long'
+      next if %w(lat long).include? attribute_name
+      return false unless self.errors[attribute_name].blank?
+    end
+    true
+  end
+
+  def only_needs_address?
+    self.valid?
+    self.attribute_names.each do |attribute_name|
+      next if %w(address city state zip).include? attribute_name
       return false unless self.errors[attribute_name].blank?
     end
     true
@@ -67,7 +76,7 @@ class GroceryStore < ApplicationRecord
   QUALITY_CALC_METHOD = 'LogExpSum'
   QUALITY_CALC_VALUE = 1.7
 
-  def public_attributes 
+  def public_attributes
     {
       :id => id,
       :name => name,
@@ -77,7 +86,7 @@ class GroceryStore < ApplicationRecord
       :zip => zip,
       :lat => lat,
       :long => long,
-      :quality => quality
+      :food_quantity => food_quantity
     }
   end
 end

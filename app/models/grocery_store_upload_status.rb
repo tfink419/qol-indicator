@@ -1,8 +1,7 @@
 class GroceryStoreUploadStatus < ApplicationRecord
-  VALID_STATES = ['initialized', 'received', 'parsing-csv', 'processing', 'complete']
+  VALID_STATES = ['initialized', 'received', 'overpass', 'processing', 'complete']
 
   validates :percent, :presence => true
-  validates :filename, :presence => true
   validates :state, :presence => true,
     :inclusion => { :in => VALID_STATES, :message => 'is not a valid state.' }
 

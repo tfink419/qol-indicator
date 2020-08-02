@@ -4,15 +4,15 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Paper, Input, Button, CircularProgress, Slider, Box, LinearProgress } from '@material-ui/core'
 
 import { flashMessage } from '../actions/messages'
-import { setUploadCsvStatusReloadIntervalId, loadedUploadCsvStatuses, loadedCurrentUploadCsvStatus, 
-  updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
-import { postAdminGroceryStoreUploadCsv, getAdminGroceryStoreUploadCsvStatuses, getAdminGroceryStoreUploadCsvStatus } from '../fetch'
+import { setGroceryStoreUploadStatusReloadIntervalId, loadedGroceryStoreUploadStatuses, loadedCurrentGroceryStoreUploadStatus, 
+  updateUploadStatusesPage, updateUploadStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
+import { postAdminGroceryStoreUpload, getAdminGroceryStoreUploadStatuses, getAdminGroceryStoreUploadStatus } from '../fetch'
 import { qualityMarks } from '../common'
 
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',
   'received': 'Job Received By Sidekiq',
-  'parsing-csv': 'Parsing CSV File',
+  'overpass': 'Retrieving Overpass Response',
   'processing': 'Processing Grocery Stores',
   'complete': 'Completed'
 }
@@ -28,24 +28,17 @@ const useStyles = makeStyles({
 
 const preventDefault = (event) => event.preventDefault();
 
-const GroceryStoreUploadForm = ({ uploadCsvStatuses, setUploadCsvStatusReloadIntervalId, loadedUploadCsvStatuses, loadedCurrentUploadCsvStatus, 
-updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryStores, flashMessage }) => {
+const GroceryStoreUploadForm = ({ groceryStoreUploadStatuses, setGroceryStoreUploadStatusReloadIntervalId, loadedGroceryStoreUploadStatuses, loadedCurrentGroceryStoreUploadStatus, 
+updateGroceryStoreUploadStatusesPage, updateGroceryStoreUploadStatusesRowsPerPage, updatedGroceryStores, flashMessage }) => {
   const classes = useStyles();
-  const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = uploadCsvStatuses;
-
-  let [selectedFile, setSelectedFile] = React.useState(null);
-  let [quality, setQuality] = React.useState(5);
-
-  const handleFileSelect = (event) => {
-    setSelectedFile(event.target.files[0])
-  }
-
-  const handleFileSubmit = (event) => {
+  const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = groceryStoreUploadStatuses;
+  
+  const handleSubmit = (event) => {
     event.preventDefault();
-    postAdminGroceryStoreUploadCsv(selectedFile, quality)
+    postAdminGroceryStoreUpload()
     .then((response) => {
       flashMessage('info', response.message);
-      loadUploadCsvStatuses(true)
+      loadGroceryStoreUploadStatuses(true)
     })
     .catch(error => {
       if(error.status == 400 || error.status == 403) 
@@ -55,45 +48,45 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
     })
   }
 
-  const loadUploadCsvStatuses = (force) => {
+  const loadGroceryStoreUploadStatuses = (force) => {
     if(!loaded || force) {
-      getAdminGroceryStoreUploadCsvStatuses(page, rowsPerPage).then(response => {
+      getAdminGroceryStoreUploadStatuses(page, rowsPerPage).then(response => {
         if(response.status == 0) {
-          loadedUploadCsvStatuses(response.upload_csv_statuses.all, response.upload_csv_status_count, response.upload_csv_statuses.current)
+          loadedGroceryStoreUploadStatuses(response.grocery_store_upload_statuses.all, response.grocery_store_upload_status_count, response.grocery_store_upload_statuses.current)
         }
       })
     }
   }
   
-  const reloadCurrentUploadCsvStatus = () => {
-    getAdminGroceryStoreUploadCsvStatus(current.id).then(response => {
+  const reloadCurrentUploadStatus = () => {
+    getAdminGroceryStoreUploadStatus(current.id).then(response => {
       if(response.status == 0) {
-        loadedCurrentUploadCsvStatus(response.upload_csv_status)
+        loadedCurrentGroceryStoreUploadStatus(response.grocery_store_upload_status)
       }
     })
   }
   
   const clearStatusReloadInterval = () => {
     clearInterval(reloadIntervalId);
-    setUploadCsvStatusReloadIntervalId(null);
+    setGroceryStoreUploadStatusReloadIntervalId(null);
   }
   
-  React.useEffect(loadUploadCsvStatuses, [page, rowsPerPage]);
+  React.useEffect(loadGroceryStoreUploadStatuses, [page, rowsPerPage]);
   React.useEffect(() => {
     if(current && (current.state == 'complete' || current.error)) {
       clearStatusReloadInterval();
-      loadedCurrentUploadCsvStatus(null)
+      loadedCurrentGroceryStoreUploadStatus(null)
       if(current.error) {
         flashMessage('error', current.error);
       }
       updatedGroceryStores();
     }
     if(!reloadIntervalId && current) {
-      setUploadCsvStatusReloadIntervalId(setInterval(reloadCurrentUploadCsvStatus, 5000))
+      setGroceryStoreUploadStatusReloadIntervalId(setInterval(reloadCurrentUploadStatus, 5000))
     }
     else if(reloadIntervalId && !current) {
       clearInterval(reloadIntervalId);
-      setUploadCsvStatusReloadIntervalId(null);
+      setGroceryStoreUploadStatusReloadIntervalId(null);
     }
     // return () => {
     //   console.log('2should get here eventually')
@@ -104,12 +97,12 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
 
   return (
     <Paper>
-      <Typography variant="h3">Upload CSV</Typography>
+      <Typography variant="h3">Start Grocery Store Upload</Typography>
       { !loaded && <CircularProgress />}
       { loaded && current &&
         <React.Fragment>
           <Typography variant="h5">
-            Currently awaiting csv file '{current.filename}'
+            Currently Building Grocery Store
           </Typography>
           <Typography variant="subtitle1">
             Current State: <strong>{STATE_MAP[current.state]}</strong>
@@ -127,47 +120,23 @@ updateUploadCsvStatusesPage, updateUploadCsvStatusesRowsPerPage, updatedGroceryS
         </React.Fragment>
       }
       { loaded && !current &&
-        <React.Fragment>
-          <Typography variant="body1">Please Upload a CSV file containing the following fields with header names:</Typography>
-          <Typography variant="body2">Name, Address, City, State, Zip, Latitude (Optional), Longitude (Optional), Quality (Optional)</Typography>
-          <form onSubmit={handleFileSubmit}>
-            <Input type="file" onChange={handleFileSelect} inputProps={{accept:'.csv'}}/>
-            <Button type="submit" className={classes.buttonMargin}
-              color="primary"
-              variant="contained">
-              Upload CSV
-            </Button>
-            <Typography variant="subtitle1">
-              Default Quality
-            </Typography>
-            <Slider
-                className={classes.slider}
-                value={quality}
-                onChange={(e, val) => setQuality(val)}
-                step={1}
-                min={0}
-                max={10}
-                valueLabelDisplay="auto"
-                marks={qualityMarks}
-            />
-          </form>
-        </React.Fragment>
+        <Button variant="contained" onClick={handleSubmit}>Start</Button>
       }
     </Paper>
   )
 }
 
 const mapStateToProps = state => ({
-  uploadCsvStatuses: state.admin.uploadCsvStatuses
+  groceryStoreUploadStatuses: state.admin.groceryStoreUploadStatuses
 })
 
 const mapDispatchToProps = {
   flashMessage,
-  setUploadCsvStatusReloadIntervalId,
-  loadedUploadCsvStatuses,
-  loadedCurrentUploadCsvStatus,
-  updateUploadCsvStatusesPage,
-  updateUploadCsvStatusesRowsPerPage,
+  setGroceryStoreUploadStatusReloadIntervalId,
+  loadedGroceryStoreUploadStatuses,
+  loadedCurrentGroceryStoreUploadStatus,
+  updateUploadStatusesPage,
+  updateUploadStatusesRowsPerPage,
   updatedGroceryStores
 }
 

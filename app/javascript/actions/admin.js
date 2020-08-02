@@ -21,11 +21,11 @@ export const loadedBuildQualityMapStatuses = (buildQualityMapStatuses, count, cu
   currentBuildQualityMapStatus
 })
 
-export const loadedUploadCsvStatuses = (uploadCsvStatuses, count, currentUploadCsvStatus) => ({
-  type: 'LOADED_UPLOAD_CSV_STATUSES',
-  uploadCsvStatuses,
+export const loadedGroceryStoreUploadStatuses = (groceryStoreUploadStatuses, count, currentGroceryStoreUploadStatus) => ({
+  type: 'LOADED_GROCERY_STORE_UPLOAD_STATUSES',
+  groceryStoreUploadStatuses,
   count,
-  currentUploadCsvStatus
+  currentGroceryStoreUploadStatus
 })
 
 export const loadedCurrentBuildQualityMapStatus = (currentBuildQualityMapStatus) => ({
@@ -33,9 +33,9 @@ export const loadedCurrentBuildQualityMapStatus = (currentBuildQualityMapStatus)
   currentBuildQualityMapStatus
 })
 
-export const loadedCurrentUploadCsvStatus = (currentUploadCsvStatus) => ({
-  type: 'LOADED_CURRENT_UPLOAD_CSV_STATUS',
-  currentUploadCsvStatus
+export const loadedCurrentGroceryStoreUploadStatus = (currentGroceryStoreUploadStatus) => ({
+  type: 'LOADED_CURRENT_GROCERY_STORE_UPLOAD_STATUS',
+  currentGroceryStoreUploadStatus
 })
 
 export const setBuildQualityMapStatusReloadIntervalId = (reloadIntervalId) => ({
@@ -43,8 +43,8 @@ export const setBuildQualityMapStatusReloadIntervalId = (reloadIntervalId) => ({
   reloadIntervalId
 })
 
-export const setUploadCsvStatusReloadIntervalId = (reloadIntervalId) => ({
-  type: 'SET_UPLOAD_CSV_STATUS_RELOAD_INTERVAL_ID',
+export const setGroceryStoreUploadStatusReloadIntervalId = (reloadIntervalId) => ({
+  type: 'SET_GROCERY_STORE_UPLOAD_STATUS_RELOAD_INTERVAL_ID',
   reloadIntervalId
 })
 
@@ -111,24 +111,24 @@ export const updateBuildQualityMapStatusesRowsPerPage = (rowsPerPage) => ({
   rowsPerPage
 })
 
-export const updateUploadCsvStatusesPage = (page) => ({
-  type:'UPDATE_UPLOAD_CSV_STATUSES_PAGE',
+export const updateGroceryStoreUploadStatusesPage = (page) => ({
+  type:'UPDATE_GROCERY_STORE_UPLOAD_STATUSES_PAGE',
   page
 })
 
-export const updateUploadCsvStatusesRowsPerPage = (rowsPerPage) => ({
-  type:'UPDATE_UPLOAD_CSV_STATUSES_ROWSPERPAGE',
+export const updateGroceryStoreUploadStatusesRowsPerPage = (rowsPerPage) => ({
+  type:'UPDATE_GROCERY_STORE_UPLOAD_STATUSES_ROWSPERPAGE',
   rowsPerPage
 })
 
 export const csvProcessing = (fileType, fileName) => ({
-  type: 'CSV_PROCESSING',
+  type: 'GROCERY_STORE_PROCESSING',
   fileType,
   fileName
 })
 
 export const csvDone = () => ({
-  type: 'CSV_DONE'
+  type: 'GROCERY_STORE_DONE'
 })
 
 export const loadedApiKeys = (apiKeys, count) => ({

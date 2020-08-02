@@ -77,7 +77,7 @@ Rails.application.configure do
     password: ENV['EMAIL_PASSWORD']
   }
 
-  Sidekiq.logger.level = 3
+  Sidekiq.logger.level = 1
 
   # Paperclip.options[:command_path] = "/usr/local/bin/"
 end

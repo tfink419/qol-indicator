@@ -8,7 +8,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Card, CardCo
 import { flashMessage } from '../actions/messages'
 import { postAdminGroceryStore } from '../fetch';
 import StateSelect from './StateSelect';
-import { qualityMarks } from '../common'
+import { foodQuantityMarks } from '../common'
 
 const useStyles = makeStyles({
   cancelButton: {
@@ -29,7 +29,7 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
     zip:'',
     lat:'',
     long:'',
-    quality: 5
+    food_quantity: 5
   };
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
@@ -98,13 +98,13 @@ const CreateGroceryStoreDialog = ({open, onClose, flashMessage}) => {
             />
             <Slider
               className={classes.slider}
-              value={groceryStore.quality}
-              onChange={(e, val) => setGroceryStore({ ...groceryStore, quality:val })}
+              value={groceryStore.food_quantity}
+              onChange={(e, val) => setGroceryStore({ ...groceryStore, food_quantity:val })}
               step={1}
               min={0}
               max={10}
               valueLabelDisplay="auto"
-              marks={qualityMarks}
+              marks={foodQuantityMarks}
             />
             <TextField
               value={groceryStore.address}

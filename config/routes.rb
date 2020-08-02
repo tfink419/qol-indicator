@@ -5,9 +5,9 @@ Rails.application.routes.draw do
   
   # Admin routes
   scope '/api/' do
-    post 'admin/grocery_stores/upload_csv'
-    get 'admin/grocery_stores/upload_csv/status', :to => 'admin/grocery_stores#upload_csv_status_index'
-    get 'admin/grocery_stores/upload_csv/status/:id', :to => 'admin/grocery_stores#upload_csv_status_show'
+    post 'admin/grocery_stores/start_upload'
+    get 'admin/grocery_stores/upload/status', :to => 'admin/grocery_stores#upload_status_index'
+    get 'admin/grocery_stores/upload/status/:id', :to => 'admin/grocery_stores#upload_status_show'
     resources 'admin/grocery_stores', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_grocery_stores'
     resources 'admin/users', :only => [:index, :create, :show, :update, :destroy], :as => 'admin_users'
     resources 'admin/api_keys', :only => [:index, :create, :show, :destroy], :as => 'admin_api_keys'

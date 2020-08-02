@@ -32,7 +32,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore = GroceryStore.new(grocery_store_params)
     Geocode.new(gstore).attempt_geocode_if_needed
     if gstore.save
-      IsochronableChanged.new(gstore).record
+      IsochronableChanged.new(gstore, GroceryStoreFoodQuantityPoint::TRANSIT_TYPE_MAP).record
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
@@ -44,7 +44,7 @@ class Admin::GroceryStoresController < ApplicationController
 
   def destroy
     gstore = GroceryStore.find(params[:id])
-    IsochronableChanged.new(gstore).record(true)
+    IsochronableChanged.new(gstore, GroceryStoreFoodQuantityPoint::TRANSIT_TYPE_MAP).record(true)
     gstore.destroy!
 
     render :json => { 
@@ -58,7 +58,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore.assign_attributes(grocery_store_params)
     Geocode.new(gstore).attempt_geocode_if_needed
     if gstore.save
-      IsochronableChanged.new(gstore).record
+      IsochronableChanged.new(gstore, GroceryStoreFoodQuantityPoint::TRANSIT_TYPE_MAP).record
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
@@ -68,42 +68,40 @@ class Admin::GroceryStoresController < ApplicationController
     end
   end
 
-  def upload_csv
-    csv_file = params[:csv_file].read
-    default_quality = params[:default_quality] ? params[:default_quality].to_i : 5
-    job_status = GroceryStoreUploadStatus.create(state:'initialized', percent:100, filename:params[:filename])
-    GroceryStoreUploadJob.perform_later(job_status, csv_file, default_quality)
+  def start_upload
+    job_status = GroceryStoreUploadStatus.create(state:'initialized', percent:100)
+    GroceryStoreUploadJob.perform_later(job_status)
     render json: {
       status: 0,
-      message: 'Upload Csv Job Initialized',
+      message: 'Upload Job Initialized',
       grocery_store_upload_status: job_status
     }
   end
 
-  def upload_csv_status_index
+  def upload_status_index
     page = params[:page].to_i
     limit = params[:limit].to_i
     offset = page*limit
     job_statuses = GroceryStoreUploadStatus.offset(offset).limit(limit).order(created_at:'DESC')
-    upload_csv_status_count = GroceryStoreUploadStatus.count
+    upload_status_count = GroceryStoreUploadStatus.count
     newest = GroceryStoreUploadStatus.last
     render json: {
       status: 0,
-      upload_csv_statuses: { all:job_statuses, current:(newest && newest.error.nil? && newest.state != 'complete') ? newest : nil },
-      upload_csv_status_count: upload_csv_status_count
+      grocery_store_upload_statuses: { all:job_statuses, current:(newest && newest.error.nil? && newest.state != 'complete') ? newest : nil },
+      grocery_store_upload_status_count: upload_status_count
     }
   end
 
-  def upload_csv_status_show
+  def upload_status_show
     render json: {
       status: 0,
-      upload_csv_status: GroceryStoreUploadStatus.find(params[:id])
+      grocery_store_upload_status: GroceryStoreUploadStatus.find(params[:id])
     }
   end
 
   private
 
   def grocery_store_params
-    params.require(:grocery_store).permit(:name, :address, :city, :state, :zip, :lat, :long, :quality)
+    params.require(:grocery_store).permit(:name, :address, :city, :state, :zip, :lat, :long, :food_quantity)
   end
 end

@@ -129,7 +129,9 @@ class Geocode
       if @place.only_coordinates_invalid?
         @geocoded = geocode
         parse_geocode if @geocoded
-        puts @place.as_json
+      elsif @place.only_needs_address?
+        @geocoded = reverse_geocode
+        parse_geocode if @geocoded
       end
     end
   end
@@ -152,16 +154,31 @@ class Geocode
     nil
   end
 
+  def reverse_geocode
+    with_retries(max_tries: 3) {
+      response = Google::Maps.geocode("#{@place.lat}, #{@place.long}")
+      response.first
+    }
+  rescue StandardError => err
+    $stderr.print err
+    $stderr.print err.backtrace
+    nil
+  end
+
   private
 
   def parse_geocode
     @place.lat = @geocoded.latitude
     @place.long = @geocoded.longitude
-    if @place.zip.nil?
-      @place.zip = @geocoded.components["postal_code"].first
-    elsif @place.city.nil? or @place.city.empty?
-      @place.city = @geocoded.components["locality"].first
-      @place.state = STATE_STATE_ABBR_MAP[@geocoded.components['administrative_area_level_1'].first]
+    if !@place.zip.present?
+      @place.zip = @geocoded.components["postal_code"].to_a[0]
+    end
+    if !@place.city.present?
+      @place.city = @geocoded.components["locality"].to_a[0]
+      @place.state = STATE_STATE_ABBR_MAP[@geocoded.components['administrative_area_level_1'].to_a[0]]
+    end
+    if !@place.address.present?
+      @place.address = @geocoded.address.match(/[^,]+/).to_a[0]
     end
   end
 end

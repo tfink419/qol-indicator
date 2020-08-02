@@ -123,12 +123,9 @@ export const deleteAdminUser = (userId) => {
   .then(handleResponse)
 }
 
-export const postAdminGroceryStoreUploadCsv = (file, quality) => {
+export const postAdminGroceryStoreUpload = (file, quality) => {
   const formData = new FormData();
-  formData.append('csv_file', file);
-  formData.append('filename', file.name);
-  formData.append('default_quality', quality);
-  return fetch('/api/admin/grocery_stores/upload_csv', { method:'POST', body: formData, 
+  return fetch('/api/admin/grocery_stores/start_upload', { method:'POST', 
     headers: {
       'Accept': 'application/json'
   }})
@@ -193,8 +190,8 @@ export const getAdminBuildQualityMapStatuses = (page, rowsPerPage) => {
   .then(handleResponse)
 }
 
-export const getAdminGroceryStoreUploadCsvStatuses = (page, rowsPerPage) => {
-  let url = "/api/admin/grocery_stores/upload_csv/status",
+export const getAdminGroceryStoreUploadStatuses = (page, rowsPerPage) => {
+  let url = "/api/admin/grocery_stores/upload/status",
     params = { limit: rowsPerPage, page };
   url += paramify(params)
   return fetch(url, {
@@ -206,8 +203,8 @@ export const getAdminGroceryStoreUploadCsvStatuses = (page, rowsPerPage) => {
   .then(handleResponse)
 }
 
-export const getAdminGroceryStoreUploadCsvStatus = (id) => {
-  return fetch("/api/admin/grocery_stores/upload_csv/status/"+id, {
+export const getAdminGroceryStoreUploadStatus = (id) => {
+  return fetch("/api/admin/grocery_stores/upload/status/"+id, {
     method:'GET', 
     headers: {
       'Accept': 'application/json'

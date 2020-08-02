@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_28_071552) do
+ActiveRecord::Schema.define(version: 2020_08_01_185211) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -80,7 +80,6 @@ ActiveRecord::Schema.define(version: 2020_07_28_071552) do
     t.float "percent"
     t.string "state"
     t.string "message"
-    t.string "filename"
     t.text "details"
     t.text "error"
     t.datetime "created_at", null: false
@@ -95,9 +94,10 @@ ActiveRecord::Schema.define(version: 2020_07_28_071552) do
     t.integer "zip"
     t.float "lat", null: false
     t.float "long", null: false
-    t.integer "quality", default: 5
+    t.integer "food_quantity", default: 5
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "organic", default: false
     t.index ["lat", "long"], name: "index_grocery_stores_on_lat_and_long"
     t.index ["long"], name: "index_grocery_stores_on_long"
   end

@@ -1,6 +1,7 @@
 class IsochronableChanged
-  def initialize(isochronable)
+  def initialize(isochronable, transit_type_map)
     @isochronable = isochronable
+    @transit_type_map = transit_type_map
   end
 
   def record(pending_deletion = false)
@@ -13,14 +14,14 @@ class IsochronableChanged
   private
 
   def queue_rebuild
-    FetchIsochrone.new(@isochronable).fetch(1, @isochronable.class::NUM_TRANSIT_TYPES) if @isochronable.isochrone_polygons.none?
+    FetchIsochrone.new(@isochronable, @transit_type_map).fetch(1, @isochronable.class::NUM_TRANSIT_TYPES) if @isochronable.isochrone_polygons.none?
     isochrones = IsochronePolygon.where(isochronable_id:@isochronable.id, isochronable_type:@isochronable.class.name)\
-    .filter { |a| GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) }
-    .sort { |a, b| GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([a.travel_type, a.distance]) <=> GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.index([b.travel_type, b.distance]) }
+    .filter { |a| @transit_type_map.index([a.travel_type, a.distance]) }
+    .sort { |a, b| @transit_type_map.index([a.travel_type, a.distance]) <=> @transit_type_map.index([b.travel_type, b.distance]) }
 
     next_job = ScheduledPointRebuild.get_next_job(@isochronable.class)
     just_created = next_job.south_bounds.blank?
-    (0...GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP.length-1).each do |trans_ind|
+    (0...GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP.length-1).each do |trans_ind|
       if just_created
         next_job.south_bounds << isochrones[trans_ind].south_bound
         next_job.west_bounds << isochrones[trans_ind].west_bound

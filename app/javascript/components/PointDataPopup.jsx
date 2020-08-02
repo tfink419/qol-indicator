@@ -37,7 +37,7 @@ export default ({data}) => (
                 data.data.grocery_stores.map((groceryStore, ind) => (
                   <TableRow key={ind}>
                     <TableCell>{groceryStore.name} at {groceryStore.address}</TableCell>
-                    <TableCell>{groceryStore.quality}/10</TableCell>
+                    <TableCell>{groceryStore.food_quantity}/10</TableCell>
                   </TableRow>
                 ))
               }

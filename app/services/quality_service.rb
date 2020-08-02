@@ -14,22 +14,22 @@ class QualityService
     quality = 0
     data = {}
     if normalized_grocery_store_quality_ratio > 0
-      travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[@map_preferences["grocery_store_quality_transit_type"]]
-      polygons = PolygonQuery.new(IsochronePolygon, GroceryStore, 'isochronable_id', 'quality')\
+      travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[@map_preferences["grocery_store_quality_transit_type"]]
+      polygons = PolygonQuery.new(IsochronePolygon, GroceryStore, 'isochronable_id', 'food_quantity')\
       .all_near_point_with_parent_and_ids(@lat, @long, travel_type, distance)
       # skip to next block if none found
       unless polygons.blank?
         results = QualityMapImage.quality_of_point(@lat, @long, polygons, GroceryStore::QUALITY_CALC_METHOD, GroceryStore::QUALITY_CALC_VALUE)
         inner_quality = results[0]
-        if inner_quality < GroceryStoreQualityMapPoint::LOW
-          inner_quality = GroceryStoreQualityMapPoint::LOW
-        elsif inner_quality > GroceryStoreQualityMapPoint::HIGH
-          inner_quality = GroceryStoreQualityMapPoint::HIGH
+        if inner_quality < GroceryStoreFoodQuantityMapPoint::LOW
+          inner_quality = GroceryStoreFoodQuantityMapPoint::LOW
+        elsif inner_quality > GroceryStoreFoodQuantityMapPoint::HIGH
+          inner_quality = GroceryStoreFoodQuantityMapPoint::HIGH
         end
-        inner_quality -= GroceryStoreQualityMapPoint::LOW
-        inner_quality = 100.to_f/(GroceryStoreQualityMapPoint::HIGH-GroceryStoreQualityMapPoint::LOW)*inner_quality
+        inner_quality -= GroceryStoreFoodQuantityMapPoint::LOW
+        inner_quality = 100.to_f/(GroceryStoreFoodQuantityMapPoint::HIGH-GroceryStoreFoodQuantityMapPoint::LOW)*inner_quality
         quality += inner_quality*normalized_grocery_store_quality_ratio
-        data[:grocery_stores] = GroceryStore.where(id:results[1]).select(:name, :address, :quality)
+        data[:grocery_stores] = GroceryStore.where(id:results[1]).select(:name, :address, :food_quantity)
       end
     end
     # inverted

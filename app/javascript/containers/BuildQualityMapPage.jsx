@@ -22,7 +22,7 @@ const STATE_MAP = {
 
 const BuildQualityMapPage = ({ setBuildQualityMapStatusReloadIntervalId, buildQualityMapStatuses, flashMessage, 
 loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQualityMapStatusesPage, updateBuildQualityMapStatusesRowsPerPage }) => {
-  let [mapPointType, setMapPointType] = React.useState("GroceryStoreQualityMapPoint");
+  let [mapPointType, setMapPointType] = React.useState("GroceryStoreFoodQuantityMapPoint");
   const { page, rowsPerPage, rows, current, loaded, reloadIntervalId } = buildQualityMapStatuses;
 
   const handleBuildQualityMap = (event) => {
@@ -163,7 +163,7 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
         <React.Fragment>
           <Typography variant="body1">This will Build the QualityMap</Typography>
           <Select value={mapPointType}  onChange={(e) => setMapPointType(e.target.value)}>
-            <MenuItem value={"GroceryStoreQualityMapPoint"}>Grocery Store Quality</MenuItem>
+            <MenuItem value={"GroceryStoreFoodQuantityMapPoint"}>Grocery Store Quality</MenuItem>
             <MenuItem value={"CensusTractPovertyMapPoint"}>Census Tract Poverty</MenuItem>
           </Select>
           <form onSubmit={handleBuildQualityMap}>

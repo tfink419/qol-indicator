@@ -149,7 +149,7 @@ function GroceryStoreTable({groceryStores, loadedGroceryStores, updateGrocerySto
             open={Boolean(anchorEl)} onClose={handleCloseMenu}
           >
             <MenuItem onClick={() => handleOpenDialog('create')}>Single Store</MenuItem>
-            <MenuItem onClick={() => history.push('/admin/grocery_stores/upload')}>Upload CSV file</MenuItem>
+            <MenuItem onClick={() => history.push('/admin/grocery_stores/upload')}>Upload</MenuItem>
           </Menu>
         </div>
       </Toolbar>

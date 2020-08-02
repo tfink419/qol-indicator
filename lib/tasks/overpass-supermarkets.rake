@@ -1,8 +1,6 @@
+require 'json'
 
 task "overpass:supermarkets" => :environment do
-  places = []
-  OverpassApiPlaceSearch.new("Colorado", ['"shop"="supermarket"']).each do |place|
-    places << place
-  end
-  puts places.length
+  places = OverpassApiSearch.new("Colorado", [%w(shop supermarket)]).get_nodes
+  File.write('super-markets.json', JSON.pretty_generate(places))
 end

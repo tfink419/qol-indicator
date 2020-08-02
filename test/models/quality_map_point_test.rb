@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class GroceryStoreQualityMapPointTest < ActiveSupport::TestCase
+class GroceryStoreFoodQuantityMapPointTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

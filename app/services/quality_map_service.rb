@@ -16,17 +16,17 @@ class QualityMapService
     image_data = []
     if normalized_grocery_store_quality_ratio > 0
       image_data << [
-        GroceryStoreQualityMapPoint::LOW,
-        GroceryStoreQualityMapPoint::HIGH,
+        GroceryStoreFoodQuantityMapPoint::LOW,
+        GroceryStoreFoodQuantityMapPoint::HIGH,
         normalized_grocery_store_quality_ratio,
-        GroceryStoreQualityMapPoint::SCALE,
+        GroceryStoreFoodQuantityMapPoint::SCALE,
         false # invert
       ]
       extra_params = [
         @map_preferences["grocery_store_quality_transit_type"]
       ]
       images << DataImageService.
-                new(GroceryStoreQualityMapPoint::SHORT_NAME, @zoom).
+                new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom).
                 load(extra_params, @lat_sector, @lng_sector)
     end
     if normalized_census_tract_poverty_ratio > 0

@@ -23,12 +23,12 @@ class BuildQualityMapSegmentJob < ApplicationJob
     point_type = build_status.parent_status.point_type
 
     case point_type
-    when 'GroceryStoreQualityMapPoint'
-      point_class = GroceryStoreQualityMapPoint
+    when 'GroceryStoreFoodQuantityMapPoint'
+      point_class = GroceryStoreFoodQuantityMapPoint
       polygon_class = IsochronePolygon
       parent_class = GroceryStore
       parent_class_id = "isochronable_id"
-      quality_column_name = "quality"
+      quality_column_name = "food_quantity"
       extra_params = [:transit_type]
       isochrone_type = true
     when 'CensusTractPovertyMapPoint'
@@ -53,7 +53,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
           before = Time.now
           build_status.update!(percent:(100.0*current/gstore_count).round(2))
         end
-        FetchIsochrone.new(gstore).fetch(transit_type_low, transit_type_high)
+        FetchIsochrone.new(gstore, GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP).fetch(transit_type_low, transit_type_high)
       end
 
       # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)
@@ -77,8 +77,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
       while current_sector.lng_sector <= @north_east_sector.lng_sector
         (transit_type_low..transit_type_high).each do |transit_type|
           new_quality_maps = []
-          if point_type == 'GroceryStoreQualityMapPoint'
-            travel_type, distance = GroceryStoreQualityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+          if point_type == 'GroceryStoreFoodQuantityMapPoint'
+            travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
           end
           polygons = PolygonQuery.new(polygon_class, parent_class, parent_class_id, quality_column_name).
           all_near_bounds_with_parent(current_sector.south, current_sector.west, current_sector.north, current_sector.east, travel_type, distance)

@@ -76,7 +76,7 @@ const AdminNav = ({buildQualityMapStatuses}) => {
                 <ListItemIcon>
                   <NoteAddIcon /> 
                 </ListItemIcon>
-                <ListItemText primary="Upload CSV" />
+                <ListItemText primary="Upload" />
               </ListItem>
             </List>
           </Collapse>

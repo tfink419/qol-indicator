@@ -18,7 +18,7 @@ export const saveState = (state) => {
 
 export const drawerWidth = 240;
 
-export const qualityMarks = [
+export const foodQuantityMarks = [
   {
     value: 1,
     label: 'Some Goods     '.replace(/ /g, "\u00a0"),

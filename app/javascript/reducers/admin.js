@@ -16,7 +16,7 @@ const admin = (state = {
     rowsPerPage:10,
     loaded: false
   },
-  uploadCsvStatuses: {
+  groceryStoreUploadStatuses: {
     page:0,
     rowsPerPage:10,
     loaded: false
@@ -82,23 +82,23 @@ const admin = (state = {
         }
       }
 
-    case 'LOADED_UPLOAD_CSV_STATUSES':
+    case 'LOADED_GROCERY_STORE_UPLOAD_STATUSES':
       return {
         ...state,
-        uploadCsvStatuses:{ 
-          ...state.uploadCsvStatuses,
-          rows:action.uploadCsvStatuses,
+        groceryStoreUploadStatuses:{ 
+          ...state.groceryStoreUploadStatuses,
+          rows:action.groceryStoreUploadStatuses,
           count:action.count,
-          current:action.currentUploadCsvStatus,
+          current:action.currentGroceryStoreUploadStatus,
           loaded: true
         }
       }
-    case 'LOADED_CURRENT_UPLOAD_CSV_STATUS':
+    case 'LOADED_CURRENT_GROCERY_STORE_UPLOAD_STATUS':
       return {
         ...state,
-        uploadCsvStatuses:{ 
-          ...state.uploadCsvStatuses,
-          current:action.currentUploadCsvStatus,
+        groceryStoreUploadStatuses:{ 
+          ...state.groceryStoreUploadStatuses,
+          current:action.currentGroceryStoreUploadStatus,
           loaded: true
         }
       }
@@ -270,25 +270,25 @@ const admin = (state = {
       }
     }
 
-    case 'UPDATE_UPLOAD_CSV_STATUSES_PAGE':
+    case 'UPDATE_GROCERY_STORE_UPLOAD_STATUSES_PAGE':
       return {
         ...state,
-        uploadCsvStatuses: {
-          ...state.uploadCsvStatuses,
+        groceryStoreUploadStatuses: {
+          ...state.groceryStoreUploadStatuses,
           page:action.page,
           loaded: false
         }
       }
-    case 'UPDATE_UPLOAD_CSV_STATUSES_ROWSPERPAGE':
+    case 'UPDATE_GROCERY_STORE_UPLOAD_STATUSES_ROWSPERPAGE':
       {
-        let {page} = state.uploadCsvStatuses;
-        if(state.uploadCsvStatuses.rowsPerPage != action.rowsPerPage) {
-          page = Math.floor(state.uploadCsvStatuses.rowsPerPage/action.rowsPerPage*page);
+        let {page} = state.groceryStoreUploadStatuses;
+        if(state.groceryStoreUploadStatuses.rowsPerPage != action.rowsPerPage) {
+          page = Math.floor(state.groceryStoreUploadStatuses.rowsPerPage/action.rowsPerPage*page);
         }
         return {
           ...state,
-          uploadCsvStatuses: {
-            ...state.uploadCsvStatuses,
+          groceryStoreUploadStatuses: {
+            ...state.groceryStoreUploadStatuses,
             rowsPerPage:action.rowsPerPage,
             page,
             loaded: false
@@ -303,11 +303,11 @@ const admin = (state = {
           reloadIntervalId: action.reloadIntervalId
         }
       }
-    case 'SET_UPLOAD_CSV_STATUS_RELOAD_INTERVAL_ID':
+    case 'SET_GROCERY_STORE_UPLOAD_STATUS_RELOAD_INTERVAL_ID':
       return {
         ...state,
-        uploadCsvStatuses: {
-          ...state.uploadCsvStatuses,
+        groceryStoreUploadStatuses: {
+          ...state.groceryStoreUploadStatuses,
           reloadIntervalId: action.reloadIntervalId
         }
       }

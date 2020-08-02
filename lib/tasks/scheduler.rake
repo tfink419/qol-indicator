@@ -24,7 +24,7 @@ end
 desc "Check for pending rebuild job and start heroku and pend the job if one exists"
 task :scheduled_jobs => :environment do
   puts "Checking for scheduled job..."
-  scheduled_job = ScheduledPointRebuild.get_current_job("GroceryStoreQualityMapPoint")
+  scheduled_job = ScheduledPointRebuild.get_current_job("GroceryStoreFoodQuantityMapPoint")
   if scheduled_job
     StartPointRebuild.new(scheduled_job).start
     if Rails.env == 'production'
