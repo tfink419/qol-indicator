@@ -11,13 +11,15 @@ class GoogleNearbySearch
   end
 
   def each_place_bulk
-    iteration_amount = 50000/ROOT_2
-    south_west_start = add_m_to_coord(@south_west, iteration_amount/2, iteration_amount/2)
-    north_east_end = add_m_to_coord(@north_east, -iteration_amount/2, -iteration_amount/2)
+    max_radi = 50000/ROOT_2
+    step = max_radi*2
+    south_west_start = add_m_to_coord(@south_west, max_radi/2, max_radi/2)
+    north_east_end = add_m_to_coord(@north_east, -max_radi/2, -max_radi/2)
 
-    current = south_west_start
-    estimated_step = add_m_to_coord(@south_west, iteration_amount, iteration_amount)
+    current = south_west_start.dup
+    estimated_step = add_m_to_coord(south_west_start, step, step)
     estimated_step = [estimated_step[0]-south_west_start[0], estimated_step[1]-south_west_start[1]]
+
     diff = [@north_east[0]-south_west_start[0], @north_east[1]-south_west_start[1]]
     estimated_steps = [1+diff[0]/estimated_step[0], 1+diff[1]/estimated_step[1]]
 
@@ -26,11 +28,11 @@ class GoogleNearbySearch
       lng_step = 0
       while current[1] < north_east_end[1]
         yield nearby_places(current), 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
-        current = add_m_to_coord(current, 0, iteration_amount)
+        current = add_m_to_coord(current, 0, step)
         lng_step += 1
       end
       yield nearby_places([current[0], north_east_end[1]]), 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
-      current = add_m_to_coord([current[0], south_west_start[1]], iteration_amount, 0)
+      current = add_m_to_coord([current[0], south_west_start[1]], step, 0)
       lat_step += 1
     end
     yield nearby_places(north_east_end), 100
