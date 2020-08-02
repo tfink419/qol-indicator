@@ -5,7 +5,7 @@ import { Typography, Paper, Input, Button, CircularProgress, Slider, Box, Linear
 
 import { flashMessage } from '../actions/messages'
 import { setGroceryStoreUploadStatusReloadIntervalId, loadedGroceryStoreUploadStatuses, loadedCurrentGroceryStoreUploadStatus, 
-  updateUploadStatusesPage, updateUploadStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
+  updateGroceryStoreUploadStatusesPage, updateGroceryStoreUploadStatusesRowsPerPage, updatedGroceryStores } from '../actions/admin'
 import { postAdminGroceryStoreUpload, getAdminGroceryStoreUploadStatuses, getAdminGroceryStoreUploadStatus } from '../fetch'
 import { qualityMarks } from '../common'
 
@@ -134,8 +134,8 @@ const mapDispatchToProps = {
   setGroceryStoreUploadStatusReloadIntervalId,
   loadedGroceryStoreUploadStatuses,
   loadedCurrentGroceryStoreUploadStatus,
-  updateUploadStatusesPage,
-  updateUploadStatusesRowsPerPage,
+  updateGroceryStoreUploadStatusesPage,
+  updateGroceryStoreUploadStatusesRowsPerPage,
   updatedGroceryStores
 }
 
