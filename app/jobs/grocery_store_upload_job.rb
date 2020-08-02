@@ -67,7 +67,7 @@ class GroceryStoreUploadJob < ApplicationJob
         if gstore.name.match("Costco") || gstore.name.match(/Sam'?s Club/)
             gstore.food_quantity = 10
             gstore.tags << "wholesale"
-        if gstore.name.match("Dollar")
+        elsif gstore.name.match("Dollar")
             gstore.food_quantity = 6
             gstore.tags << "dollar_store"
         elsif gstore.tags.include?("convenience_store")
@@ -121,7 +121,7 @@ class GroceryStoreUploadJob < ApplicationJob
           place["lat"] > north_east[0]+0.5 ||
           place["lon"] < south_west[1]-0.5 ||
           place["lon"] > north_east[1]+0.5
-          next
+            next
         end
       end
       if place["tags"]["name"]
