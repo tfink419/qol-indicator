@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_01_185211) do
+ActiveRecord::Schema.define(version: 2020_08_02_042901) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -97,7 +97,9 @@ ActiveRecord::Schema.define(version: 2020_08_01_185211) do
     t.integer "food_quantity", default: 5
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "organic", default: false
+    t.string "google_place_id"
+    t.string "tags", default: [], array: true
+    t.index ["google_place_id"], name: "index_grocery_stores_on_google_place_id", unique: true
     t.index ["lat", "long"], name: "index_grocery_stores_on_lat_and_long"
     t.index ["long"], name: "index_grocery_stores_on_long"
   end

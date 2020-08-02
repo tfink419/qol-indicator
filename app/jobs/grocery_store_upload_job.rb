@@ -5,16 +5,6 @@ class GroceryStoreUploadJob < ApplicationJob
     Signal.trap('INT') { throw SystemExit }
     Signal.trap('TERM') { throw SystemExit }
     job_status.update!(state: 'received', percent:100)
-    job_status.update!(state: 'overpass', percent:0)
-    puts "Retrieving from Overpass"
-    places = []
-    with_retries(max_tries: 3, base_sleep_seconds: 30, max_sleep_seconds: 120) {
-      places = OverpassApiSearch.new("Colorado", [%w(shop supermarket), %w(shop wholesale), %w(shop convenience), %w(shop farm), %w(shop bakery), 
-        %w(shop butcher), %w(shop cheese), %w(shop deli), %w(shop greengrocer), 
-        %w(shop health_food), %w(shop pastry), %w(shop seafood)]).get_nodes
-    }
-    puts "Retrieved from Overpass"
-    job_status.update!(percent:100)
 
     number_sucessful = 0
     south = 9999
@@ -27,56 +17,161 @@ class GroceryStoreUploadJob < ApplicationJob
     before = Time.now
 
     job_status.update!(state:'processing', percent:0)
-    places.each_with_index do |place, ind|
+
+    count = 0
+    
+    google_place_ids = {}
+    if Rails.env == 'production'
+      south_west = [37.002, -109.056]
+      north_east = [41.001460, -102.072898]
+    else
+      south_west = [39.716055, -105.034992]
+      north_east = [39.780840, -104.940299]
+    end
+    GoogleNearbySearch.new(south_west, north_east, [
+      %w(store food), %w(convenience_store), ["store", "Costco"], ["store", "Sam's Club"]
+    ]).
+    each_place_bulk do |places, progress|
+      puts "Processing #{places.length} places"
       if (Time.now-before) >= 5
         before = Time.now
-        job_status.update!(percent:((ind+1)*100.0/places.length).round(2))
+        job_status.update!(percent:progress.round(2))
       end
-      next unless place["tags"]["name"]
-      gstore = GroceryStore.new(name:place["tags"]["name"], lat:place["lat"], long:place["lon"])
-      gstore.organic = (place["tags"]["organic"] && place["tags"]["organic"] != "no") ||
-        gstore.name.match("Sprouts") || gstore.name.match("Whole Foods") || gstore.name.match("Natural Grocers")
-      case place["tags"]["shop"]
-      when "supermarket", "wholesale"
-        gstore.food_quantity = 10
-      when "bakery", "butcher", "seafood", "deli", "seafood", "greengrocer"
-        gstore.food_quantity = 7
-      when "health_food", "pastry", "cheese", "farm"
-        gstore.food_quantity = 4
-      when "convenience"
-        gstore.food_quantity = 3
-      end
+      places = places.reduce([]) do |new_arr, place|
+        next new_arr if google_place_ids[place["place_id"]]
+        google_place_ids[place["place_id"]] = true
+        vicinity_split = place["vicinity"].split(",").map(&:strip)
+        compound_code_split = place["plus_code"].to_h["compound_code"].to_s.split(",").map(&:strip)
+        if vicinity_split.length == 2
+          address = vicinity_split[0]
+          city = vicinity_split[1]
+        elsif vicinity_split.length == 1
+          city = vicinity_split[0]
+        end
+        if compound_code_split.length > 1
+          state = Geocode::STATE_STATE_ABBR_MAP[compound_code_split[1]] ?
+            Geocode::STATE_STATE_ABBR_MAP[compound_code_split[1]] :
+            compound_code_split[1]
+        end
 
-      Geocode.new(gstore).attempt_geocode_if_needed
-      if gstore.save
-        number_sucessful += 1
+        gstore = GroceryStore.new(
+          name:place["name"],
+          lat:place["geometry"]["location"]["lat"],
+          long:place["geometry"]["location"]["lng"],
+          tags:place["types"],
+          address:address,
+          city:city,
+          state:state,
+          google_place_id:place["place_id"]
+        )
+        if gstore.name.match("Costco") || gstore.name.match(/Sam'?s Club/)
+            gstore.food_quantity = 10
+            gstore.tags << "wholesale"
+        if gstore.name.match("Dollar")
+            gstore.food_quantity = 6
+            gstore.tags << "dollar_store"
+        elsif gstore.tags.include?("convenience_store")
+          if place["price_level"] && place["price_level"] > 1
+            gstore.food_quantity = 4
+          elsif place["rating"] && place["rating"] > 3
+            gstore.food_quantity = 2
+          else
+            gstore.food_quantity = 1
+          end
+        elsif gstore.tags.include?("grocery_or_supermarket") || gstore.tags.include?("supermarket")
+          gstore.food_quantity = 10
+        elsif gstore.tags.include?("bakery")
+          gstore.food_quantity = 5
+        elsif gstore.tags.include? "food"
+          if place["rating"] && place["rating"] > 4
+            gstore.food_quantity = 4
+          elsif place["rating"] && place["rating"] > 2.5
+            gstore.food_quantity = 3
+          else
+            gstore.food_quantity = 2
+          end
+        end
+        gstore.tags.delete("store")
+        gstore.tags.delete("food")
+        gstore.tags.delete("point_of_interest")
+        gstore.tags.delete("establishment")
+        if ["Sprouts", "Whole Foods", "Natural Grocers"].any? { |match| gstore.name.match(match) }
+          gstore.tags << "organic"
+        end
+
+        Geocode.new(gstore).attempt_geocode_if_needed
         south = gstore.lat if gstore.lat < south
         north = gstore.lat if gstore.lat > north
         west = gstore.long if gstore.long < west
         east = gstore.long if gstore.long > east
-      else
-        failed << place["tags"]["name"]
-        failed_example = gstore.errors.full_messages
+        new_arr << gstore
+        new_arr
+      end
+      GroceryStore.import places
+    end
+    places = []
+    with_retries(max_tries: 3, base_sleep_seconds: 30, max_sleep_seconds: 120) {
+      places = OverpassApiSearch.new("Colorado", [%w(shop supermarket), %w(shop wholesale), %w(shop convenience), %w(shop farm), %w(shop bakery), 
+        %w(shop butcher), %w(shop cheese), %w(shop deli), %w(shop greengrocer), 
+        %w(shop health_food), %w(shop pastry), %w(shop seafood)]).get_nodes
+    }
+    places.each do |place|
+
+      if Rails.env != 'production'
+        if place["lat"] < south_west[0]-0.5 ||
+          place["lat"] > north_east[0]+0.5 ||
+          place["lon"] < south_west[1]-0.5 ||
+          place["lon"] > north_east[1]+0.5 ||
+          next
+        end
+      end
+      if place["tags"]["name"]
+        gstore = GroceryStore.all_near_point(place["lat"], place["lon"], 0.001).search(place["tags"]["name"].split(" ").first).first
+        unless gstore
+          gstore = GroceryStore.new(name:place["tags"]["name"], lat:place["lat"], long:place["lon"], food_quantity: 10)
+          Geocode.new(gstore).attempt_geocode_if_needed
+        end
+        gstore.tags << "organic" if !gstore.tags.include?("organic") && (place["tags"]["organic"] && place["tags"]["organic"] != "no")
+        if place["tags"]["shop"]
+          tag = place["tags"]["shop"]
+          case place["tags"]["shop"]
+          when "convenience"
+            tag = "convenience_store"
+            gstore.food_quantity = 2 if gstore.food_quantity > 4
+          when "supermarket"
+            gstore.food_quantity = 10
+          when "wholesale"
+            gstore.food_quantity = 10
+          when "butcher"
+            gstore.food_quantity = 3 if gstore.food_quantity > 5
+          when "cheese"
+            gstore.food_quantity = 4 if gstore.food_quantity > 5
+          when "deli"
+            gstore.food_quantity = 6 if gstore.food_quantity > 5
+          when "bakery"
+            gstore.food_quantity = 5 if gstore.food_quantity > 5
+          when "health_food"
+            gstore.food_quantity = 6 if gstore.food_quantity > 5
+          when "farm"
+            gstore.food_quantity = 4 if gstore.food_quantity > 5
+          when "greengrocer"
+            gstore.food_quantity = 4 if gstore.food_quantity > 5
+          when "pastry"
+            gstore.food_quantity = 3 if gstore.food_quantity > 5
+          when "seafood"
+            gstore.food_quantity = 3 if gstore.food_quantity > 5
+          end
+          gstore.tags << tag if !gstore.tags.include?(tag)
+          if gstore.save
+            south = gstore.lat if gstore.lat < south
+            north = gstore.lat if gstore.lat > north
+            west = gstore.long if gstore.long < west
+            east = gstore.long if gstore.long > east
+          end
+        end
       end
     end
-    job_status.state = 'complete'
-    job_status.percent = '100'
-    if number_sucessful == places.length
-      job_status.message = "File uploaded and All Grocery Stores were added successfully."
-    elsif number_sucessful.to_f/places.length > 0.8
-      job_status.message = "File uploaded and #{number_sucessful}/#{places.length} Grocery Stores were added successfully."
-      job_status.details = "Grocery Stores at columns #{failed.to_s} failed to upload\n"+failed_example.to_s
-    elsif number_sucessful == 0
-        job_status.message = "All Grocery Stores Failed to Upload"
-        job_status.details = failed_example
-    elsif number_sucessful.to_f/places.length < 0.5
-      job_status.message = "More than half the Grocery Stores Failed to Upload"
-      job_status.error = "Grocery Stores at columns #{failed.to_s} failed to upload"
-      job_status.details = failed_example
-    end
-    job_status.save
-
-    unless south == 9999 # should only happen if all failed to upload
+    unless south == 9999
       # Rebuild all points in the range of added grocery stores
       south_west = [(south-0.5).floor(1), (west-0.5).floor(1)]
       north_east = [(north+0.5).ceil(1), (east+0.5).ceil(1)]

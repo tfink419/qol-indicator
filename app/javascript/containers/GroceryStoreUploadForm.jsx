@@ -12,7 +12,6 @@ import { qualityMarks } from '../common'
 const STATE_MAP = {
   'initialized': 'Job Sent to Sidekiq',
   'received': 'Job Received By Sidekiq',
-  'overpass': 'Retrieving Overpass Response',
   'processing': 'Processing Grocery Stores',
   'complete': 'Completed'
 }

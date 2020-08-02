@@ -13,6 +13,7 @@ class GroceryStore < ApplicationRecord
     :inclusion => { :in => LocationValidator::STATE_CODES, :message => 'is not a valid state.' }
   validates :lat, :presence => true, :inclusion => -180..180
   validates :long, :presence => true, :inclusion => -180..180
+  validates :google_place_id, uniqueness: true, allow_nil: true
   validates :zip, :inclusion => { :in => [*0..99999, nil], :message => 'is not a valid zip code.' }
 
   validates :food_quantity, :inclusion => 0..10
@@ -42,13 +43,8 @@ class GroceryStore < ApplicationRecord
     where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
   }
 
-  scope :all_near_point, lambda { |lat, long, transit_type|
-    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (lat-0.02*transit_type).round(3), (lat+0.02*transit_type).round(3), (long-0.02*transit_type).round(3), (long+0.02*transit_type).round(3)])
-  }
-
-  scope :all_near_point_wide, lambda { |lat, long, transit_type|
-    extra_length = 0.03+transit_type*0.03
-    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (lat-extra_length).round(3), (lat+extra_length).round(3), (long-extra_length).round(3), (long+extra_length+0.1).round(3)])
+  scope :all_near_point, lambda { |lat, long, size|
+    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', lat-size, lat+size, long-size, long+size])
   }
 
   def valid_location?
@@ -74,19 +70,20 @@ class GroceryStore < ApplicationRecord
   end
 
   QUALITY_CALC_METHOD = 'LogExpSum'
-  QUALITY_CALC_VALUE = 1.7
+  QUALITY_CALC_VALUE = 1.8
 
   def public_attributes
     {
-      :id => id,
-      :name => name,
-      :address => address,
-      :city => city,
-      :state => state,
-      :zip => zip,
-      :lat => lat,
-      :long => long,
-      :food_quantity => food_quantity
+      id: id,
+      name: name,
+      address: address,
+      city: city,
+      state: state,
+      zip: zip,
+      lat: lat,
+      long: long,
+      food_quantity: food_quantity,
+      tags: tags
     }
   end
 end
