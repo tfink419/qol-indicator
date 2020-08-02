@@ -25,18 +25,15 @@ class GoogleNearbySearch
     while current[0] < north_east_end[0]
       lng_step = 0
       while current[1] < north_east_end[1]
-        yield current, 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
-        # yield nearby_places(current), 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
+        yield nearby_places(current), 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
         current = add_m_to_coord(current, 0, iteration_amount)
         lng_step += 1
       end
-      yield [current[0], north_east_end[1]], 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
-      # yield nearby_places([current[0], north_east_end[1]]), 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
+      yield nearby_places([current[0], north_east_end[1]]), 100*(1.0/estimated_steps[0]*(lng_step+1)/estimated_steps[1]+lat_step/estimated_steps[0])
       current = add_m_to_coord([current[0], south_west_start[1]], iteration_amount, 0)
       lat_step += 1
     end
-    yield north_east_end, 100
-    # yield nearby_places(north_east_end), 100
+    yield nearby_places(north_east_end), 100
   end
 
   private
