@@ -116,12 +116,11 @@ class GroceryStoreUploadJob < ApplicationJob
         %w(shop health_food), %w(shop pastry), %w(shop seafood)]).get_nodes
     }
     places.each do |place|
-
       if Rails.env != 'production'
         if place["lat"] < south_west[0]-0.5 ||
           place["lat"] > north_east[0]+0.5 ||
           place["lon"] < south_west[1]-0.5 ||
-          place["lon"] > north_east[1]+0.5 ||
+          place["lon"] > north_east[1]+0.5
           next
         end
       end
