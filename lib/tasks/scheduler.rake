@@ -32,7 +32,7 @@ task :scheduled_jobs => :environment do
     else
       puts "Started Job"
     end
-  elsif BuildQualityMapStatus.most_recent.nil?
+  elsif BuildQualityMapStatus.most_recent.nil? && GroceryStoreUploadStatus.last.complete?
     if Rails.env == 'production'
       HerokuWorkersService.new.stop
     else

@@ -71,6 +71,7 @@ class Admin::GroceryStoresController < ApplicationController
   def start_upload
     job_status = GroceryStoreUploadStatus.create(state:'initialized', percent:100)
     GroceryStoreUploadJob.perform_later(job_status)
+    HerokuWorkersService.new.start(1) if Rails.env == 'production'
     render json: {
       status: 0,
       message: 'Upload Job Initialized',
