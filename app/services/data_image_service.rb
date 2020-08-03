@@ -36,6 +36,7 @@ class DataImageService
     else
       dir = "#{Rails.root}/quality_map_image_data/#{dir}"
       file_path = "#{dir}/#{filename}"
+      puts "Retrieving: '#{file_path}'"
       File.read(file_path) if(File.exist?(file_path))
     end
   end

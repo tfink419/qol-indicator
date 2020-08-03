@@ -269,9 +269,9 @@ export const getMapDataPoint = (lat, long, mapPreferences, abortSignal) => {
   .then(handleResponse)
 }
 
-export const getMapDataGroceryStores = (southWest, northEast, abortSignal) => {
+export const getMapDataGroceryStores = (southWest, northEast, mapPreferences, abortSignal) => {
   let url = "/map_data/grocery_stores",
-    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast) };
+    params = { south_west: parseLatLng(southWest), north_east: parseLatLng(northEast), map_preferences: JSON.stringify(mapPreferences) };
   // Turn object into http params
   url += paramify(params)
 

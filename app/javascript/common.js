@@ -38,10 +38,10 @@ export const foodQuantityMarks = [
 ];  
 
 export const defaultPreferences = {
-  grocery_store_quality_transit_type:2,
+  grocery_store_transit_type:2,
   census_tract_poverty_low:5,
   census_tract_poverty_high:40,
-  grocery_store_quality_ratio:50,
+  grocery_store_ratio:50,
   census_tract_poverty_ratio:50
 };
 

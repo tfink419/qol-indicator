@@ -7,15 +7,16 @@ class QualityService
 
   def get_quality_data
     sum = 0
-    sum += @map_preferences["grocery_store_quality_ratio"]
+    sum += @map_preferences["grocery_store_ratio"]
     sum += @map_preferences["census_tract_poverty_ratio"]
-    normalized_grocery_store_quality_ratio = @map_preferences["grocery_store_quality_ratio"]/sum.to_f
+    normalized_grocery_store_ratio = @map_preferences["grocery_store_ratio"]/sum.to_f
     normalized_census_tract_poverty_ratio = @map_preferences["census_tract_poverty_ratio"]/sum.to_f
     quality = 0
     data = {}
-    if normalized_grocery_store_quality_ratio > 0
-      travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[@map_preferences["grocery_store_quality_transit_type"]]
-      polygons = PolygonQuery.new(IsochronePolygon, GroceryStore, 'isochronable_id', 'food_quantity')\
+    if normalized_grocery_store_ratio > 0
+      parent_query = TagQuery.new(GroceryStore).query(@map_preferences["grocery_store_tags"], true)
+      travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[@map_preferences["grocery_store_transit_type"]]
+      polygons = PolygonQuery.new(IsochronePolygon, parent_query, 'isochronable_id', 'food_quantity')\
       .all_near_point_with_parent_and_ids(@lat, @long, travel_type, distance)
       # skip to next block if none found
       unless polygons.blank?
@@ -28,12 +29,17 @@ class QualityService
         end
         inner_quality -= GroceryStoreFoodQuantityMapPoint::LOW
         inner_quality = 100.to_f/(GroceryStoreFoodQuantityMapPoint::HIGH-GroceryStoreFoodQuantityMapPoint::LOW)*inner_quality
-        quality += inner_quality*normalized_grocery_store_quality_ratio
+        quality += inner_quality*normalized_grocery_store_ratio
         data[:grocery_stores] = GroceryStore.where(id:results[1]).select(:name, :address, :food_quantity)
       end
     end
     # inverted
     if normalized_census_tract_poverty_ratio > 0
+      parent_query = {
+        name:CensusTract.name,
+        table_name:CensusTract.table_name,
+        query:'all'
+      }
       polygons = PolygonQuery.new(CensusTractPolygon, CensusTract, 'census_tract_id', 'poverty_percent')\
       .all_near_point_with_parent_and_ids(@lat, @long, nil, nil)
       # skip to next block if none found

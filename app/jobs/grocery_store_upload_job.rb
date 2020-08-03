@@ -38,7 +38,8 @@ class GroceryStoreUploadJob < ApplicationJob
         job_status.update!(percent:progress.round(2))
       end
       places = places.reduce([]) do |new_arr, place|
-        next new_arr if google_place_ids[place["place_id"]]
+        next new_arr if google_place_ids[place["place_id"]] ||
+          !place["types"].include? "food"
         google_place_ids[place["place_id"]] = true
         vicinity_split = place["vicinity"].split(",").map(&:strip)
         compound_code_split = place["plus_code"].to_h["compound_code"].to_s.split(",").map(&:strip)
@@ -53,7 +54,7 @@ class GroceryStoreUploadJob < ApplicationJob
             Geocode::STATE_STATE_ABBR_MAP[compound_code_split[1]] :
             compound_code_split[1]
         end
-
+        
         gstore = GroceryStore.new(
           name:place["name"],
           lat:place["geometry"]["location"]["lat"],
@@ -64,12 +65,16 @@ class GroceryStoreUploadJob < ApplicationJob
           state:state,
           google_place_id:place["place_id"]
         )
-        if gstore.name.match("Costco") || gstore.name.match(/Sam'?s Club/)
+        downcased_name = place["name"].downcase
+        if downcased_name.match("costco") || downcased_name.match(/sam'?s club/)
             gstore.food_quantity = 10
             gstore.tags << "wholesale"
-        elsif gstore.name.match("Dollar")
+        elsif downcased_name.match("dollar")
             gstore.food_quantity = 6
             gstore.tags << "dollar_store"
+        elsif downcased_name.match("deli")
+          gstore.food_quantity = 6
+          gstore.tags << "deli"
         elsif gstore.tags.include?("convenience_store")
           if place["price_level"] && place["price_level"] > 1
             gstore.food_quantity = 4

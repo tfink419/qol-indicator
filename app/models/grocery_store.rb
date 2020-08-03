@@ -28,8 +28,37 @@ class GroceryStore < ApplicationRecord
 
   NUM_TRANSIT_TYPES = 9
 
+
+  # List of tags so far
+  # ["restaurant", "supermarket", "movie_rental", "hardware_store", "farm", 
+  # "general_contractor", "car_repair", "meal_delivery", "finance", "bank",
+  # "home_goods_store", "greengrocer", "deli", "tourist_attraction", "travel_agency",
+  # "atm", "bar", "laundry", "butcher", "convenience_store", "clothing_store",
+  # "car_wash", "night_club", "car_rental", "bakery", "lodging", "campground",
+  # "drugstore", "locksmith", "health", "spa", "liquor_store", "pastry", "seafood",
+  # "dollar_store", "furniture_store", "storage", "rv_park", "department_store",
+  # "real_estate_agency", "pet_store", "veterinary_care", "hair_care", "health_food",
+  # "organic", "movie_theater", "wholesale", "jewelry_store", "shoe_store",
+  # "shopping_mall", "gym", "gas_station", "florist", "electronics_store", "cafe",
+  # "art_gallery", "book_store", "beauty_salon", "cheese", "grocery_or_supermarket",
+  # "meal_takeaway", "park", "pharmacy"]
+
+  # true == required
+
+  TAG_GROUPS = [
+    [false, %w(supermarket grocery_or_supermarket wholesale)], # Supermarkets, Grocery Stores, or Wholesale Stores (AKA Sam's Club / Costco)
+    [true, %w(organic)], # Organic food
+    [false, %w(gas_station convenience_store dollar_store)], # Convenience Stores
+    [false, %w(deli butcher seafood cheese)], # Non-Vegan Specialties
+    [false, %w(bakery pastry)], # Vegan Specialties
+    false # Other categories (not in categories above)
+  ]
+
+  TAG_GROUPS_CALC_SIZE = 2**(TAG_GROUPS.length)-1
+
+  TAG_OTHER_NOT = TAG_GROUPS.flatten.filter {|obj| obj.is_a?(String) }
+
   after_destroy do
-    # can not use dependent destroy because it destroys before
     IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').delete_all
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_02_042901) do
+ActiveRecord::Schema.define(version: 2020_08_03_155650) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -122,11 +122,12 @@ ActiveRecord::Schema.define(version: 2020_08_02_042901) do
 
   create_table "map_preferences", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "grocery_store_quality_transit_type", default: 2
+    t.integer "grocery_store_transit_type", default: 2
     t.integer "census_tract_poverty_low", default: 5
     t.integer "census_tract_poverty_high", default: 40
     t.integer "census_tract_poverty_ratio", default: 50
-    t.integer "grocery_store_quality_ratio", default: 50
+    t.integer "grocery_store_ratio", default: 50
+    t.integer "grocery_store_tags", default: 1
     t.index ["user_id"], name: "index_map_preferences_on_user_id"
   end
 

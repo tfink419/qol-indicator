@@ -92,8 +92,8 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
           </Typography>
           <Slider
             classes={{markLabel:classes.groceryStoreQualityMarkLabel}}
-            value={mapPreferences.preferences.grocery_store_quality_transit_type}
-            onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_quality_transit_type:val })}
+            value={mapPreferences.preferences.grocery_store_transit_type}
+            onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_transit_type:val })}
             step={1}
             min={1}
             max={9}
@@ -114,8 +114,8 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
                 </Grid>
                 <Grid item xs={12}>
                   <Slider
-                    value={mapPreferences.preferences.grocery_store_quality_ratio}
-                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_quality_ratio:val })}
+                    value={mapPreferences.preferences.grocery_store_ratio}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_ratio:val })}
                     step={1}
                     min={0}
                     max={100}

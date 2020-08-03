@@ -8,33 +8,47 @@ class PolygonQuery
   end
 
   def all_near_bounds_with_parent(south, west, north, east, travel_type, distance)
+    if @parent_class[:query] == 'none'
+      return @polygon_class.where(id:nil)
+    end
     where_query = {}
     if @is_isochronable_type
-      where_query[:isochronable_type] = @parent_class.name
+      where_query[:isochronable_type] = @parent_class[:name]
     end
     unless travel_type.nil? || distance.nil?
       where_query[:travel_type] = travel_type
       where_query[:distance] = distance
     end
-    all_near_bounds(south, west, north, east).
-    joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
-    where(where_query).
-    pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column}"))
+    query = all_near_bounds(south, west, north, east).
+    joins(Arel.sql("INNER JOIN #{@parent_class[:table_name]} ON #{@parent_class[:table_name]}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
+    where(where_query)
+    if @parent_class[:query] != 'all'
+      query = query.where(@parent_class[:query])
+    end
+    query.
+    pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class[:table_name]}.#{@parent_quality_column}"))
   end
   
   def all_near_point_with_parent_and_ids(lat, long, travel_type, distance)
+  if @parent_class[:query] == 'none'
+    return @polygon_class.where(id:nil)
+  end
   where_query = {}
   if @is_isochronable_type
-    where_query[:isochronable_type] = @parent_class.name
+    where_query[:isochronable_type] = @parent_class[:name]
   end
   unless travel_type.nil? || distance.nil?
     where_query[:travel_type] = travel_type
     where_query[:distance] = distance
   end
-  all_near_point(lat, long).
-  joins(Arel.sql("INNER JOIN #{@parent_class.table_name} ON #{@parent_class.table_name}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
-  where(where_query).
-  pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class.table_name}.#{@parent_quality_column}"), Arel.sql("#{@parent_class.table_name}.id"))
+  query = all_near_point(lat, long).
+  joins(Arel.sql("INNER JOIN #{@parent_class[:table_name]} ON #{@parent_class[:table_name]}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
+  where(where_query)
+  if @parent_class[:query] != 'all'
+    query = query.where(@parent_class[:query])
+  end
+  query.
+  pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class[:table_name]}.#{@parent_quality_column}"), Arel.sql("#{@parent_class[:table_name]}.id"))
 end
 
   def all_near_point(lat, long)

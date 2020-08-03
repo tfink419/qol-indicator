@@ -17,6 +17,7 @@ const ICON_BASE_URL = 'https://my-qoli-icons.s3-us-west-1.amazonaws.com/';
 const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpen, infoWindowLoaded, infoWindows }) => {
   const groceryStores = React.useRef([]);
   const justRetrievedGroceryStores = React.useRef([]);
+  const prevMapPreferences = React.useRef(mapPreferences.preferences);
   const store = useStore();
   const prevAbortController = React.useRef(null)
 
@@ -24,6 +25,7 @@ const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpe
     groceryStores.current.forEach(groceryStore => {
       groceryStore.marker.setMap(null);
     });
+    groceryStores.current = [];
   }
 
   const onGroceryStoreChange = (id) => {
@@ -47,8 +49,12 @@ const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpe
     }
     let controller = new AbortController();
     prevAbortController.current = controller;
-    if(mapPreferences.preferences.grocery_store_quality_ratio > 0 && currentLocation.zoom > 10) {
-      getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, controller.signal)
+    if(mapPreferences.preferences.grocery_store_ratio > 0 && currentLocation.zoom > 10) {
+      if(mapPreferences.preferences.grocery_store_tags != prevMapPreferences.current.grocery_store_tags) {
+        removeAllMarkers();
+      }
+      prevMapPreferences.current = mapPreferences.preferences;
+      getMapDataGroceryStores(currentLocation.southWest, currentLocation.northEast, mapPreferences.preferences, controller.signal)
       .then(response => {
         justRetrievedGroceryStores.current = [];
         response.grocery_stores.forEach((groceryStore) => {
