@@ -39,7 +39,7 @@ class GroceryStoreUploadJob < ApplicationJob
       end
       places = places.reduce([]) do |new_arr, place|
         next new_arr if google_place_ids[place["place_id"]] ||
-          !place["types"].include? "food"
+          !place["types"].include?("food")
         google_place_ids[place["place_id"]] = true
         vicinity_split = place["vicinity"].split(",").map(&:strip)
         compound_code_split = place["plus_code"].to_h["compound_code"].to_s.split(",").map(&:strip)
