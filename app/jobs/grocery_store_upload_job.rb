@@ -107,7 +107,7 @@ class GroceryStoreUploadJob < ApplicationJob
         new_arr << gstore
         new_arr
       end
-      GroceryStore.import places
+      GroceryStore.import places, on_duplicate_key_ignore: true
     end
     places = []
     with_retries(max_tries: 3, base_sleep_seconds: 30, max_sleep_seconds: 120) {

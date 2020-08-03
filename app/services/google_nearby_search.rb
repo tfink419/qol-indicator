@@ -12,11 +12,12 @@ class GoogleNearbySearch
 
   def each_place_bulk
     max_radi = 50000/ROOT_2
+    # Max radi that you can successfully gather all google maps info block by block
     step = max_radi*2
     south_west_start = add_m_to_coord(@south_west, max_radi/2, max_radi/2)
     north_east_end = add_m_to_coord(@north_east, -max_radi/2, -max_radi/2)
 
-    current = south_west_start.dup
+    current = south_west_start
     estimated_step = add_m_to_coord(south_west_start, step, step)
     estimated_step = [estimated_step[0]-south_west_start[0], estimated_step[1]-south_west_start[1]]
 

@@ -1,4 +1,5 @@
 require 'google-maps'
+require 'mapbox-sdk'
 
 class Geocode
   STATE_ABBR_STATE_MAP = {
@@ -128,10 +129,13 @@ class Geocode
     unless @place.valid?
       if @place.only_coordinates_invalid?
         @geocoded = geocode
-        parse_geocode if @geocoded
+        parse_google_geocode if @geocoded
       elsif @place.only_needs_address?
         @geocoded = reverse_geocode
-        parse_geocode if @geocoded
+        parse_google_geocode if @geocoded
+      elsif @place.zip.nil?
+        @geocoded = reverse_geocode_only_zip
+        parse_mapbox_geocode if @geocoded
       end
     end
   end
@@ -167,7 +171,7 @@ class Geocode
 
   private
 
-  def parse_geocode
+  def parse_google_geocode
     @place.lat = @geocoded.latitude
     @place.long = @geocoded.longitude
     if !@place.zip.present?
@@ -179,6 +183,12 @@ class Geocode
     end
     if !@place.address.present?
       @place.address = @geocoded.address.match(/[^,]+/).to_a[0]
+    end
+  end
+
+  def parse_mapbox_geocode
+    if !@place.zip.present?
+      @place.zip = placenames.first["features"].find { |feature| feature["place_type"][0] == "postcode" }["text"].to_i
     end
   end
 end
