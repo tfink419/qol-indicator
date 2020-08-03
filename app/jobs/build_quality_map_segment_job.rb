@@ -181,7 +181,6 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 case param
                 when :transit_type
                   transit_type
-                end
                 when :tags
                   tag_calc_num
                 end
