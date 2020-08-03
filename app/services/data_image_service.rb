@@ -14,6 +14,7 @@ class DataImageService
   end
 
   def save(extra_details, lat_sector, lng_sector, data)
+    return if data.nil?
     dir = "#{@zoom}/#{@map_point_type}/#{extra_details.join("/")}/#{lat_sector}".gsub(/[\/]+/, '/')
     filename = "#{lng_sector}.png"
     if USE_AWS_S3
