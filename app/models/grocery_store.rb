@@ -44,12 +44,15 @@ class GroceryStore < ApplicationRecord
   # "meal_takeaway", "park", "pharmacy"]
 
   # true == required
+  # required must be on top
 
   TAG_GROUPS = [
-    [false, %w(supermarket grocery_or_supermarket wholesale)], # Supermarkets, Grocery Stores, or Wholesale Stores (AKA Sam's Club / Costco)
     [true, %w(organic)], # Organic food
+    [false, %w(supermarket grocery_or_supermarket)], # Supermarkets, Grocery Stores
+    [false, %w(wholesale)], # Wholesale Stores (AKA Sam's Club / Costco)
     [false, %w(gas_station convenience_store dollar_store)], # Convenience Stores
-    [false, %w(deli butcher seafood cheese)], # Non-Vegan Specialties
+    [false, %w(deli butcher seafood)], # Non-Vegetarian Specialties
+    [false, %w(cheese)], # Cheese
     [false, %w(bakery pastry)], # Vegan Specialties
     false # Other categories (not in categories above)
   ]

@@ -48,6 +48,22 @@ class TagQuery
     end
   end
 
+  def all_calcs_in_tag(tag_num)
+    calc_num = (1 << tag_num)
+    calcs = [calc_num]
+    if(@record_type::TAG_GROUPS[tag_num] && @record_type::TAG_GROUPS[tag_num][0]) # required
+      calcs = [calc_num]
+      if tag_num+1 < @record_type::TAG_GROUPS.length
+        ((tag_num+1)...@record_type::TAG_GROUPS.length).each do |inner_tag_num|
+          all_calcs_in_tag(inner_tag_num).each do |inner_calc|
+            calcs << (calc_num | inner_calc)
+          end
+        end
+      end
+    end
+    calcs.sort
+  end
+
   private
 
   def raw_query_from(and_tags, or_tags, others)
