@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash'
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid,
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, FormControl, FormGroup, FormControlLabel, Checkbox, FormHelperText,
 Slider, CircularProgress, Typography, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core/';
 
 import { flashMessage } from '../actions/messages'
@@ -52,6 +52,17 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
     onClose(false);
   };
 
+  const handleGroceryStoreTagChange = (amount, checked) => {
+    let tags;
+    if(checked) {
+      tags = mapPreferences.preferences.grocery_store_tags | (1 << amount);
+    }
+    else {
+      tags =  mapPreferences.preferences.grocery_store_tags & ~(1 << amount);
+    }
+    tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_tags:tags })
+  };
+
   const handleUpdate = () => {
     setMapPreferenceErrors({});
     setLoading(true)
@@ -87,20 +98,74 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
       <Dialog open={true} disableBackdropClick={true} onClose={handleClose}>
         <DialogTitle>Update Your Map Preferences</DialogTitle>
         <DialogContent>
-          <Typography gutterBottom>
-            Grocery Store Proximity (minutes)
-          </Typography>
-          <Slider
-            classes={{markLabel:classes.groceryStoreQualityMarkLabel}}
-            value={mapPreferences.preferences.grocery_store_transit_type}
-            onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_transit_type:val })}
-            step={1}
-            min={1}
-            max={9}
-            valueLabelDisplay="auto"
-            marks={transitTypeMarks}
-            valueLabelFormat={(val) => ((val-1)%3+1)*8}
-          />
+          <ExpansionPanel>
+            <ExpansionPanelSummary>
+              <Typography>Grocery Store</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Ratio
+                  </Typography>
+                  <Slider
+                      value={mapPreferences.preferences.grocery_store_ratio}
+                      onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_ratio:val })}
+                      step={1}
+                      min={0}
+                      max={100}
+                      valueLabelDisplay="auto"
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Proximity (minutes)
+                  </Typography>
+                  <Slider
+                    classes={{markLabel:classes.groceryStoreQualityMarkLabel}}
+                    value={mapPreferences.preferences.grocery_store_transit_type}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_transit_type:val })}
+                    step={1}
+                    min={1}
+                    max={9}
+                    valueLabelDisplay="auto"
+                    marks={transitTypeMarks}
+                    valueLabelFormat={(val) => ((val-1)%3+1)*8}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl component="fieldset" className={classes.formControl}>
+                    <FormGroup>
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 1) & 1) == 1} onChange={e => handleGroceryStoreTagChange(1, e.target.checked)} name="organic" />}
+                        label="Organic"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={(mapPreferences.preferences.grocery_store_tags & 1) == 1} onChange={e => handleGroceryStoreTagChange(0, e.target.checked)} name="grocery_and_wholesale" />}
+                        label="Grocery Stores and Wholesale Stores"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 3) & 1) == 1} onChange={e => handleGroceryStoreTagChange(3, e.target.checked)} name="non_vegan_specialty" />}
+                        label="Butchers, Seafood, and Cheese Vendors"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 4) & 1) == 1} onChange={e => handleGroceryStoreTagChange(4, e.target.checked)} name="vegan_specialty" />}
+                        label="Bakeries and Pastry"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 2) & 1) == 1} onChange={e => handleGroceryStoreTagChange(2, e.target.checked)} name="convenience_stores" />}
+                        label="Convenience Stores"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 5) & 1) == 1} onChange={e => handleGroceryStoreTagChange(5, e.target.checked)} name="others" />}
+                        label="Others"
+                      />
+                    </FormGroup>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
           <ExpansionPanel>
             <ExpansionPanelSummary>
               <Typography>Ratios</Typography>
@@ -109,7 +174,7 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
               <Grid container>
                 <Grid item xs={12}>
                   <Typography gutterBottom>
-                    Grocery Store Quality
+                    Grocery Store
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
