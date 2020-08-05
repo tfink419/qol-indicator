@@ -10,10 +10,12 @@ class BuildQualityMapSegmentJob < ApplicationJob
     
     Signal.trap('INT') { throw SystemExit }
     Signal.trap('TERM') { throw SystemExit }
+
+    build_status.update!(percent:100, state:'received') if build_status.state == 'initialized'
+
     segment = build_status.segment
-    job_retry ||= build_status.created_at < 15.minutes.ago
-    build_status.update!(percent:100, state:'received')
     puts "Segment #{segment}"
+
     gstore_count = segment_part = (GroceryStore.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
     segment_low = (segment-1)*segment_part
     segment_low += 1 unless segment == 1
@@ -43,24 +45,28 @@ class BuildQualityMapSegmentJob < ApplicationJob
       isochrone_type = false
     end
 
-    # Isochrone only points
-    if isochrone_type
-      current = 0
-      build_status.update!(percent:0, state:'isochrones')
-      puts 'Isochrones State...'
-      before = Time.now
-      GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
-        current += 1
-        if Time.now-before > 5
-          before = Time.now
-          build_status.update!(percent:(100.0*current/gstore_count).round(2))
-        end
-        FetchIsochrone.new(gstore, GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP).fetch(transit_type_low, transit_type_high)
-      end
+    unless %w(received isochrones isochrones-complete).include?(build_status.state)
+      build_status.update!(percent:100, state:'received')
 
-      # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)
-      build_status.update!(state:'isochrones-complete', percent:100)
-      sleep(5) until build_status.reload.parent_status.state == 'quality-map-points'
+      # Isochrone only points
+      if isochrone_type
+        current = 0
+        build_status.update!(percent:0, state:'isochrones')
+        puts 'Isochrones State...'
+        before = Time.now
+        GroceryStore.offset(segment_low).limit(segment_part.round).find_each do |gstore|
+          current += 1
+          if Time.now-before > 5
+            before = Time.now
+            build_status.update!(percent:(100.0*current/gstore_count).round(2))
+          end
+          FetchIsochrone.new(gstore, GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP).fetch(transit_type_low, transit_type_high)
+        end
+
+        # Mark as complete and wait for parent job to be done (i.e. all other tasks are complete)
+        build_status.update!(state:'isochrones-complete', percent:100)
+        sleep(5) until build_status.reload.parent_status.state == 'quality-map-points'
+      end
     end
 
     @south_west_sector = MapSector.new(DataImageService::DATA_CHUNK_SIZE, MapPoint.from_coords(build_status.parent_status.south_west))
@@ -73,81 +79,83 @@ class BuildQualityMapSegmentJob < ApplicationJob
     )
     @lat_sector = current_sector.lat_sector
     puts 'Quality Map Points'
-    build_status.update!(percent:0, state:'quality-map-points', updated_at:Time.now)
-    while true # see towards bottom of loop
-      puts "Lat Sector: #{@lat_sector}"
-      while current_sector.lng_sector <= @north_east_sector.lng_sector
-        (transit_type_low..transit_type_high).each do |transit_type|
-          (0...num_tags).each do |tag_num|
-            TagQuery.new(GroceryStore).all_calcs_in_tag(tag_num).each do |tag_calc_num|
-              if num_tags == 1
-                parent_query = {
-                  name:parent_class.name,
-                  table_name:parent_class.table_name,
-                  query:'all'
-                }
-              else
-                parent_query = TagQuery.new(parent_class).query(tag_calc_num, true)
-              end
-              new_quality_maps = []
-              if point_type == 'GroceryStoreFoodQuantityMapPoint'
-                travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
-              end
-              polygons = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
-              all_near_bounds_with_parent(
-                current_sector.south,
-                current_sector.west,
-                current_sector.north,
-                current_sector.east,
-                travel_type,
-                distance
-              )
-              # skip to next block if none found
-  
-              added_params = extra_params.map do |param|
-                case param
-                when :transit_type
-                  transit_type
-                when :tags
-                  tag_calc_num
+    if %w(received isochrones-complete quality-map-points).include?(build_status.state)
+      build_status.update!(percent:0, state:'quality-map-points', updated_at:Time.now)
+      while true # see towards bottom of loop
+        puts "Lat Sector: #{@lat_sector}"
+        while current_sector.lng_sector <= @north_east_sector.lng_sector
+          (transit_type_low..transit_type_high).each do |transit_type|
+            (0...num_tags).each do |tag_num|
+              TagQuery.new(GroceryStore).all_calcs_in_tag(tag_num).each do |tag_calc_num|
+                if num_tags == 1
+                  parent_query = {
+                    name:parent_class.name,
+                    table_name:parent_class.table_name,
+                    query:'all'
+                  }
+                else
+                  parent_query = TagQuery.new(parent_class).query(tag_calc_num, true)
                 end
-              end
-              unless polygons.blank?
-                create_and_save_data_image(
-                  image_service,
-                  current_sector,
-                  polygons,
-                  point_class,
-                  parent_class,
-                  added_params
+                new_quality_maps = []
+                if point_type == 'GroceryStoreFoodQuantityMapPoint'
+                  travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+                end
+                polygons = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
+                all_near_bounds_with_parent(
+                  current_sector.south,
+                  current_sector.west,
+                  current_sector.north,
+                  current_sector.east,
+                  travel_type,
+                  distance
                 )
+                # skip to next block if none found
+    
+                added_params = extra_params.map do |param|
+                  case param
+                  when :transit_type
+                    transit_type
+                  when :tags
+                    tag_calc_num
+                  end
+                end
+                unless polygons.blank?
+                  create_and_save_data_image(
+                    image_service,
+                    current_sector,
+                    polygons,
+                    point_class,
+                    parent_class,
+                    added_params
+                  )
+                end
               end
             end
           end
+          current_sector = current_sector.next_lng_sector
+          @lng_sector = current_sector.lng_sector
+          build_status.update!(
+            percent:calc_grocery_store_quality_map_point_percent
+          )
         end
-        current_sector = current_sector.next_lng_sector
+        @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
+        break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
+        current_sector = MapSector.from_sectors(
+          DataImageService::DATA_CHUNK_SIZE,
+          @lat_sector,
+          @south_west_sector.lng_sector
+        )
         @lng_sector = current_sector.lng_sector
+        build_status.parent_status.update!(
+          current_lat:current_sector.south,
+          current_lat_sector:@lat_sector
+        )
         build_status.update!(
+          current_lat:current_sector.south,
+          current_lat_sector:@lat_sector,
           percent:calc_grocery_store_quality_map_point_percent
         )
       end
-      @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
-      break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
-      current_sector = MapSector.from_sectors(
-        DataImageService::DATA_CHUNK_SIZE,
-        @lat_sector,
-        @south_west_sector.lng_sector
-      )
-      @lng_sector = current_sector.lng_sector
-      build_status.parent_status.update!(
-        current_lat:current_sector.south,
-        current_lat_sector:@lat_sector
-      )
-      build_status.update!(
-        current_lat:current_sector.south,
-        current_lat_sector:@lat_sector,
-        percent:calc_grocery_store_quality_map_point_percent
-      )
     end
     puts "Building Initial Points Complete"
     build_status.update!(percent:100, state:'waiting-subsample')
@@ -179,7 +187,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
             (0...num_tags).each do |tag_num|
-              TagQuery.new(GroceryStore).all_calcs_in_tag(tag_num).each do |tag_calc_num|
+              TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 added_params = extra_params.map do |param|
                   case param
                   when :transit_type
@@ -205,12 +213,12 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 end
               end
             end
-            current_sector = current_sector.next_lng_sector
-            @lng_sector = current_sector.lng_sector
-            build_status.update!(
-              percent:calc_grocery_store_quality_map_point_percent
-            )
           end
+          current_sector = current_sector.next_lng_sector
+          @lng_sector = current_sector.lng_sector
+          build_status.update!(
+            percent:calc_grocery_store_quality_map_point_percent
+          )
         end
         @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
         break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]

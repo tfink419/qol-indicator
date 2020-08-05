@@ -137,27 +137,35 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
                   <FormControl component="fieldset" className={classes.formControl}>
                     <FormGroup>
                       <FormControlLabel
-                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 1) & 1) == 1} onChange={e => handleGroceryStoreTagChange(1, e.target.checked)} name="organic" />}
+                        control={<Checkbox checked={(mapPreferences.preferences.grocery_store_tags & 1) == 1} onChange={e => handleGroceryStoreTagChange(0, e.target.checked)} name="organic" />}
                         label="Organic"
                       />
                       <FormControlLabel
-                        control={<Checkbox checked={(mapPreferences.preferences.grocery_store_tags & 1) == 1} onChange={e => handleGroceryStoreTagChange(0, e.target.checked)} name="grocery_and_wholesale" />}
-                        label="Grocery Stores and Wholesale Stores"
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 1) & 1) == 1} onChange={e => handleGroceryStoreTagChange(1, e.target.checked)} name="grocery_and_wholesale" />}
+                        label="Grocery Stores"
                       />
                       <FormControlLabel
-                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 3) & 1) == 1} onChange={e => handleGroceryStoreTagChange(3, e.target.checked)} name="non_vegan_specialty" />}
-                        label="Butchers, Seafood, and Cheese Vendors"
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 2) & 1) == 1} onChange={e => handleGroceryStoreTagChange(2, e.target.checked)} name="grocery_and_wholesale" />}
+                        label="Wholesale Stores"
                       />
                       <FormControlLabel
-                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 4) & 1) == 1} onChange={e => handleGroceryStoreTagChange(4, e.target.checked)} name="vegan_specialty" />}
-                        label="Bakeries and Pastry"
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 4) & 1) == 1} onChange={e => handleGroceryStoreTagChange(4, e.target.checked)} name="non_vegan_specialty" />}
+                        label="Butchers and Seafood Vendors"
                       />
                       <FormControlLabel
-                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 2) & 1) == 1} onChange={e => handleGroceryStoreTagChange(2, e.target.checked)} name="convenience_stores" />}
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 5) & 1) == 1} onChange={e => handleGroceryStoreTagChange(5, e.target.checked)} name="non_vegan_specialty" />}
+                        label="Cheese Vendors"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 6) & 1) == 1} onChange={e => handleGroceryStoreTagChange(6, e.target.checked)} name="vegan_specialty" />}
+                        label="Bakeries and Pastries"
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 3) & 1) == 1} onChange={e => handleGroceryStoreTagChange(3, e.target.checked)} name="convenience_stores" />}
                         label="Convenience Stores"
                       />
                       <FormControlLabel
-                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 5) & 1) == 1} onChange={e => handleGroceryStoreTagChange(5, e.target.checked)} name="others" />}
+                        control={<Checkbox checked={((mapPreferences.preferences.grocery_store_tags >> 7) & 1) == 1} onChange={e => handleGroceryStoreTagChange(7, e.target.checked)} name="others" />}
                         label="Others"
                       />
                     </FormGroup>

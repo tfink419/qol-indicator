@@ -126,17 +126,17 @@ class Geocode
   end
   
   def attempt_geocode_if_needed
-    unless @place.valid?
+    if !@place.valid?
       if @place.only_coordinates_invalid?
         @geocoded = geocode
         parse_google_geocode if @geocoded
       elsif @place.only_needs_address?
-        @geocoded = reverse_geocode
+        @geocoded = reverse_geocode_google
         parse_google_geocode if @geocoded
-      elsif @place.zip.nil?
-        @geocoded = reverse_geocode_only_zip
-        parse_mapbox_geocode if @geocoded
       end
+    elsif @place.zip.nil?
+      @geocoded = reverse_geocode_mapbox
+      parse_mapbox_geocode if @geocoded
     end
   end
 
@@ -158,9 +158,23 @@ class Geocode
     nil
   end
 
-  def reverse_geocode
+  def reverse_geocode_google
     with_retries(max_tries: 3) {
       response = Google::Maps.geocode("#{@place.lat}, #{@place.long}")
+      response.first
+    }
+  rescue StandardError => err
+    $stderr.print err
+    $stderr.print err.backtrace
+    nil
+  end
+
+  def reverse_geocode_mapbox
+    with_retries(max_tries: 3) {
+      response = Mapbox::Geocoder.geocode_reverse({
+        "latitude": @place.lat,
+        "longitude": @place.long
+      })
       response.first
     }
   rescue StandardError => err
@@ -188,7 +202,7 @@ class Geocode
 
   def parse_mapbox_geocode
     if !@place.zip.present?
-      @place.zip = placenames.first["features"].find { |feature| feature["place_type"][0] == "postcode" }["text"].to_i
+      @place.zip = @geocoded["features"].find { |feature| feature["place_type"][0] == "postcode" }["text"].to_i
     end
   end
 end

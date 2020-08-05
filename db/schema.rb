@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_03_155650) do
+ActiveRecord::Schema.define(version: 2020_08_04_174148) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 2020_08_03_155650) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["census_tract_id"], name: "index_census_tract_polygons_on_census_tract_id", unique: true
+    t.index ["south_bound", "north_bound", "west_bound", "east_bound"], name: "index_census_tract_polygons_on_bounds"
   end
 
   create_table "census_tracts", force: :cascade do |t|

@@ -20,15 +20,23 @@ class QualityMapService
         GroceryStoreFoodQuantityMapPoint::HIGH,
         normalized_grocery_store_ratio,
         GroceryStoreFoodQuantityMapPoint::SCALE,
-        false # invert
+        false, # invert
+        GroceryStore::QUALITY_CALC_METHOD,
+        GroceryStore::QUALITY_CALC_VALUE
       ]
       extra_params = [
         @map_preferences["grocery_store_transit_type"],
-        @map_preferences["grocery_store_tags"]
+        0
       ]
-      images << DataImageService.
-                new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom).
-                load(extra_params, @lat_sector, @lng_sector)
+      
+      images << TagQuery.new(GroceryStore).
+      breakup_calc_num(@map_preferences["grocery_store_tags"]).
+      map { |tag_calc|
+        extra_params[1] = tag_calc
+        DataImageService.
+          new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom).
+          load(extra_params, @lat_sector, @lng_sector)
+      }.filter{ |image| !image.nil? }
     end
     if normalized_census_tract_poverty_ratio > 0
       image_data << [
@@ -36,11 +44,13 @@ class QualityMapService
         @map_preferences["census_tract_poverty_high"],
         normalized_census_tract_poverty_ratio,
         CensusTractPovertyMapPoint::SCALE,
-        true # invert
+        true, # invert
+        CensusTract::QUALITY_CALC_METHOD,
+        CensusTract::QUALITY_CALC_VALUE
       ]
-      images << DataImageService.
+      images << [DataImageService.
                 new(CensusTractPovertyMapPoint::SHORT_NAME, @zoom).
-                load([], @lat_sector, @lng_sector)
+                load([], @lat_sector, @lng_sector)].filter{ |image| !image.nil? }
     end
     im = QualityMapImage.colorized_quality_image(DataImageService::DATA_CHUNK_SIZE, images, image_data)
     im
