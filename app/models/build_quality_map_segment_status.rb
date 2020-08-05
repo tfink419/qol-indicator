@@ -20,10 +20,6 @@ class BuildQualityMapSegmentStatus < ApplicationRecord
     error || %w(waiting-subsample).include?(state)
   end
 
-  def atleast_waiting_subsample_state?
-    error || %w(waiting-subsample).include?(state)
-  end
-
   def atleast_quality_map_state?
     error || %w(quality-map-points waiting-subsample subsample).include?(state)
   end
