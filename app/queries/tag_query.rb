@@ -66,18 +66,22 @@ class TagQuery
   end
 
   def breakup_calc_num(calc_num)
-    any_required = (0..@record_type::TAG_GROUPS.length).any? do |tag_num| 
-      @record_type::TAG_GROUPS[tag_num] && @record_type::TAG_GROUPS[tag_num][0] && ((1 << tag_num) & calc_num )!= 0
-    end
-    if any_required
-      [calc_num]
-    else
-      (0..@record_type::TAG_GROUPS.length).reduce([]) do |calcs, tag_num|
-        calc = ((1 << tag_num) & calc_num)
-        calcs << calc if calc != 0
-        calcs
+    required = 0
+    calcs = (0..@record_type::TAG_GROUPS.length).reduce([]) do |calcs, tag_num|
+      calc = ((1 << tag_num) & calc_num)
+      if calc != 0
+        if @record_type::TAG_GROUPS[tag_num] && @record_type::TAG_GROUPS[tag_num][0]
+          required = required | (1 << tag_num)
+        else
+          calcs << (required | calc)
+        end
       end
+      calcs
     end
+    if calcs.empty? && required != 0 && calc_num != 0
+      calcs << required
+    end
+    calcs
   end
 
   private

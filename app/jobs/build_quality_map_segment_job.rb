@@ -45,7 +45,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       isochrone_type = false
     end
 
-    unless %w(received isochrones isochrones-complete).include?(build_status.state)
+    if %w(initialized received isochrones isochrones-complete).include?(build_status.state)
       build_status.update!(percent:100, state:'received')
 
       # Isochrone only points
