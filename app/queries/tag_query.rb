@@ -92,13 +92,15 @@ class TagQuery
     if and_tags.length > 0
       queries << and_tags.map { |tag| "'#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" AND ")
     end
+    or_queries = []
     if or_tags.length > 0
-      queries << or_tags.map { |tag| "'#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" OR ")
+      or_queries << or_tags.map { |tag| "'#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" OR ")
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
-      queries << to_not.map { |tag| "NOT ('#{tag}' = ANY(#{@record_type.table_name}.tags))" }.join(" AND ")
+      or_queries << to_not.map { |tag| "NOT ('#{tag}' = ANY(#{@record_type.table_name}.tags))" }.join(" AND ")
     end
+    queries << or_queries.map { |a_query| "(#{a_query})"}.join(" OR ")
     queries.map { |a_query| "(#{a_query})"}.join(" AND ")
   end
 
@@ -111,25 +113,22 @@ class TagQuery
         query_record = query_record.where(["? = ANY(tags)", tag])
       end
     end
+    or_queries = []
     if or_tags.length > 0
-      or_queries = []
       or_tags.each do |tag|
         or_queries << "'#{tag}' = ANY(tags)"
-      end
-      if query_record.nil?
-        query_record = @record_type.where(Arel.sql(or_queries.join(" OR ")))
-      else
-        query_record = query_record.where(Arel.sql(or_queries.join(" OR ")))
       end
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
-      to_not.each do |tag|
-        if query_record.nil?
-          query_record = @record_type.where.not(["? = ANY(tags)", tag])
-        else
-          query_record = query_record.where.not(["? = ANY(tags)", tag])
-        end
+      not_queries = to_not.map { |tag| "NOT '#{tag}' = ANY(tags)" }
+      or_queries << "(#{not_queries.join(" AND ")})"
+    end
+    unless or_queries.empty?
+      if query_record.nil?
+        query_record = @record_type.where(Arel.sql(or_queries.join(" OR ")))
+      else
+        query_record = query_record.where(Arel.sql(or_queries.join(" OR ")))
       end
     end
     query_record

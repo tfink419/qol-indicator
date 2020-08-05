@@ -6,6 +6,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
 
   def perform(build_status)
     return if build_status.state == 'complete'
+    if build_status.parent_status.id != BuildQualityMapStatus.most_recent.id
+      return BuildQualityMapSegmentJob.set(wait: 15.seconds).perform_later(@build_status)
+    end
     Rails.logger = ActiveRecord::Base.logger = Sidekiq.logger
     
     Signal.trap('INT') { throw SystemExit }
