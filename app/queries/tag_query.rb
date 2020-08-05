@@ -98,9 +98,11 @@ class TagQuery
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
-      or_queries << to_not.map { |tag| "NOT ('#{tag}' = ANY(#{@record_type.table_name}.tags))" }.join(" AND ")
+      or_queries << to_not.map { |tag| "NOT '#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" AND ")
     end
-    queries << or_queries.map { |a_query| "(#{a_query})"}.join(" OR ")
+    unless or_queries.empty?
+      queries << or_queries.map { |a_query| "(#{a_query})"}.join(" OR ")
+    end
     queries.map { |a_query| "(#{a_query})"}.join(" AND ")
   end
 
