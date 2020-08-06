@@ -49,6 +49,7 @@ class TagQuery
   end
 
   def all_calcs_in_tag(tag_num)
+    return [0] if @record_type::TAG_GROUPS.length == 0 
     return [] if tag_num >= @record_type::TAG_GROUPS.length
     calc_num = (1 << tag_num)
     calcs = [calc_num]

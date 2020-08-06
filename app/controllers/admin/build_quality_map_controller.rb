@@ -32,7 +32,7 @@ class Admin::BuildQualityMapController < ApplicationController
       south_west:south_west,
       north_east:north_east,
       transit_type_low:1,
-      transit_type_high:GroceryStore::NUM_TRANSIT_TYPES,
+      transit_type_high:transit_type_high,
       point_type:point_type
     )
     BuildQualityMapJob.perform_later(build_status)

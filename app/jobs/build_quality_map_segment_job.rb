@@ -44,7 +44,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       parent_class_id = "census_tract_id"
       quality_column_name = "poverty_percent"
       extra_params = []
-      num_tags = 1
+      num_tags = 0
       isochrone_type = false
     end
 
@@ -89,8 +89,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
             (0...num_tags).each do |tag_num|
-              TagQuery.new(GroceryStore).all_calcs_in_tag(tag_num).each do |tag_calc_num|
-                if num_tags == 1
+              TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
+                if num_tags == 0
                   parent_query = {
                     name:parent_class.name,
                     table_name:parent_class.table_name,

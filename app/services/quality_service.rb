@@ -40,7 +40,7 @@ class QualityService
         table_name:CensusTract.table_name,
         query:'all'
       }
-      polygons = PolygonQuery.new(CensusTractPolygon, CensusTract, 'census_tract_id', 'poverty_percent')\
+      polygons = PolygonQuery.new(CensusTractPolygon, parent_query, 'census_tract_id', 'poverty_percent')\
       .all_near_point_with_parent_and_ids(@lat, @long, nil, nil)
       # skip to next block if none found
       if polygons.blank?

@@ -9,7 +9,7 @@ class PolygonQuery
 
   def all_near_bounds_with_parent(south, west, north, east, travel_type, distance)
     if @parent_class[:query] == 'none'
-      return @polygon_class.where(id:nil)
+      return @polygon_class.none
     end
     where_query = {}
     if @is_isochronable_type
@@ -31,7 +31,7 @@ class PolygonQuery
   
   def all_near_point_with_parent_and_ids(lat, long, travel_type, distance)
   if @parent_class[:query] == 'none'
-    return @polygon_class.where(id:nil)
+    return @polygon_class.none
   end
   where_query = {}
   if @is_isochronable_type

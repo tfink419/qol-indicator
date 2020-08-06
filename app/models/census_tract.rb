@@ -9,6 +9,8 @@ class CensusTract < ApplicationRecord
   QUALITY_CALC_METHOD = 'First'
   QUALITY_CALC_VALUE = 0
 
+  TAG_GROUPS = []
+
   def public_attributes
     {
       poverty_percent: poverty_percent,
