@@ -88,7 +88,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
-            (0...num_tags).each do |tag_num|
+            (0..num_tags).each do |tag_num|
+              next if num_tags != 0 && tag_num == num_tags
               TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 if num_tags == 0
                   parent_query = {
@@ -189,7 +190,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
         puts "Zoom: #{zoom}, Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
-            (0...num_tags).each do |tag_num|
+            (0..num_tags).each do |tag_num|
+              next if num_tags != 0 && tag_num == num_tags
               TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 added_params = extra_params.map do |param|
                   case param

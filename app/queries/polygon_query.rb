@@ -7,7 +7,7 @@ class PolygonQuery
     @is_isochronable_type = (@parent_id_column == 'isochronable_id')
   end
 
-  def all_near_bounds_with_parent(south, west, north, east, travel_type, distance)
+  def all_near_bounds_with_parent(south, west, north, east, travel_type, distance, raw=false)
     if @parent_class[:query] == 'none'
       return @polygon_class.none
     end
@@ -25,8 +25,13 @@ class PolygonQuery
     if @parent_class[:query] != 'all'
       query = query.where(@parent_class[:query])
     end
-    query.
-    pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class[:table_name]}.#{@parent_quality_column}"))
+    if raw
+      query.
+      select(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class[:table_name]}.#{@parent_quality_column}"), Arel.sql("#{@parent_class[:table_name]}.id")).to_sql
+    else
+      query.
+      pluck(Arel.sql("#{@polygon_class.table_name}.geometry"), Arel.sql("#{@parent_class[:table_name]}.#{@parent_quality_column}"))
+    end
   end
   
   def all_near_point_with_parent_and_ids(lat, long, travel_type, distance)

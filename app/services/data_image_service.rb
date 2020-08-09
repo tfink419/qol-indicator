@@ -13,31 +13,35 @@ class DataImageService
     end
   end
 
-  def save(extra_details, lat_sector, lng_sector, data)
-    return if data.nil?
+  def get_path(extra_details, lat_sector, lng_sector)
     dir = "#{@zoom}/#{@map_point_type}/#{extra_details.join("/")}/#{lat_sector}".gsub(/[\/]+/, '/')
     filename = "#{lng_sector}.png"
+    "#{dir}/#{filename}"
+  end
+
+  def save(extra_details, lat_sector, lng_sector, data)
+    return if data.nil?
+    file_path = get_path(extra_details, lat_sector, lng_sector)
     if USE_AWS_S3
       @s3_client.put_object(bucket: @bucket, key: "#{dir}/#{filename}", body:data)
     else
+      puts "Saving: '#{file_path}'"
       dir = "#{Rails.root}/quality_map_image_data/#{dir}"
       FileUtils.mkdir_p dir
-      File.open("#{dir}/#{filename}", 'wb') { |f| f.write(data) }
+      File.open(file_path, 'wb') { |f| f.write(data) }
     end
   end
 
   def load(extra_details, lat_sector, lng_sector)
-    dir = "#{@zoom}/#{@map_point_type}/#{extra_details.join("/")}/#{lat_sector}".gsub(/[\/]+/,"/")
-    filename = "#{lng_sector}.png"
+    file_path = get_path(extra_details, lat_sector, lng_sector)
     if USE_AWS_S3
       @s3_client.get_object({
         bucket: @bucket, 
-        key: "#{dir}/#{filename}", 
+        key: file_path, 
       }).body.read rescue nil
     else
-      dir = "#{Rails.root}/quality_map_image_data/#{dir}"
-      file_path = "#{dir}/#{filename}"
       puts "Retrieving: '#{file_path}'"
+      dir = "#{Rails.root}/quality_map_image_data/#{dir}"
       File.read(file_path) if(File.exist?(file_path))
     end
   end

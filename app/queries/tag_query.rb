@@ -67,6 +67,7 @@ class TagQuery
   end
 
   def breakup_calc_num(calc_num)
+    return [0] if @record_type::TAG_GROUPS.length == 0
     required = 0
     calcs = (0..@record_type::TAG_GROUPS.length).reduce([]) do |calcs, tag_num|
       calc = ((1 << tag_num) & calc_num)
