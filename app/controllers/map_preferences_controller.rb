@@ -2,7 +2,7 @@ class MapPreferencesController < ApplicationController
   before_action :confirm_logged_in
   def show
     user = User.find(session[:user_id])
-    user.create_map_preferences unless map_preferences
+    user.create_map_preferences unless user.map_preferences
     render :json => { 
       :status => 0, 
       :map_preferences => user.map_preferences.public_attributes
