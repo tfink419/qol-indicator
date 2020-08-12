@@ -8,7 +8,7 @@ class DataImageCuda
   REDIS_INCR_NAME = "data_image_qda:max_id"
   
   def initialize
-    @redis = Redis.new(url:ENV['REDIS_URL'] || "redis://localhost:6379")
+    @redis = Redis.new(url:ENV['REDIS_PROVIDER'] || "redis://localhost:6379")
   end
   
   def queue(lat, lng, multiply_const,

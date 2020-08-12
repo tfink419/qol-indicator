@@ -19,6 +19,11 @@ class DataImageService
     "#{dir}/#{filename}"
   end
 
+  def presigned_url_put(extra_details, lat_sector, lng_sector)
+    signer = Aws::S3::Presigner.new(client:@s3_client)
+    signer.presigned_url(:put_object, bucket: "my-qoli-data", key: path)
+  end
+
   def save(extra_details, lat_sector, lng_sector, data)
     return if data.nil?
     file_path = get_path(extra_details, lat_sector, lng_sector)
