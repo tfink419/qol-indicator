@@ -31,6 +31,7 @@ class DataImageCuda
   end
 
   def status(id)
+    @redis.rget("#{REDIS_STATUS_DIR_NAME}:#{id}")
   end
 
 end
