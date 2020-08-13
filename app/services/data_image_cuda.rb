@@ -32,11 +32,7 @@ class DataImageCuda
   end
 
   def status(id)
-    status_details = @redis.get("#{REDIS_STATUS_DIR_NAME}:#{id}").split(":")
-    {
-      status:status_details[0],
-      updated_at:DateTime.strptime(details[1],'%s')
-    }
+    @redis.hgetall("#{REDIS_STATUS_DIR_NAME}:#{id}")
   end
 
 end
