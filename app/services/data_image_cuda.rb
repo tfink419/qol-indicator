@@ -1,3 +1,4 @@
+require 'date'
 class DataImageCuda
   METHOD_MAP = {
     "LogExpSum" => 0,
@@ -31,7 +32,11 @@ class DataImageCuda
   end
 
   def status(id)
-    @redis.rget("#{REDIS_STATUS_DIR_NAME}:#{id}")
+    status_details = @redis.get("#{REDIS_STATUS_DIR_NAME}:#{id}").split(":")
+    {
+      status:status_details[0],
+      updated_at:DateTime.strptime(details[1],'%s')
+    }
   end
 
 end
