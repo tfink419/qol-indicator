@@ -1,6 +1,6 @@
 require 'date'
 class DataImageCuda
-  class TimeoutError < StandardError;
+  class TimeoutError < StandardError; end
   METHOD_MAP = {
     "LogExpSum" => 0,
     "First" => 1
@@ -33,20 +33,20 @@ class DataImageCuda
   end
 
   def await_complete
+    return nil if @id.nil?
     message = "magic"
     @redis.subscribe_with_timeout(60, "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{@id}") do |on|
       on.message do |channel, message|
         message == "success"
       end
-    rescue Redis::TimeoutError
-      throw TimeoutError.new "Timed out waiting for CUDA computation"
     end
     message
+  rescue Redis::TimeoutError
+    throw TimeoutError.new "Timed out waiting for CUDA computation"
   end
 
   def get_details
+    return nil if @id.nil?
     @redis.hgetall("#{REDIS_DETAILS_BASE_NAME}:#{@id}")
-    self
   end
-
 end
