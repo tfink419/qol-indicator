@@ -22,7 +22,7 @@ class DataImageCuda
       quality_calc_method, quality_calc_value,
       url, query)
     id = @redis.incr REDIS_INCR_NAME
-    @redis.rpush REDIS_QUEUE_NAME, @id.to_s
+    @redis.lpush REDIS_QUEUE_NAME, @id.to_s
     queue_details_key = "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
     @redis.hset(queue_details_key, "start_lat", lat.to_s)
     @redis.hset(queue_details_key, "start_lng", lng.to_s)
