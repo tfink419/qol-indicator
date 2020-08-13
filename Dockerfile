@@ -11,7 +11,7 @@ COPY Gemfile* ./
 RUN gem install bundler -v 2.1.4
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN $GITHUB_TOKEN
-RUN bundle install
+RUN bundle install --without development test
 COPY . .
 
 # Start the main process.

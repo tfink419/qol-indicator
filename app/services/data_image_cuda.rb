@@ -5,7 +5,8 @@ class DataImageCuda
     "First" => 1
   }
   REDIS_QUEUE_NAME = "data_image_qda:queue"
-  REDIS_STATUS_DIR_NAME = "data_image_qda:status"
+  REDIS_COMPLETE_CHANNEL_BASE_NAME = "data_image_qda:complete"
+  REDIS_DETAILS_BASE_NAME = "data_image_qda:details"
   REDIS_INCR_NAME = "data_image_qda:max_id"
   
   def initialize
@@ -31,8 +32,13 @@ class DataImageCuda
   id
   end
 
-  def status(id)
-    @redis.hgetall("#{REDIS_STATUS_DIR_NAME}:#{id}")
+  def await_complete(id)
+    @redis.subscribe_with_timeout(5, "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}") do |on|
+      on.message do |channel, message|
+        yield message
+      end
+      pp on.methods
+    end
   end
 
 end
