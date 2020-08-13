@@ -19,7 +19,7 @@ class DataImageCuda
       quality_calc_method, quality_calc_value,
       url, query)
     @id = @redis.incr REDIS_INCR_NAME
-    @redis.rpush REDIS_QUEUE_NAME, "#{id}
+    @redis.rpush REDIS_QUEUE_NAME, "#{@id}
 #{lat}
 #{lng}
 #{multiply_const}
