@@ -50,6 +50,7 @@ class BuildQualityMapJob < ApplicationJob
 
       # Isochrone only points
       if isochrone_type
+        parent_class_count = parent_class.count
         current = 0
         build_status.update!(percent:0, state:'isochrones')
         puts 'Isochrones State...'
@@ -58,7 +59,7 @@ class BuildQualityMapJob < ApplicationJob
           current += 1
           if Time.now-before > 5
             before = Time.now
-            build_status.update!(percent:(100.0*current/isochrone_parent_count_count).round(2))
+            build_status.update!(percent:(100.0*current/parent_class_count).round(2))
           end
           FetchIsochrone.new(parent, point_class::TRANSIT_TYPE_MAP).fetch(transit_type_low, transit_type_high)
         end
