@@ -19,9 +19,6 @@ class BuildQualityMapSegmentJob < ApplicationJob
     segment = build_status.segment
     puts "Segment #{segment}"
 
-    segment_low = (segment-1)*segment_part
-    segment_low += 1 unless segment == 1
-    segment_low = segment_low.round
     transit_type_low = build_status.parent_status.transit_type_low
     transit_type_high = build_status.parent_status.transit_type_high
     point_type = build_status.parent_status.point_type
@@ -36,6 +33,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
       extra_params = [:transit_type, :tags]
       num_tags = GroceryStore::TAG_GROUPS.length
       isochronable_count = segment_part = (parent_class.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
+      segment_low = (segment-1)*segment_part
+      segment_low += 1 unless segment == 1
+      segment_low = segment_low.round
       isochrone_type = true
     when 'CensusTractPovertyMapPoint'
       point_class = CensusTractPovertyMapPoint
