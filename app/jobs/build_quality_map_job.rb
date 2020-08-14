@@ -1,4 +1,5 @@
 class BuildQualityMapJob < ApplicationJob
+  class NoSuchPointTypeError < StandardError; end
   queue_as :build_quality_map
   sidekiq_options retry: 0
 
@@ -34,10 +35,12 @@ class BuildQualityMapJob < ApplicationJob
       extra_params = []
       num_tags = 0
       isochrone_type = false
+    else
+      throw NoSuchPointTypeError.new("Invalid Point Type Given")
     end
 
-    transit_type_low = build_status.transit_type_low
-    transit_type_high = build_status.transit_type_high
+    transit_type_low = @build_status.transit_type_low
+    transit_type_high = @build_status.transit_type_high
 
     @build_status.update!(state:'received', percent:100) if @build_status.state == 'initialized'
 
@@ -69,16 +72,20 @@ class BuildQualityMapJob < ApplicationJob
     end
 
     current_sector = @south_west_sector
-    if %w(isochrones quality-map-points).include?(@build_status.state)
+    if %w(received isochrones quality-map-points).include?(@build_status.state)
+      puts "Building Quality Points"
       @lat_sector = current_sector.lat_sector
       @lng_sector = current_sector.lng_sector
       build_status.update!(percent:0, state:'quality-map-points')
       while # see towards bottom of loop
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
+          puts "Lng Sector: #{@lng_sector}"
           (transit_type_low..transit_type_high).each do |transit_type|
+            puts "Transit Type: #{transit_type}"
             (0..num_tags).each do |tag_num|
               next if num_tags != 0 && tag_num == num_tags
+              puts "Tag Num: #{tag_num}"
               TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 if num_tags == 0
                   parent_query = {
@@ -133,7 +140,7 @@ class BuildQualityMapJob < ApplicationJob
           end
           current_sector = current_sector.next_lng_sector
           @lng_sector = current_sector.lng_sector
-          @lng_percent = (@build_status.current_lng_sector-@south_west_sector.lng_sector).to_f /
+          @lng_percent = (@lng_sector-@south_west_sector.lng_sector).to_f /
             (@north_east_sector.lng_sector-@south_west_sector.lng_sector+1)
           build_status.update!(
             percent:calc_grocery_store_quality_map_point_percent
@@ -221,10 +228,11 @@ class BuildQualityMapJob < ApplicationJob
 
     puts "Complete"
     @build_status.update!(percent:100, state:'complete')
-    HerokuWorkersService.new(NUM_SEGMENTS+1).stop
   rescue => err
     puts "Errored out"
     @build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
+  ensure
+    HerokuWorkersService.new(NUM_SEGMENTS+1).stop
   end
 
   private
