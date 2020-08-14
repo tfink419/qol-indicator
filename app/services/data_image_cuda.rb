@@ -13,7 +13,7 @@ class DataImageCuda
   REDIS_DETAILS_BASE_NAME = "data_image_qda:details"
   REDIS_INCR_NAME = "data_image_qda:max_id"
   
-  def initialize()
+  def initialize
     @redis = Redis.new(url:ENV['REDISCLOUD_URL'] || "redis://localhost:6379")
   end
   
