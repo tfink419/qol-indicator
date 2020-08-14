@@ -117,15 +117,6 @@ class BuildQualityMapJob < ApplicationJob
                     distance,
                     true # Raw
                   )
-                  pp PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
-                  all_near_bounds_with_parent(
-                    current_sector.south,
-                    current_sector.west,
-                    current_sector.north,
-                    current_sector.east,
-                    travel_type,
-                    distance
-                  )
                   # skip to next block if none found
                   added_params = extra_params.map do |param|
                     case param

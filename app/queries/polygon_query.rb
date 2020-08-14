@@ -8,12 +8,12 @@ class PolygonQuery
   end
 
   def any_near_bounds_with_parent?(south, west, north, east, travel_type, distance)
-    any_near_bounds_with_parent_query(south, west, north, east, travel_type, distance, false).
+    all_near_bounds_with_parent_query(south, west, north, east, travel_type, distance, false).
     any?
   end
 
   def all_near_bounds_with_parent(south, west, north, east, travel_type, distance, raw=false)
-    query = any_near_bounds_with_parent_query(south, west, north, east, travel_type, distance, raw)
+    query = all_near_bounds_with_parent_query(south, west, north, east, travel_type, distance, raw)
     if raw
       query.
       select(
@@ -71,7 +71,7 @@ class PolygonQuery
 
   private
   
-  def any_near_bounds_with_parent_query(south, west, north, east, travel_type, distance, raw)
+  def all_near_bounds_with_parent_query(south, west, north, east, travel_type, distance, raw)
     if @parent_class[:query] == 'none'
       return @polygon_class.none
     end
