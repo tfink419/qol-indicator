@@ -125,7 +125,7 @@ class BuildQualityMapJob < ApplicationJob
                       tag_calc_num
                     end
                   end
-                  url = DataImageService.new(parent_class::SHORT_NAME, current_sector.zoom).
+                  url = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom).
                     presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
                   id = dic.queue(
                     current_sector.south_step,
