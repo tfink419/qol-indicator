@@ -98,7 +98,7 @@ class BuildQualityMapJob < ApplicationJob
                 if @build_status.point_type == 'GroceryStoreFoodQuantityMapPoint'
                   travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
                 end
-                unless PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
+                if PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
                     all_near_bounds_with_parent(
                       current_sector.south,
                       current_sector.west,
