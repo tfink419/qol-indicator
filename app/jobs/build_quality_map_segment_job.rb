@@ -135,17 +135,25 @@ class BuildQualityMapSegmentJob < ApplicationJob
                   end
                   url = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom).
                     presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
-                  id = dic.queue(
-                    current_sector.south_step,
-                    current_sector.west_step,
-                    MapPoint::STEP_INVERT,
-                    DataImageService::DATA_CHUNK_SIZE,
-                    point_class::SCALE,
-                    parent_class::QUALITY_CALC_METHOD,
-                    parent_class::QUALITY_CALC_VALUE,
-                    url,
-                    polygon_query
-                  )
+                  begin
+                    id = dic.queue(
+                      current_sector.south_step,
+                      current_sector.west_step,
+                      MapPoint::STEP_INVERT,
+                      DataImageService::DATA_CHUNK_SIZE,
+                      point_class::SCALE,
+                      parent_class::QUALITY_CALC_METHOD,
+                      parent_class::QUALITY_CALC_VALUE,
+                      url,
+                      polygon_query
+                    )
+                  rescue DataImageCuda::TimeoutError
+                    workers_service = GoogleWorkersService.new
+                    with_retries(max_tries: 4, rescue: DataImageCuda::TimeoutError) {
+                      workers_service.check!
+                      dic.wait_for(id)
+                    }
+                  end
                 end
               end
             end

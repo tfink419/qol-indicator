@@ -3,9 +3,10 @@ require 'platform-api'
 class HerokuWorkersService
   HEROKU_APP_NAME = 'qol-indicator'
   HEROKU_PROC_NAME = 'worker'
+  NUM_SIDEKIQS=3
 
-  def initialize(num_workers = 1)
-    @num_workers = num_workers
+  def initialize(num_services = 1)
+    @num_workers = (num_services+NUM_SIDEKIQS-1)/NUM_SIDEKIQS
     @heroku = PlatformAPI.connect_oauth(ENV['HEROKU_TOKEN'])
   end
   def start

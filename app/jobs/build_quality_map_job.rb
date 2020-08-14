@@ -59,7 +59,7 @@ class BuildQualityMapJob < ApplicationJob
     
     @build_status.update!(state:'isochrones', percent:0)
     puts "Waiting Isochrones complete"
-
+    GoogleWorkersService.new.check!
     until @build_status.reload.segment_statuses.all?(&:atleast_isochrones_complete_state?)
       sleep(5)
       @build_status.update!(percent:(@build_status.segment_statuses.sum { |segment_status| segment_status.percent/@num_segments_this_build }).round(3), updated_at:Time.now)
@@ -120,6 +120,7 @@ class BuildQualityMapJob < ApplicationJob
     @build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
   ensure
     HerokuWorkersService.new.stop
+    GoogleWorkersService.new.stop
   end
 
   private

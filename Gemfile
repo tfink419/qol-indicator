@@ -77,3 +77,7 @@ gem 'google-maps'
 gem 'activerecord-import'
 
 gem 'aws-sdk-s3'
+
+gem 'google-api-client', '~> 0.43'
+
+gem 'googleauth'
