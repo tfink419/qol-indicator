@@ -119,6 +119,7 @@ class BuildQualityMapJob < ApplicationJob
     puts "Errored out"
     @build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
   ensure
+    puts "Ensure went off"
     HerokuWorkersService.new.stop
     GoogleWorkersService.new.stop
   end
