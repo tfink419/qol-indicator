@@ -42,6 +42,16 @@ class DataImageCuda
     id
   end
 
+  def wait_for(id)
+    response = @redis.blpop("#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30)
+    if response.nil?
+      throw TimeoutError
+    elsif response == "failed"
+      throw CudaFunctionFailure
+    end
+    response
+  end
+
   def del_from_queue(id)
     @redis.lrem(REDIS_QUEUE_NAME, 0, id.to_s)
     @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"

@@ -188,7 +188,6 @@ class GroceryStoreUploadJob < ApplicationJob
         transit_type_high:9,
         point_type:'GroceryStoreFoodQuantityMapPoint'
       )
-      HerokuWorkersService.new.start
       BuildQualityMapJob.perform_later(build_status)
     end
   rescue StandardError => err

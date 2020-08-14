@@ -3,9 +3,8 @@ require 'platform-api'
 class HerokuWorkersService
   HEROKU_APP_NAME = 'qol-indicator-workers'
   HEROKU_PROC_NAME = 'worker'
-  NUM_WORKERS = (ENV['NUM_HEATMAP_THREADS'] || 8).to_i + 1
 
-  def initialize(num_workers = NUM_WORKERS)
+  def initialize(num_workers = 1)
     @num_workers = num_workers
     @heroku = PlatformAPI.connect_oauth(ENV['HEROKU_TOKEN'])
   end
