@@ -1,7 +1,7 @@
 require 'platform-api'
 
 class HerokuWorkersService
-  HEROKU_APP_NAME = 'qol-indicator-workers'
+  HEROKU_APP_NAME = 'qol-indicator'
   HEROKU_PROC_NAME = 'worker'
 
   def initialize(num_workers = 1)
