@@ -68,7 +68,15 @@ class BuildQualityMapJob < ApplicationJob
       end
     end
 
+    current_sector = MapSector.from_sectors(
+      DataImageService::DATA_CHUNK_SIZE,
+      build_status.current_lat_sector,
+      @south_west_sector.zoom_out.lng_sector,
+      @south_west_sector.zoom-1
+    )
     if %w(isochrones quality-map-points).include?(@build_status.state)
+      @lat_sector = current_sector.lat_sector
+      @lng_sector = current_sector.lng_sector
       build_status.update!(percent:0, state:'quality-map-points')
       while # see towards bottom of loop
         puts "Lat Sector: #{@lat_sector}"
@@ -206,7 +214,7 @@ class BuildQualityMapJob < ApplicationJob
       }
         sleep(5)
         @lng_percent = @build_status.segment_statuses.sum { |segment_status|
-          segment_status.atleast_quality_map_state? ? (segment_status.percent/@num_segments_this_build) : 0 # 0 if not yet in the right state
+          segment_status.atleast_waiting_subsample_state? ? (segment_status.percent/@num_segments_this_build) : 0 # 0 if not yet in the right state
         }
         @build_status.update!(
           percent:calc_total_quality_map_percent,
