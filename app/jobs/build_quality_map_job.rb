@@ -145,7 +145,7 @@ class BuildQualityMapJob < ApplicationJob
           end
           current_sector = current_sector.next_lng_sector
           @lng_sector = current_sector.lng_sector
-          @lng_percent = (@lng_sector-@south_west_sector.lng_sector).to_f /
+          @lng_percent = 100.0*(@lng_sector-@south_west_sector.lng_sector) /
             (@north_east_sector.lng_sector-@south_west_sector.lng_sector+1)
           build_status.update!(
             percent:calc_total_quality_map_percent
