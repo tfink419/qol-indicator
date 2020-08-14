@@ -148,7 +148,7 @@ class BuildQualityMapJob < ApplicationJob
           @lng_percent = (@lng_sector-@south_west_sector.lng_sector).to_f /
             (@north_east_sector.lng_sector-@south_west_sector.lng_sector+1)
           build_status.update!(
-            percent:calc_grocery_store_quality_map_point_percent
+            percent:calc_total_quality_map_percent
           )
         end
         break unless @lat_sector < @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
@@ -161,7 +161,7 @@ class BuildQualityMapJob < ApplicationJob
         build_status.update!(
           current_lat:current_sector.south,
           current_lat_sector:@lat_sector,
-          percent:calc_grocery_store_quality_map_point_percent
+          percent:calc_total_quality_map_percent
         )
       end
     end
