@@ -10,6 +10,7 @@ class BuildQualityMapJob < ApplicationJob
     if @build_status.id != BuildQualityMapStatus.most_recent.id
       return BuildQualityMapJob.set(wait: 15.seconds).perform_later(@build_status, job_retry)
     end
+    @actually_ran = true
     Rails.logger = ActiveRecord::Base.logger = Sidekiq.logger    
     Signal.trap('INT') { throw SystemExit }
     Signal.trap('TERM') { throw SystemExit }
@@ -119,9 +120,10 @@ class BuildQualityMapJob < ApplicationJob
     puts "Errored out"
     @build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
   ensure
-    puts "Ensure went off"
-    HerokuWorkersService.new.stop
-    GoogleWorkersService.new.stop
+    if @actually_ran
+      HerokuWorkersService.new.stop
+      GoogleWorkersService.new.stop
+    end
   end
 
   private

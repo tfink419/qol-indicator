@@ -9,6 +9,7 @@ class HerokuWorkersService
     @num_workers = (num_services+NUM_SIDEKIQS-1)/NUM_SIDEKIQS
     @heroku = PlatformAPI.connect_oauth(ENV['HEROKU_TOKEN'])
   end
+
   def start
     @heroku.formation.update(HEROKU_APP_NAME, HEROKU_PROC_NAME, { quantity: @num_workers })
   end

@@ -5,6 +5,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
   sidekiq_options retry: 0
 
   def perform(build_status)
+    return unless build_status
     return if build_status.state == 'complete'
     if build_status.parent_status.id != BuildQualityMapStatus.most_recent.id
       return BuildQualityMapSegmentJob.set(wait: 15.seconds).perform_later(@build_status)
