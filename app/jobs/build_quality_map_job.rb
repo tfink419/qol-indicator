@@ -77,15 +77,12 @@ class BuildQualityMapJob < ApplicationJob
       @lat_sector = current_sector.lat_sector
       @lng_sector = current_sector.lng_sector
       build_status.update!(percent:0, state:'quality-map-points')
-      while # see towards bottom of loop
+      while true # see towards bottom of loop
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
-          puts "Lng Sector: #{@lng_sector}"
           (transit_type_low..transit_type_high).each do |transit_type|
-            puts "Transit Type: #{transit_type}"
             (0..num_tags).each do |tag_num|
               next if num_tags != 0 && tag_num == num_tags
-              puts "Tag Num: #{tag_num}"
               TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 if num_tags == 0
                   parent_query = {
