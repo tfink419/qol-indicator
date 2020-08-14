@@ -68,12 +68,7 @@ class BuildQualityMapJob < ApplicationJob
       end
     end
 
-    current_sector = MapSector.from_sectors(
-      DataImageService::DATA_CHUNK_SIZE,
-      build_status.current_lat_sector,
-      @south_west_sector.zoom_out.lng_sector,
-      @south_west_sector.zoom-1
-    )
+    current_sector = @south_west_sector
     if %w(isochrones quality-map-points).include?(@build_status.state)
       @lat_sector = current_sector.lat_sector
       @lng_sector = current_sector.lng_sector
