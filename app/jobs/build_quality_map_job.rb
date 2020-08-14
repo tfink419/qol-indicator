@@ -97,27 +97,34 @@ class BuildQualityMapJob < ApplicationJob
                 if @build_status.point_type == 'GroceryStoreFoodQuantityMapPoint'
                   travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
                 end
-                polygon_query = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
-                all_near_bounds_with_parent(
-                  current_sector.south,
-                  current_sector.west,
-                  current_sector.north,
-                  current_sector.east,
-                  travel_type,
-                  distance,
-                  true
-                )
-                # skip to next block if none found
-    
-                added_params = extra_params.map do |param|
-                  case param
-                  when :transit_type
-                    transit_type
-                  when :tags
-                    tag_calc_num
+                unless PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
+                    all_near_bounds_with_parent(
+                      current_sector.south,
+                      current_sector.west,
+                      current_sector.north,
+                      current_sector.east,
+                      travel_type,
+                      distance
+                    ).any?
+                  polygon_query = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
+                  all_near_bounds_with_parent(
+                    current_sector.south,
+                    current_sector.west,
+                    current_sector.north,
+                    current_sector.east,
+                    travel_type,
+                    distance,
+                    true # Raw
+                  )
+                  # skip to next block if none found
+                  added_params = extra_params.map do |param|
+                    case param
+                    when :transit_type
+                      transit_type
+                    when :tags
+                      tag_calc_num
+                    end
                   end
-                end
-                unless polygons.blank?
                   url = DataImageService.new(parent_class::SHORT_NAME, current_sector.zoom).
                     presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
                   id = dic.queue(
