@@ -77,7 +77,7 @@ class BuildQualityMapJob < ApplicationJob
       @lat_sector = current_sector.lat_sector
       @lng_sector = current_sector.lng_sector
       build_status.update!(percent:0, state:'quality-map-points')
-      while true # see towards bottom of loop
+      loop do # see towards bottom of loop
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
@@ -94,7 +94,7 @@ class BuildQualityMapJob < ApplicationJob
                   parent_query = TagQuery.new(parent_class).query(tag_calc_num, true)
                 end
                 new_quality_maps = []
-                if point_type == 'GroceryStoreFoodQuantityMapPoint'
+                if @build_status.point_type == 'GroceryStoreFoodQuantityMapPoint'
                   travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
                 end
                 polygon_query = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
