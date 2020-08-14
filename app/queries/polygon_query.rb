@@ -7,6 +7,27 @@ class PolygonQuery
     @is_isochronable_type = (@parent_id_column == 'isochronable_id')
   end
 
+  def any_near_bounds_with_parent?(south, west, north, east, travel_type, distance)
+    if @parent_class[:query] == 'none'
+      return @polygon_class.none
+    end
+    where_query = {}
+    if @is_isochronable_type
+      where_query[:isochronable_type] = @parent_class[:name]
+    end
+    unless travel_type.nil? || distance.nil?
+      where_query[:travel_type] = travel_type
+      where_query[:distance] = distance
+    end
+    query = all_near_bounds(south, west, north, east).
+    joins(Arel.sql("INNER JOIN #{@parent_class[:table_name]} ON #{@parent_class[:table_name]}.id = #{@polygon_class.table_name}.#{@parent_id_column}")).
+    where(where_query)
+    if @parent_class[:query] != 'all'
+      query = query.where(@parent_class[:query])
+    end
+    query.any?
+  end
+
   def all_near_bounds_with_parent(south, west, north, east, travel_type, distance, raw=false)
     if @parent_class[:query] == 'none'
       return @polygon_class.none

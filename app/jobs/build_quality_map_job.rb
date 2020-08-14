@@ -99,14 +99,14 @@ class BuildQualityMapJob < ApplicationJob
                   travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
                 end
                 if PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
-                    all_near_bounds_with_parent(
+                    any_near_bounds_with_parent?(
                       current_sector.south,
                       current_sector.west,
                       current_sector.north,
                       current_sector.east,
                       travel_type,
                       distance
-                    ).any?
+                    )
                   polygon_query = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
                   all_near_bounds_with_parent(
                     current_sector.south,
