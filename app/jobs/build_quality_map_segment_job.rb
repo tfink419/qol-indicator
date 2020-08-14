@@ -61,7 +61,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
           current += 1
           if Time.now-before > 5
             before = Time.now
-            build_status.update!(percent:(100.0*current/gstore_count).round(2))
+            build_status.update!(percent:(100.0*current/isochronable_count).round(2))
           end
           FetchIsochrone.new(isochronable, point_class::TRANSIT_TYPE_MAP).fetch(transit_type_low, transit_type_high)
         end
