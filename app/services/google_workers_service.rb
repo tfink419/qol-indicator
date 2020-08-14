@@ -12,7 +12,7 @@ class GoogleWorkersService
   end
 
   def check!
-    APP.each do |app|
+    APPS.each do |app|
       unless is_one_up?(app)
         start
         sleep(5) until is_running?(app)
