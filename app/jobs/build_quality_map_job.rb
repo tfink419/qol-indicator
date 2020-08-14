@@ -253,7 +253,7 @@ class BuildQualityMapJob < ApplicationJob
   def calc_total_quality_map_percent
     lat_percent_per_step = (0.01 / (@north_east_sector.lat_sector-@south_west_sector.lat_sector+1))
     ((
-      (@build_status.current_lat_sector-@south_west_sector.lat_sector).to_f/
+      (@lat_sector-@south_west_sector.lat_sector).to_f/
         (@north_east_sector.lat_sector-@south_west_sector.lat_sector+1)+
         @lng_percent*lat_percent_per_step)*
         100).round(3)
