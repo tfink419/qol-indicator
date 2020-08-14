@@ -127,7 +127,7 @@ class BuildQualityMapJob < ApplicationJob
                   end
                   url = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom).
                     presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
-                  id = dic.queue(
+                  id = DataImageCuda.new.queue(
                     current_sector.south_step,
                     current_sector.west_step,
                     MapPoint::STEP_INVERT,

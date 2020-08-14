@@ -25,7 +25,7 @@ const FlashNotice = ({messages, flashMessage, deleteMessage}) => {
       { message && 
         <Snackbar key={message[0]} open={true} autoHideDuration={6000} onClose={() => deleteMessage(message[0])}>
           <Alert severity={message[1]} onClose={() => deleteMessage(message[0])}>
-            {messages[0][2]}
+            {messages[0][2].slice(0, 512) + (messages[0][2].length > 512 ? "..." : "")}
           </Alert>
         </Snackbar>
       }
