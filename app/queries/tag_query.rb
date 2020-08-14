@@ -92,15 +92,15 @@ class TagQuery
     queries = []
 
     if and_tags.length > 0
-      queries << and_tags.map { |tag| "'#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" AND ")
+      queries << "#{@record_type.table_name}.tags::text[] @> #{str_arr_to_pg_arr(and_tags)}"
     end
     or_queries = []
     if or_tags.length > 0
-      or_queries << or_tags.map { |tag| "'#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" OR ")
+      or_queries << "#{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(or_tags)}"
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
-      or_queries << to_not.map { |tag| "NOT '#{tag}' = ANY(#{@record_type.table_name}.tags)" }.join(" AND ")
+      or_queries << "NOT #{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(to_not)}"
     end
     unless or_queries.empty?
       queries << or_queries.map { |a_query| "(#{a_query})"}.join(" OR ")
@@ -110,23 +110,18 @@ class TagQuery
 
   def query_from(and_tags, or_tags, others)
     query_record = nil
-    and_tags.each do |tag|
-      if query_record.nil?
-        query_record = @record_type.where(["? = ANY(tags)", tag])
-      else
-        query_record = query_record.where(["? = ANY(tags)", tag])
-      end
+    unless and_tags.empty?
+      @record_type.where("#{@record_type.table_name}.tags::text[] @> #{str_arr_to_pg_arr(and_tags)}")
     end
+
     or_queries = []
-    if or_tags.length > 0
-      or_tags.each do |tag|
-        or_queries << "'#{tag}' = ANY(tags)"
-      end
+    unless or_tags.empty?
+      or_queries << "#{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(or_tags)}"
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
       not_queries = to_not.map { |tag| "NOT '#{tag}' = ANY(tags)" }
-      or_queries << "(#{not_queries.join(" AND ")})"
+      or_queries << "NOT #{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(to_not)}"
     end
     unless or_queries.empty?
       if query_record.nil?
@@ -136,5 +131,11 @@ class TagQuery
       end
     end
     query_record
+  end
+
+  private
+
+  def str_arr_to_pg_arr(arr)
+    "ARRAY["+arr.map{ |el| "'#{el}'" }.join(',')+"]"
   end
 end

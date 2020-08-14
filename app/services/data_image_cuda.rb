@@ -22,7 +22,6 @@ class DataImageCuda
       quality_calc_method, quality_calc_value,
       url, query)
     id = @redis.incr REDIS_INCR_NAME
-    @redis.lpush REDIS_QUEUE_NAME, id.to_s
     queue_details_key = "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
     @redis.hset(queue_details_key, "start_lat", lat.to_s)
     @redis.hset(queue_details_key, "start_lng", lng.to_s)
@@ -33,6 +32,7 @@ class DataImageCuda
     @redis.hset(queue_details_key, "quality_calc_value", quality_calc_value.to_s)
     @redis.hset(queue_details_key, "aws_s3_url", url)
     @redis.hset(queue_details_key, "polygons_db_request", query)
+    @redis.lpush REDIS_QUEUE_NAME, id.to_s
     response = @redis.blpop("#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30)
     if response.nil?
       throw TimeoutError
@@ -55,6 +55,10 @@ class DataImageCuda
   def del_from_queue(id)
     @redis.lrem(REDIS_QUEUE_NAME, 0, id.to_s)
     @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
+  end
+
+  def get_still_working
+    redis.lrange REDIS_WORKING_NAME, 0, -1
   end
 
   def get_details(id)
