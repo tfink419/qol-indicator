@@ -15,7 +15,11 @@ class GoogleWorkersService
     APPS.each do |app|
       start_one(app) unless is_one_up?(app)
     end
-    sleep(5) until is_running?
+    num_waits = 0
+    until is_running? || num_waits > 24 # At most 2 minutes
+      sleep(5)
+      num_waits += 1
+    end
   end
 
   def status
