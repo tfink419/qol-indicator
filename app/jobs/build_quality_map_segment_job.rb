@@ -151,6 +151,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                   rescue DataImageCuda::TimeoutError
                     workers_service = GoogleWorkersService.new
                     with_retries(max_tries: 4, rescue: DataImageCuda::TimeoutError) {
+                      dic.try_to_place_back_in_queue(id)
                       workers_service.check!
                       dic.wait_for(id)
                     }
