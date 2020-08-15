@@ -12,3 +12,4 @@ class NodeCentroid
     end
     [lng/@has_nodes.nodes.length, lat/@has_nodes.nodes.length]
   end
+end
