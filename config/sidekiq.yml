@@ -1,8 +1,8 @@
 :concurrency: 1
 staging:
-  :concurrency: 3
+  :concurrency: 10
 production:
-  :concurrency: 3
+  :concurrency: 10
 :queues:
   - build_quality_map
   - build_quality_map_segment

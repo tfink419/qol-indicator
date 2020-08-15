@@ -56,8 +56,8 @@ class DataImageCuda
 
   def status
     {
-      queued: queued,
-      working: working
+      queued: queued.length,
+      working: working.length
     }
   end
 
