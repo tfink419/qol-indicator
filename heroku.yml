@@ -8,5 +8,5 @@ run:
   web: bundle exec puma -C config/puma.rb
   worker:
     command:
-      - RAILS_MAX_THREADS=${SIDEKIQ_RAILS_MAX_THREADS:-25} bundle exec sidekiq
+      - RAILS_MAX_THREADS=25 bundle exec sidekiq -c ${SIDEKIQ_CONCURRENCY:-10}
     image: web
