@@ -111,7 +111,7 @@ class TagQuery
   def query_from(and_tags, or_tags, others)
     query_record = nil
     unless and_tags.empty?
-      @record_type.where("#{@record_type.table_name}.tags::text[] @> #{str_arr_to_pg_arr(and_tags)}")
+      query_record = @record_type.where("#{@record_type.table_name}.tags::text[] @> #{str_arr_to_pg_arr(and_tags)}")
     end
 
     or_queries = []
