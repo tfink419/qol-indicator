@@ -36,9 +36,9 @@ class DataImageCuda
     @redis.lpush REDIS_QUEUE_NAME, id.to_s
     response = @redis.blpop "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30
     if response.nil?
-      throw TimeoutError
+      raise TimeoutError
     elsif response == "failed"
-      throw CudaFunctionFailure
+      raise CudaFunctionFailure
     end
     id
   end
@@ -46,12 +46,13 @@ class DataImageCuda
   def wait_for(id)
     response = @redis.blpop "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30
     if response.nil?
-      throw TimeoutError
+      raise TimeoutError
     elsif response == "failed"
-      throw CudaFunctionFailure
+      raise CudaFunctionFailure
     end
     response
   end
+
   def get_still_working
     redis.lrange REDIS_WORKING_NAME, 0, -1
   end
@@ -65,6 +66,10 @@ class DataImageCuda
       @redis.lrem REDIS_WORKING_NAME, 0, id.to_s
       @redis.lpush REDIS_QUEUE_NAME, id.to_s
     end
+  end
+
+  def throw_err
+    raise TimeoutError
   end
 
   private
