@@ -70,7 +70,6 @@ class DataImageCuda
       ids.each do |id|
         @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
       end
-      @redis.exec
     }
   end
 
