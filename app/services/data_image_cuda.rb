@@ -68,7 +68,7 @@ class DataImageCuda
       @redis.del REDIS_QUEUE_NAME
       @redis.del REDIS_WORKING_NAME
       ids.each do |id|
-        @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}")
+        @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
       end
       @redis.exec
     }
@@ -107,7 +107,7 @@ class DataImageCuda
 
   def del_from_queue(id)
     @redis.lrem REDIS_QUEUE_NAME, 0, id.to_s
-    @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}")
+    @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
   end
 
 end
