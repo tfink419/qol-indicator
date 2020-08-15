@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_15_194634) do
+ActiveRecord::Schema.define(version: 2020_08_15_212520) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -131,6 +131,15 @@ ActiveRecord::Schema.define(version: 2020_08_15_194634) do
     t.integer "grocery_store_ratio", default: 50
     t.integer "grocery_store_tags", default: 1
     t.index ["user_id"], name: "index_map_preferences_on_user_id"
+  end
+
+  create_table "parks", force: :cascade do |t|
+    t.integer "openstreetmap_id"
+    t.text "name"
+    t.json "nodes"
+    t.integer "num_activities", default: 10
+    t.float "lat"
+    t.float "long"
   end
 
   create_table "password_resets", force: :cascade do |t|
