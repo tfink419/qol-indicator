@@ -23,7 +23,8 @@ class DataImageCuda
       url, query)
     id = @redis.incr REDIS_INCR_NAME
     queue_details_key = "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
-    @redis.set queue_details_key,
+    @redis.pipelined {
+      @redis.set queue_details_key,
 "#{lat}
 #{lng}
 #{multiply_const}
@@ -33,7 +34,9 @@ class DataImageCuda
 #{quality_calc_value}
 #{url}
 #{query}"
-    @redis.lpush REDIS_QUEUE_NAME, id.to_s
+      @redis.expire queue_details_key, 3600 # 1 hour
+      @redis.lpush REDIS_QUEUE_NAME, id.to_s
+    }
     response = @redis.blpop "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30
     if response.nil?
       raise TimeoutError
@@ -41,6 +44,34 @@ class DataImageCuda
       raise CudaFunctionFailure
     end
     id
+  end
+  
+  def queued
+    @redis.lrange(REDIS_QUEUE_NAME, 0, -1)
+  end
+
+  def working
+    @redis.lrange(REDIS_WORKING_NAME, 0, -1)
+  end
+
+  def status
+    {
+      queued: queued,
+      working: working
+    }
+  end
+
+  def purge_queues
+    ids = queued
+    ids << working
+    @redis.pipelined {
+      @redis.del REDIS_QUEUE_NAME
+      @redis.del REDIS_WORKING_NAME
+      ids.each do |id|
+        @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}")
+      end
+      @redis.exec
+    }
   end
 
   def wait_for(id)
@@ -76,7 +107,7 @@ class DataImageCuda
 
   def del_from_queue(id)
     @redis.lrem REDIS_QUEUE_NAME, 0, id.to_s
-    @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
+    @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}")
   end
 
 end

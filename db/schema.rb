@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_04_174148) do
+ActiveRecord::Schema.define(version: 2020_08_15_194634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,7 @@ ActiveRecord::Schema.define(version: 2020_08_04_174148) do
     t.index ["google_place_id"], name: "index_grocery_stores_on_google_place_id", unique: true
     t.index ["lat", "long"], name: "index_grocery_stores_on_lat_and_long"
     t.index ["long"], name: "index_grocery_stores_on_long"
+    t.index ["tags"], name: "index_grocery_stores_on_tags", using: :gin
   end
 
   create_table "isochrone_polygons", force: :cascade do |t|

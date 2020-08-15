@@ -67,6 +67,7 @@ class BuildQualityMapJob < ApplicationJob
 
     return if error_found
     
+    DataImageCuda.new.purge_queues
     GoogleWorkersService.new.check!
     @build_status.update!(state:'quality-map-points', percent:0)
     puts "Waiting Quality Map Points Complete"
