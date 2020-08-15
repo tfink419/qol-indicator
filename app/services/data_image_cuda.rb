@@ -23,15 +23,15 @@ class DataImageCuda
       url, query)
     id = @redis.incr REDIS_INCR_NAME
     queue_details_key = "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
-    @redis.hset(queue_details_key, "start_lat", lat.to_s)
-    @redis.hset(queue_details_key, "start_lng", lng.to_s)
-    @redis.hset(queue_details_key, "multiply_const", multiply_const.to_s)
-    @redis.hset(queue_details_key, "image_size", image_size.to_s)
-    @redis.hset(queue_details_key, "quality_scale", scale.to_s)
-    @redis.hset(queue_details_key, "quality_calc_method", METHOD_MAP[quality_calc_method].to_s)
-    @redis.hset(queue_details_key, "quality_calc_value", quality_calc_value.to_s)
-    @redis.hset(queue_details_key, "aws_s3_url", url)
-    @redis.hset(queue_details_key, "polygons_db_request", query)
+    @redis.set(queue_details_key, "#{lat}
+#{lng}
+#{multiply_const}
+#{image_size}
+#{scale}
+#{METHOD_MAP[quality_calc_method]}
+#{quality_calc_value}
+#{url}
+#{query}")
     @redis.lpush REDIS_QUEUE_NAME, id.to_s
     response = @redis.blpop("#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30)
     if response.nil?
@@ -51,12 +51,6 @@ class DataImageCuda
     end
     response
   end
-
-  def del_from_queue(id)
-    @redis.lrem(REDIS_QUEUE_NAME, 0, id.to_s)
-    @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
-  end
-
   def get_still_working
     redis.lrange REDIS_WORKING_NAME, 0, -1
   end
@@ -64,4 +58,18 @@ class DataImageCuda
   def get_details(id)
     @redis.hgetall "#{REDIS_DETAILS_BASE_NAME}:#{id}"
   end
+
+  def purge_completed
+    while (popped = @redis.lpop(REDIS_COMPLETE_CHANNEL_BASE_NAME))
+      @redis.del "#{REDIS_DETAILS_BASE_NAME}:#{popped}"
+    end
+  end
+
+  private
+
+  def del_from_queue(id)
+    @redis.lrem(REDIS_QUEUE_NAME, 0, id.to_s)
+    @redis.del "#{REDIS_QUEUE_DETAILS_BASE_NAME}:#{id}"
+  end
+
 end
