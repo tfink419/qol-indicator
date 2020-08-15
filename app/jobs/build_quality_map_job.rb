@@ -2,7 +2,7 @@ class BuildQualityMapJob < ApplicationJob
   queue_as :build_quality_map
   sidekiq_options retry: 0
 
-  NUM_SEGMENTS=(ENV['NUM_HEATMAP_THREADS'] || 19).to_i
+  NUM_SEGMENTS=(ENV['NUM_HEATMAP_THREADS'] || 9).to_i
 
   def perform(build_status, job_retry=false)
     @build_status = build_status

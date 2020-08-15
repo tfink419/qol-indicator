@@ -3,7 +3,7 @@ require 'platform-api'
 class HerokuWorkersService
   HEROKU_APP_NAME = 'qol-indicator'
   HEROKU_PROC_NAME = 'worker'
-  NUM_SIDEKIQS=3
+  NUM_SIDEKIQS=10
 
   def initialize(num_services = 1)
     @num_workers = (num_services+NUM_SIDEKIQS-1)/NUM_SIDEKIQS
