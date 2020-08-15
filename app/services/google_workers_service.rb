@@ -13,11 +13,9 @@ class GoogleWorkersService
 
   def check!
     APPS.each do |app|
-      unless is_one_up?(app)
-        start
-        sleep(5) until is_running?(app)
-      end
+      start_one(app) unless is_one_up?(app)
     end
+    sleep(5) until is_running?
   end
 
   def status

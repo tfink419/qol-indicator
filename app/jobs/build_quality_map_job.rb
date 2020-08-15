@@ -67,8 +67,8 @@ class BuildQualityMapJob < ApplicationJob
 
     return if error_found
     
-    @build_status.update!(state:'quality-map-points', percent:0)
     GoogleWorkersService.new.check!
+    @build_status.update!(state:'quality-map-points', percent:0)
     puts "Waiting Quality Map Points Complete"
 
     until @build_status.reload.segment_statuses.all?(&:atleast_waiting_subsample_state?)
