@@ -1,4 +1,4 @@
-class GroceryStoreFoodQuantityMapPoint < MapPoint
+class ParkActivitiesMapPoint < MapPoint
   TRANSIT_TYPE_MAP = [
     [nil, nil], # shouldn't be used
     ['walking', 8],
@@ -6,13 +6,10 @@ class GroceryStoreFoodQuantityMapPoint < MapPoint
     ['walking', 24],
     ['cycling', 8],
     ['cycling', 16],
-    ['cycling', 24],
-    ['driving', 8],
-    ['driving', 16],
-    ['driving', 24]
+    ['cycling', 24]
   ]
   LOW = 0
   HIGH = 12.5
   SCALE = 42000000
-  SHORT_NAME = 'grocery-store-food-quantity'
+  SHORT_NAME = 'park-activities'
 end

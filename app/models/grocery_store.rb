@@ -70,15 +70,6 @@ class GroceryStore < ApplicationRecord
     where(['grocery_stores.name ILIKE ? or grocery_stores.address ILIKE ?', search_query, search_query])
   }
 
-  scope :where_in_coordinate_range, lambda { |south_west, north_east| 
-    extra = (north_east[1] - south_west[1])*0.1
-    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', (south_west[0]-extra).round(3), (north_east[0]+extra).round(3), (south_west[1]-extra).round(3), (north_east[1]+extra).round(3)])
-  }
-
-  scope :all_near_point, lambda { |lat, long, size|
-    where(['lat BETWEEN ? AND ? AND long BETWEEN ? AND ?', lat-size, lat+size, long-size, long+size])
-  }
-
   def valid_location?
     LocationValidator::valid_location?(city, state, zip)
   end

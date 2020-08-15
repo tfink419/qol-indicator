@@ -130,7 +130,7 @@ class GroceryStoreUploadJob < ApplicationJob
         end
       end
       if place["tags"]["name"]
-        gstore = GroceryStore.all_near_point(place["lat"], place["lon"], 0.001).search(place["tags"]["name"].split(" ").first).first
+        gstore = CenterQuery.new(GroceryStore).all_near_point(place["lat"], place["lon"], 0.001).search(place["tags"]["name"].split(" ").first).first
         unless gstore
           gstore = GroceryStore.new(name:place["tags"]["name"], lat:place["lat"], long:place["lon"], food_quantity: 10)
           Geocode.new(gstore).attempt_geocode_if_needed
@@ -185,7 +185,7 @@ class GroceryStoreUploadJob < ApplicationJob
         south_west:south_west,
         north_east:north_east,
         transit_type_low:1,
-        transit_type_high:9,
+        transit_type_high:GroceryStore::NUM_TRANSIT_TYPES,
         point_type:'GroceryStoreFoodQuantityMapPoint'
       )
       BuildQualityMapJob.perform_later(build_status)

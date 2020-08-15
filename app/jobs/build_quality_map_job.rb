@@ -117,7 +117,7 @@ class BuildQualityMapJob < ApplicationJob
 
     puts "Complete"
     @build_status.update!(percent:100, state:'complete')
-  rescue => err
+  rescue Exception => err
     puts "Errored out"
     @build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
   ensure

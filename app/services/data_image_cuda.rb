@@ -34,7 +34,7 @@ class DataImageCuda
 #{quality_calc_value}
 #{url}
 #{query}"
-      @redis.expire queue_details_key, 3600 # 1 hour
+      @redis.expire queue_details_key, 900 # 15 min
       @redis.lpush REDIS_QUEUE_NAME, id.to_s
     }
     response = @redis.blpop "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30
@@ -83,19 +83,13 @@ class DataImageCuda
     response
   end
 
-  def get_still_working
-    redis.lrange REDIS_WORKING_NAME, 0, -1
-  end
-
   def get_details(id)
     @redis.hgetall "#{REDIS_DETAILS_BASE_NAME}:#{id}"
   end
 
-  def try_to_place_back_in_queue(id)
-    if @redis.lrange(REDIS_WORKING_NAME, 0, -1).include? id.to_s
-      @redis.lrem REDIS_WORKING_NAME, 0, id.to_s
-      @redis.lpush REDIS_QUEUE_NAME, id.to_s
-    end
+  def place_back_in_queue(id)
+    @redis.lrem REDIS_WORKING_NAME, 0, id.to_s
+    @redis.lpush REDIS_QUEUE_NAME, id.to_s
   end
 
   def throw_err

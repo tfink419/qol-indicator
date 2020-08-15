@@ -1,6 +1,7 @@
 require 'quality_map_image'
 
 class BuildQualityMapSegmentJob < ApplicationJob
+  class InvalidPointType < StandardError; end
   queue_as :build_quality_map_segment
   sidekiq_options retry: 0
 
@@ -47,6 +48,21 @@ class BuildQualityMapSegmentJob < ApplicationJob
       extra_params = []
       num_tags = 0
       isochrone_type = false
+    when 'ParkActivitiesMapPoint'
+      point_class = ParkActivitiesMapPoint
+      polygon_class = IsochronePolygon
+      parent_class = Park
+      parent_class_id = "isochronable_id"
+      quality_column_name = "num_activities"
+      extra_params = [:transit_type]
+      num_tags = 0
+      isochronable_count = segment_part = (parent_class.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
+      segment_low = (segment-1)*segment_part
+      segment_low += 1 unless segment == 1
+      segment_low = segment_low.round
+      isochrone_type = true
+    else
+      raise InvalidPointType
     end
 
     if %w(initialized received isochrones isochrones-complete).include?(build_status.state)
@@ -151,7 +167,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                   rescue DataImageCuda::TimeoutError
                     workers_service = GoogleWorkersService.new
                     with_retries(max_tries: 4, rescue: DataImageCuda::TimeoutError) {
-                      dic.try_to_place_back_in_queue(id)
+                      dic.place_back_in_queue(id)
                       workers_service.check!
                       dic.wait_for(id)
                     }
@@ -285,8 +301,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
     end
     puts "Complete"
     build_status.update!(percent:100, state:'complete')
-
-  rescue => err
+  rescue Exception => err
     puts "Errored out"
     build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
   end

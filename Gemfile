@@ -60,7 +60,7 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'mapbox-sdk', '~> 2.3.0'
-# gem 'ruby_clipper', '~> 6.2.1'
+gem 'ruby_clipper', '~> 6.2.1'
 gem 'httplog'
 
 # gem 'resque'

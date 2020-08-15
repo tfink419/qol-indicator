@@ -38,7 +38,7 @@ class MapDataController < ApplicationController
     map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
     map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
 
-    grocery_stores = TagQuery.new(GroceryStore).query(map_preferences["grocery_store_tags"]).where_in_coordinate_range(south_west, north_east)\
+    grocery_stores = CenterQuery.new(TagQuery.new(GroceryStore).query(map_preferences["grocery_store_tags"])).where_in_coordinate_range(south_west, north_east)\
     .limit(10000)\
     .pluck(:id, :lat, :long, :food_quantity)
 
