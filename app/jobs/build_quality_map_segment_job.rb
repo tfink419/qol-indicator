@@ -105,6 +105,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       while true # see towards bottom of loop
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
+          dic_ids = []
           (transit_type_low..transit_type_high).each do |transit_type|
             (0..num_tags).each do |tag_num|
               next if num_tags != 0 && tag_num == num_tags
@@ -152,29 +153,32 @@ class BuildQualityMapSegmentJob < ApplicationJob
                   end
                   url = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom).
                     presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
-                  begin
-                    id = dic.queue(
-                      current_sector.south_step,
-                      current_sector.west_step,
-                      MapPoint::STEP_INVERT,
-                      DataImageService::DATA_CHUNK_SIZE,
-                      point_class::SCALE,
-                      parent_class::QUALITY_CALC_METHOD,
-                      parent_class::QUALITY_CALC_VALUE,
-                      url,
-                      polygon_query
-                    )
-                    dic.wait_for(id)
-                  rescue DataImageCuda::TimeoutError
-                    workers_service = GoogleWorkersService.new
-                    with_retries(max_tries: 10, rescue: DataImageCuda::TimeoutError) {
-                      dic.place_back_in_queue(id)
-                      workers_service.check!
-                      dic.wait_for(id)
-                    }
-                  end
+                  
+                  dic_ids << dic.queue(
+                    current_sector.south_step,
+                    current_sector.west_step,
+                    MapPoint::STEP_INVERT,
+                    DataImageService::DATA_CHUNK_SIZE,
+                    point_class::SCALE,
+                    parent_class::QUALITY_CALC_METHOD,
+                    parent_class::QUALITY_CALC_VALUE,
+                    url,
+                    polygon_query
+                  )
                 end
               end
+            end
+          end
+          dic_ids.each do |id|
+            begin
+              dic.wait_for(id)
+            rescue DataImageCuda::TimeoutError
+              workers_service = GoogleWorkersService.new
+              with_retries(max_tries: 10, rescue: DataImageCuda::TimeoutError) {
+                dic.place_back_in_queue(id)
+                workers_service.check!
+                dic.wait_for(id)
+              }
             end
           end
           current_sector = current_sector.next_lng_sector
