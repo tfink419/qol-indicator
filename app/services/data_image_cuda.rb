@@ -37,12 +37,6 @@ class DataImageCuda
       @redis.expire queue_details_key, 900 # 15 min
       @redis.lpush REDIS_QUEUE_NAME, id.to_s
     }
-    response = @redis.blpop "#{REDIS_COMPLETE_CHANNEL_BASE_NAME}:#{id}", 30
-    if response.nil?
-      raise TimeoutError
-    elsif response == "failed"
-      raise CudaFunctionFailure
-    end
     id
   end
   
