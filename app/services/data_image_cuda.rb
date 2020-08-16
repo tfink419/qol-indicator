@@ -82,7 +82,7 @@ class DataImageCuda
   end
 
   def place_back_in_queue(id)
-    unless redis.lpos REDIS_QUEUE_NAME, id.to_s
+    unless @redis.lpos REDIS_QUEUE_NAME, id.to_s
       @redis.lrem REDIS_WORKING_NAME, 0, id.to_s
       @redis.lpush REDIS_QUEUE_NAME, id.to_s
     end
