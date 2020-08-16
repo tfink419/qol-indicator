@@ -16,10 +16,11 @@ class GoogleWorkersService
       start_one(app) unless is_one_up?(app)
     end
     num_waits = 0
-    until is_running? || num_waits > 24 # At most 2 minutes
+    until is_running? || num_waits >= 24 # At most 2 minutes
       sleep(5)
       num_waits += 1
     end
+    puts "Waited #{num_waits*5} seconds for Google"
   end
 
   def status
