@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'tyler.fink@snapdocs.com'
+  default from: 'tfink419@gmail.com'
   layout 'mailer'
 end

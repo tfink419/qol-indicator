@@ -143,7 +143,7 @@ class BuildQualityMapJob < ApplicationJob
     }
     lat_percent_per_step = (0.01 / (@north_east_sector.lat_sector-@south_west_sector.lat_sector+1))
     ((
-      (@build_status.current_lat_sector-@south_west_sector.lat_sector).to_f/
+      (@build_status.current_lat_sector-NUM_SEGMENTS-@south_west_sector.lat_sector).to_f/
         (@north_east_sector.lat_sector-@south_west_sector.lat_sector+1)+
         long_percent*lat_percent_per_step)*
         100).round(3)

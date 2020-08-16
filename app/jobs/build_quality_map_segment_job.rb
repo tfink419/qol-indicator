@@ -150,6 +150,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                       tag_calc_num
                     end
                   end
+                  id = 0 # Set id for rescue below
                   url = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom).
                     presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
                   begin
