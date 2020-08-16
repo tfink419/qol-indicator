@@ -139,11 +139,11 @@ class BuildQualityMapJob < ApplicationJob
 
   def calc_total_quality_map_percent
     long_percent = @build_status.segment_statuses.sum { |segment_status|
-      segment_status.atleast_quality_map_state? ? (segment_status.percent/@num_segments_this_build) : 0 # 0 if not yet in the right state
+      segment_status.atleast_quality_map_state? ? segment_status.percent : 0 # 0 if not yet in the right state
     }
     lat_percent_per_step = (0.01 / (@north_east_sector.lat_sector-@south_west_sector.lat_sector+1))
     ((
-      (@build_status.current_lat_sector-NUM_SEGMENTS-@south_west_sector.lat_sector).to_f/
+      (@build_status.current_lat_sector-NUM_SEGMENTS-@south_west_sector.lat_sector+1).to_f/
         (@north_east_sector.lat_sector-@south_west_sector.lat_sector+1)+
         long_percent*lat_percent_per_step)*
         100).round(3)

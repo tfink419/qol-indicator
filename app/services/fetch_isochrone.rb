@@ -4,9 +4,10 @@ require 'mapbox-sdk'
 require 'clipper'
 
 class FetchIsochrone
-  def initialize(isochronable, transit_type_map)
+  def initialize(isochronable, transit_type_map, multi = false)
     @isochronable = isochronable
     @transit_type_map = transit_type_map
+    @multi = multi
   end
 
   def fetch(transit_type_low, transit_type_high)
@@ -14,8 +15,7 @@ class FetchIsochrone
     tries = 0
     (transit_type_low..transit_type_high).each do |transit_type|
       travel_type, distance = @transit_type_map[transit_type]
-      no_isochrones = @isochronable.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
-      if no_isochrones
+      if @isochronable.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
         geo = get_geo_from_mapbox(travel_type, distance)
         unless geo.nil?
           isochrones << {travel_type:travel_type, distance:distance, geometry:geo}
