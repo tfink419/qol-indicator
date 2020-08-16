@@ -34,7 +34,7 @@ class DataImageCuda
 #{quality_calc_value}
 #{url}
 #{query}"
-      @redis.expire queue_details_key, 900 # 15 min
+      @redis.expire queue_details_key, 3600 # 1 hour
       @redis.lpush REDIS_QUEUE_NAME, id.to_s
     }
     id
