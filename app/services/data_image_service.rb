@@ -28,10 +28,10 @@ class DataImageService
     return if data.nil?
     file_path = get_path(extra_details, lat_sector, lng_sector)
     if USE_AWS_S3
-      @s3_client.put_object(bucket: BUCKET, key: "#{dir}/#{filename}", body:data)
+      @s3_client.put_object(bucket: BUCKET, key: file_path, body:data)
     else
       puts "Saving: '#{file_path}'"
-      dir = "#{Rails.root}/quality_map_image_data/#{dir}"
+      dir = "#{Rails.root}/quality_map_image_data/#{file_path[0...file_path.rindex('/')]}"
       FileUtils.mkdir_p dir
       File.open(file_path, 'wb') { |f| f.write(data) }
     end
@@ -46,7 +46,6 @@ class DataImageService
       }).body.read rescue nil
     else
       puts "Retrieving: '#{file_path}'"
-      dir = "#{Rails.root}/quality_map_image_data/#{dir}"
       File.read(file_path) if(File.exist?(file_path))
     end
   end

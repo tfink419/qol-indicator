@@ -102,6 +102,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
     if %w(received isochrones-complete quality-map-points).include?(build_status.state)
       dic = DataImageCuda.new
       build_status.update!(percent:0, state:'quality-map-points', updated_at:Time.now)
+      dis = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom)
       while true # see towards bottom of loop
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
@@ -163,8 +164,11 @@ class BuildQualityMapSegmentJob < ApplicationJob
                       tag_calc_num
                     end
                   end
-                  url = DataImageService.new(point_class::SHORT_NAME, current_sector.zoom).
-                    presigned_url_put(added_params, current_sector.lat_sector, current_sector.lng_sector)
+                  url = dis.presigned_url_put(
+                    added_params,
+                    current_sector.lat_sector,
+                    current_sector.lng_sector
+                  )
                   
                   dic_ids << dic.queue(
                     current_sector.south_step,
@@ -245,6 +249,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       puts "Starting lat_sector #{@lat_sector}"
       while true # see towards bottom of loop
         puts "Zoom: #{zoom}, Lat Sector: #{@lat_sector}"
+        dis = DataImageService.new(point_class::SHORT_NAME, zoom)
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
             (0..num_tags).each do |tag_num|
@@ -265,8 +270,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 
                 image = QualityMapImage.shrink4(DataImageService::DATA_CHUNK_SIZE, north_west, north_east, south_west, south_east)
                 if image
-                  DataImageService.new(point_class::SHORT_NAME, zoom)
-                  .save(
+                  dis.save(
                     added_params,
                     current_sector.lat_sector,
                     current_sector.lng_sector,
