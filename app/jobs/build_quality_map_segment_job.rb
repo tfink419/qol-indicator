@@ -207,8 +207,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
       end
     end
     puts "Building Initial Points Complete"
-    build_status.update!(percent:100, state:'waiting-subsample')
-    sleep(5) until build_status.reload.parent_status.state == 'subsample'
+    build_status.update!(percent:100, state:'waiting-shrink')
+    sleep(5) until build_status.reload.parent_status.state == 'shrink'
     
     current_sector = MapSector.from_sectors(
       DataImageService::DATA_CHUNK_SIZE,
@@ -219,14 +219,14 @@ class BuildQualityMapSegmentJob < ApplicationJob
     @lat_sector = current_sector.lat_sector
     @lng_sector = current_sector.lng_sector
 
-    puts 'Subsampling'
+    puts 'Shrinking'
     (0...@south_west_sector.zoom).reverse_each do |zoom|
       @south_west_sector = @south_west_sector.zoom_out
       @north_east_sector = @north_east_sector.zoom_out
       build_status.update!(
         current_lat:@south_west_sector.south,
         current_lat_sector:@lat_sector,
-        state:'subsample',
+        state:'shrink',
         current_zoom:zoom,
         percent: 0
       )
@@ -251,7 +251,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                   load(added_params, sector.lat_sector, sector.lng_sector)
                 end
                 
-                image = QualityMapImage.subsample4(DataImageService::DATA_CHUNK_SIZE, north_west, north_east, south_west, south_east)
+                image = QualityMapImage.shrink4(DataImageService::DATA_CHUNK_SIZE, north_west, north_east, south_west, south_east)
                 if image
                   DataImageService.new(point_class::SHORT_NAME, zoom)
                   .save(
@@ -290,8 +290,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
         )
       end
 
-      build_status.update!(percent:100, state:'waiting-subsample')
-      until zoom == 0 || (build_status.reload.parent_status.state == 'subsample' &&
+      build_status.update!(percent:100, state:'waiting-shrink')
+      until zoom == 0 || (build_status.reload.parent_status.state == 'shrink' &&
         build_status.parent_status.current_zoom == zoom-1)
         sleep(5)
       end

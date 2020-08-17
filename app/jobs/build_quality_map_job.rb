@@ -72,7 +72,7 @@ class BuildQualityMapJob < ApplicationJob
     @build_status.update!(state:'quality-map-points', percent:0)
     puts "Waiting Quality Map Points Complete"
 
-    until @build_status.reload.segment_statuses.all?(&:atleast_waiting_subsample_state?)
+    until @build_status.reload.segment_statuses.all?(&:atleast_waiting_shrink_state?)
       sleep(5)
       @build_status.update!(
         percent:calc_total_quality_map_percent,
@@ -97,14 +97,14 @@ class BuildQualityMapJob < ApplicationJob
       @build_status.update!(
         current_lat:current_sector.south,
         current_lat_sector:current_sector.lat_sector,
-        state:'subsample',
+        state:'shrink',
         current_zoom:zoom,
         percent:0
       )
-      puts "Waiting Subsample"
+      puts "Waiting Shrink"
 
       until @build_status.reload.segment_statuses.all? { |segment_status|
-        segment_status.complete? || (segment_status.waiting_subsample_state? && segment_status.current_zoom == zoom)
+        segment_status.complete? || (segment_status.waiting_shrink_state? && segment_status.current_zoom == zoom)
       }
         sleep(5)
         @build_status.update!(

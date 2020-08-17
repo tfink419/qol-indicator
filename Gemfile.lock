@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 8f803e6dde023ddc98cd33df6930c19e64a0a700
+  revision: 1885a31ec92d66da6951f82c5950d7ae84edcc24
   specs:
-    quality_map_image (0.7.9)
+    quality_map_image (0.7.10)
       gradient (~> 0.5.1)
       ruby-vips
 
@@ -58,7 +58,7 @@ GEM
       io-like (~> 0.3.0)
     arel (9.0.0)
     aws-eventstream (1.1.0)
-    aws-partitions (1.351.0)
+    aws-partitions (1.356.0)
     aws-sdk-core (3.104.3)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
@@ -67,15 +67,15 @@ GEM
     aws-sdk-kms (1.36.0)
       aws-sdk-core (~> 3, >= 3.99.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.75.0)
-      aws-sdk-core (~> 3, >= 3.104.1)
+    aws-sdk-s3 (1.78.0)
+      aws-sdk-core (~> 3, >= 3.104.3)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.1)
-    aws-sigv4 (1.2.1)
+    aws-sigv4 (1.2.2)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.15)
     bindex (0.8.1)
-    bootsnap (1.4.7)
+    bootsnap (1.4.8)
       msgpack (~> 1.0)
     builder (3.2.4)
     byebug (11.1.3)
@@ -92,7 +92,7 @@ GEM
       archive-zip (~> 0.10)
       nokogiri (~> 1.8)
     color (1.8)
-    concurrent-ruby (1.1.6)
+    concurrent-ruby (1.1.7)
     connection_pool (2.2.3)
     crass (1.0.6)
     declarative (0.0.20)
@@ -281,7 +281,7 @@ GEM
       activemodel (>= 5.0)
       bindex (>= 0.4.0)
       railties (>= 5.0)
-    webpacker (5.1.1)
+    webpacker (5.2.0)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)

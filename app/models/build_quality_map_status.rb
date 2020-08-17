@@ -1,5 +1,5 @@
 class BuildQualityMapStatus < ApplicationRecord
-  VALID_STATES = %w(initialized received branching isochrones quality-map-points subsample complete)
+  VALID_STATES = %w(initialized received branching isochrones quality-map-points shrink complete)
 
   validates :percent, :presence => true
   validates :state, :presence => true,
