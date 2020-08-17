@@ -88,6 +88,10 @@ class DataImageCuda
     end
   end
 
+  def latest
+    @redis.get REDIS_INCR_NAME
+  end
+
   def throw_err
     raise TimeoutError
   end

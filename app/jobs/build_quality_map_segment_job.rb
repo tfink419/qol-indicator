@@ -107,6 +107,18 @@ class BuildQualityMapSegmentJob < ApplicationJob
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           dic_ids = []
           (transit_type_low..transit_type_high).each do |transit_type|
+            next unless PolygonQuery.new(polygon_class, { # Dont check for every tag
+              name:parent_class.name,
+              table_name:parent_class.table_name,
+              query:'all'
+            }, parent_class_id, quality_column_name).
+              any_near_bounds_with_parent?(
+                current_sector.south,
+                current_sector.west,
+                current_sector.north,
+                current_sector.east,
+                travel_type,
+                distance)
             (0..num_tags).each do |tag_num|
               next if num_tags != 0 && tag_num == num_tags
               TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
