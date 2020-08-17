@@ -165,6 +165,7 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
           <Select value={mapPointType}  onChange={(e) => setMapPointType(e.target.value)}>
             <MenuItem value={"GroceryStoreFoodQuantityMapPoint"}>Grocery Store Quality</MenuItem>
             <MenuItem value={"CensusTractPovertyMapPoint"}>Census Tract Poverty</MenuItem>
+            <MenuItem value={"ParkActivitiesMapPoint"}>Park Activities</MenuItem>
           </Select>
           <form onSubmit={handleBuildQualityMap}>
             <Button type="submit"
