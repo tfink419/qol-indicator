@@ -92,15 +92,15 @@ class TagQuery
     queries = []
 
     if and_tags.length > 0
-      queries << "#{@record_type.table_name}.tags::text[] @> #{str_arr_to_pg_arr(and_tags)}"
+      queries << "#{@record_type.table_name}.tags @> #{str_arr_to_pg_arr(and_tags)}::varchar[]"
     end
     or_queries = []
     if or_tags.length > 0
-      or_queries << "#{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(or_tags)}"
+      or_queries << "#{@record_type.table_name}.tags && #{str_arr_to_pg_arr(or_tags)}::varchar[]"
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
-      or_queries << "NOT #{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(to_not)}"
+      or_queries << "NOT #{@record_type.table_name}.tags && #{str_arr_to_pg_arr(to_not)}::varchar[]"
     end
     unless or_queries.empty?
       queries << or_queries.map { |a_query| "(#{a_query})"}.join(" OR ")
@@ -111,17 +111,17 @@ class TagQuery
   def query_from(and_tags, or_tags, others)
     query_record = nil
     unless and_tags.empty?
-      query_record = @record_type.where("#{@record_type.table_name}.tags::text[] @> #{str_arr_to_pg_arr(and_tags)}")
+      query_record = @record_type.where("#{@record_type.table_name}.tags @> #{str_arr_to_pg_arr(and_tags)}::varchar[]")
     end
 
     or_queries = []
     unless or_tags.empty?
-      or_queries << "#{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(or_tags)}"
+      or_queries << "#{@record_type.table_name}.tags && #{str_arr_to_pg_arr(or_tags)}::varchar[]"
     end
     if others
       to_not = @record_type::TAG_OTHER_NOT.difference(and_tags+or_tags)
       not_queries = to_not.map { |tag| "NOT '#{tag}' = ANY(tags)" }
-      or_queries << "NOT #{@record_type.table_name}.tags::text[] && #{str_arr_to_pg_arr(to_not)}"
+      or_queries << "NOT #{@record_type.table_name}.tags && #{str_arr_to_pg_arr(to_not)}::varchar[]"
     end
     unless or_queries.empty?
       if query_record.nil?

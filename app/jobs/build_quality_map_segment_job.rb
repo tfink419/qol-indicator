@@ -107,6 +107,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           dic_ids = []
           (transit_type_low..transit_type_high).each do |transit_type|
+            if point_type == 'GroceryStoreFoodQuantityMapPoint'
+              travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+            end
             next unless PolygonQuery.new(polygon_class, { # Dont check for every tag
               name:parent_class.name,
               table_name:parent_class.table_name,
@@ -131,12 +134,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 else
                   parent_query = TagQuery.new(parent_class).query(tag_calc_num, true)
                 end
-                new_quality_maps = []
-                if point_type == 'GroceryStoreFoodQuantityMapPoint'
-                  travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
-                end
+                poly_query_service = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name)
                 
-                if PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
+                if poly_query_service.
                     any_near_bounds_with_parent?(
                       current_sector.south,
                       current_sector.west,
@@ -144,7 +144,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                       current_sector.east,
                       travel_type,
                       distance)
-                  polygon_query = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name).
+                  polygon_query = poly_query_service.
                   all_near_bounds_with_parent(
                     current_sector.south,
                     current_sector.west,
