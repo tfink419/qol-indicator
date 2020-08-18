@@ -21,7 +21,7 @@ class DataImageService
 
   def presigned_url_put(extra_details, lat_sector, lng_sector)
     signer = Aws::S3::Presigner.new(client:@s3_client)
-    signer.presigned_url(:put_object, bucket: BUCKET, key: get_path(extra_details, lat_sector, lng_sector))
+    signer.presigned_url(:put_object, expires_in: 3600, bucket: BUCKET, key: get_path(extra_details, lat_sector, lng_sector))
   end
 
   def save(extra_details, lat_sector, lng_sector, data)

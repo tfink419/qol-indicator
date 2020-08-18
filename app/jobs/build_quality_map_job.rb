@@ -67,10 +67,13 @@ class BuildQualityMapJob < ApplicationJob
 
     return if error_found
     
-    DataImageCuda.new.purge_queues
-    GoogleWorkersService.new.check!
-    @build_status.update!(state:'quality-map-points', percent:0)
-    puts "Waiting Quality Map Points Complete"
+
+    unless @build_status.reload.segment_statuses.all?(&:atleast_waiting_shrink_state?)
+      DataImageCuda.new.purge_queues
+      GoogleWorkersService.new.check!
+      @build_status.update!(state:'quality-map-points', percent:0)
+      puts "Waiting Quality Map Points Complete"
+    end
 
     until @build_status.reload.segment_statuses.all?(&:atleast_waiting_shrink_state?)
       sleep(5)
@@ -80,6 +83,7 @@ class BuildQualityMapJob < ApplicationJob
       )
     end
 
+    GoogleWorkersService.new.stop
     return if error_found
 
     (0...@south_west_sector.zoom).reverse_each do |zoom|
