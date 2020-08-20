@@ -59,7 +59,9 @@ class GroceryStore < ApplicationRecord
 
   TAG_GROUPS_CALC_SIZE = 2**(TAG_GROUPS.length)-1
 
-  TAG_OTHER_NOT = TAG_GROUPS.flatten.filter {|obj| obj.is_a?(String) }
+  # Has to ignore required
+  TAG_OTHER_NOT = TAG_GROUPS.filter {|tag_group| tag_group && !tag_group[0] }.
+    flatten.filter {|obj| obj.is_a?(String) }
 
   after_destroy do
     IsochronePolygon.where(isochronable_id:self.id, isochronable_type:'GroceryStore').delete_all

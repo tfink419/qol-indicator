@@ -15,8 +15,8 @@ const STATE_MAP = {
   'isochrones': 'Checking/Fetching Isochrone Polygons',
   'isochrones-complete': 'Finished Isochrone Polygons, Waiting For Others',
   'quality-map-points': 'Building Quality Map Points',
-  'waiting-subsample': 'Waiting for Next Subsample Phase',
-  'subsample': 'Sub-Sampling',
+  'waiting-shrink': 'Waiting for Next Shrink Phase',
+  'shrink': 'Shrinking',
   'complete': 'Completed'
 }
 
@@ -139,7 +139,7 @@ loadedBuildQualityMapStatuses, loadedCurrentBuildQualityMapStatus, updateBuildQu
               <Typography variant="subtitle2">
                 Current State: <strong>{STATE_MAP[segment_status.state]}</strong>
               </Typography>
-              { (segment_status.state == 'quality-map-points' || segment_status.state == 'subsample') && (
+              { (segment_status.state == 'quality-map-points' || segment_status.state == 'shrink') && (
                 <Typography variant="subtitle2">
                   Current Lat: <strong>{segment_status.current_lat}</strong>
                   &nbsp; Current Lat Sector: <strong>{segment_status.current_lat_sector}</strong>

@@ -9,13 +9,13 @@ class Admin::BuildQualityMapController < ApplicationController
     when "GroceryStoreFoodQuantityMapPoint"
       transit_type_high = GroceryStore::NUM_TRANSIT_TYPES
       polygon_class_service = PolygonClassService.new(IsochronePolygon.where(isochronable_type:'GroceryStore'))
-      south_west = polygon_class_service.furthest_south_west
-      if south_west[0]
-        north_east = polygon_class_service.furthest_north_east
-      else
-        south_west = [GroceryStore.minimum(:lat)-0.5, GroceryStore.minimum(:long)-0.5]
-        north_east = [GroceryStore.maximum(:lat)+0.5, GroceryStore.maximum(:long)+0.5]
-      end
+      south_west = [GroceryStore.minimum(:lat)-0.5, GroceryStore.minimum(:long)-0.5]
+      north_east = [GroceryStore.maximum(:lat)+0.5, GroceryStore.maximum(:long)+0.5]
+    when "ParkActivitiesMapPoint"
+      transit_type_high = Park::NUM_TRANSIT_TYPES
+      polygon_class_service = PolygonClassService.new(IsochronePolygon.where(isochronable_type:'Park'))
+      south_west = [Park.minimum(:lat)-0.5, Park.minimum(:long)-0.5]
+      north_east = [Park.maximum(:lat)+0.5, Park.maximum(:long)+0.5]
     when "CensusTractPovertyMapPoint"
       polygon_class_service = PolygonClassService.new(CensusTractPolygon)
       south_west = polygon_class_service.furthest_south_west

@@ -98,6 +98,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       @south_west_sector.lng_sector
     )
     @lat_sector = current_sector.lat_sector
+    tag_query = TagQuery.new(parent_class)
     puts 'Quality Map Points'
     if %w(received isochrones-complete quality-map-points).include?(build_status.state)
       dic = DataImageCuda.new
@@ -125,7 +126,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                 distance)
             (0..num_tags).each do |tag_num|
               next if num_tags != 0 && tag_num == num_tags
-              TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
+              tag_query.all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 if num_tags == 0
                   parent_query = {
                     name:parent_class.name,
@@ -247,14 +248,16 @@ class BuildQualityMapSegmentJob < ApplicationJob
         percent: 0
       )
       puts "Starting lat_sector #{@lat_sector}"
+      
       while true # see towards bottom of loop
         puts "Zoom: #{zoom}, Lat Sector: #{@lat_sector}"
         dis = DataImageService.new(point_class::SHORT_NAME, zoom)
+        dis_zoomed = DataImageService.new(point_class::SHORT_NAME, zoom+1)
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           (transit_type_low..transit_type_high).each do |transit_type|
             (0..num_tags).each do |tag_num|
               next if num_tags != 0 && tag_num == num_tags
-              TagQuery.new(parent_class).all_calcs_in_tag(tag_num).each do |tag_calc_num|
+              tag_query.all_calcs_in_tag(tag_num).each do |tag_calc_num|
                 added_params = extra_params.map do |param|
                   case param
                   when :transit_type
@@ -264,7 +267,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
                   end
                 end
                 north_west, north_east, south_west, south_east = current_sector.zoom_in.map do |sector|
-                  DataImageService.new(point_class::SHORT_NAME, zoom+1).
+                  dis_zoomed.
                   load(added_params, sector.lat_sector, sector.lng_sector)
                 end
                 
