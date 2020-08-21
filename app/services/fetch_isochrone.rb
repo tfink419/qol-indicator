@@ -55,7 +55,7 @@ class FetchIsochrone
       geo = IsochronePolygon.extract_geo_from_mapbox(isochrone)
       unless geo.empty? || geo.first.empty?
         if first_done
-          c.add_clip_polygon(geo)
+          c.add_clip_polygons(geo)
         else
           c.add_subject_polygons(geo)
           first_done = true
