@@ -1,8 +1,8 @@
 GIT
   remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
-  revision: 1885a31ec92d66da6951f82c5950d7ae84edcc24
+  revision: 64006e004a732c9ca8f8a1de53177c903c58c750
   specs:
-    quality_map_image (0.7.10)
+    quality_map_image (0.7.11)
       gradient (~> 0.5.1)
       ruby-vips
 
@@ -58,8 +58,8 @@ GEM
       io-like (~> 0.3.0)
     arel (9.0.0)
     aws-eventstream (1.1.0)
-    aws-partitions (1.356.0)
-    aws-sdk-core (3.104.3)
+    aws-partitions (1.358.0)
+    aws-sdk-core (3.104.4)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
@@ -150,7 +150,7 @@ GEM
       activesupport (>= 5.0.0)
     jmespath (1.4.0)
     json (2.3.1)
-    jwt (2.2.1)
+    jwt (2.2.2)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -281,7 +281,7 @@ GEM
       activemodel (>= 5.0)
       bindex (>= 0.4.0)
       railties (>= 5.0)
-    webpacker (5.2.0)
+    webpacker (5.2.1)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
