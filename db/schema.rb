@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_21_201142) do
+ActiveRecord::Schema.define(version: 2020_08_21_205048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -140,6 +140,8 @@ ActiveRecord::Schema.define(version: 2020_08_21_201142) do
     t.integer "num_activities", default: 10
     t.float "lat"
     t.float "long"
+    t.index ["lat", "long"], name: "index_parks_on_lat_and_long"
+    t.index ["openstreetmap_id"], name: "index_parks_on_openstreetmap_id", unique: true
   end
 
   create_table "password_resets", force: :cascade do |t|
