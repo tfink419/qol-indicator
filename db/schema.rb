@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_15_212520) do
+ActiveRecord::Schema.define(version: 2020_08_21_201142) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -134,7 +134,7 @@ ActiveRecord::Schema.define(version: 2020_08_15_212520) do
   end
 
   create_table "parks", force: :cascade do |t|
-    t.integer "openstreetmap_id"
+    t.text "openstreetmap_id"
     t.text "name"
     t.json "nodes"
     t.integer "num_activities", default: 10
