@@ -3,13 +3,13 @@ class NodeCentroid
     @nodes = nodes
   end
 
-  def get_entroid
+  def get_centroid
     lat = 0
     lng = 0
     @nodes.each do |node|
       lng += node[0]
       lat += node[1]
     end
-    [lng/@has_nodes.nodes.length, lat/@has_nodes.nodes.length]
+    [lng/@nodes.length, lat/@nodes.length]
   end
 end

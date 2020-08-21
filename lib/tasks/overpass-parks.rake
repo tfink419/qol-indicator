@@ -1,7 +1,7 @@
 require 'json'
 
 task "overpass:parks" => :environment do
-  parks = OverpassApiSearch.new("Colorado", [%w(leisure park)]).get_nodes
+  parks = OverpassApiSearch.new("Colorado", [%w(leisure park)]).get_ways_and_nodes
   south = 9999
   west = 9999
   north = -9999
@@ -11,11 +11,11 @@ task "overpass:parks" => :environment do
     puts "Park #{i += 1}"
     if place["type"] == "way"
       nodes = place["nodes"].map { |node| [node["lon"], node["lat"]]}
-      lng, lat = NodeCentroid.new(nodes)
+      lng, lat = NodeCentroid.new(nodes).get_centroid
       south = lat if lat < south
       north = lat if lat > north
-      west = long if long < west
-      east = long if long > east
+      west = lng if lng < west
+      east = lng if lng > east
       next [
         place["tags"]["name"],
         place["id"],
@@ -36,7 +36,7 @@ task "overpass:parks" => :environment do
         [place["lon"], place["lat"]]
       ]
     end
-  end))
+  end), on_duplicate_key_ignore: true)
 
   unless south == 9999
     # Rebuild all points in the range of added grocery stores
