@@ -3,6 +3,7 @@ class BuildQualityMapJob < ApplicationJob
   sidekiq_options retry: 0
 
   NUM_SEGMENTS=(ENV['NUM_HEATMAP_THREADS'] || 9).to_i
+  NUM_SHRINK_SEGMENTS=(ENV['NUM_SHRINK_THREADS'] || 29).to_i
 
   def perform(build_status, job_retry=false)
     @build_status = build_status
@@ -26,25 +27,23 @@ class BuildQualityMapJob < ApplicationJob
     # dont reset lat and try workers if this is a retry and lat already exists
     unless job_retry && @build_status.current_lat
       HerokuWorkersService.new(NUM_SEGMENTS+1).start
-      if @build_status.segment_statuses.none?
-        current_sector = @south_west_sector
-        (1..NUM_SEGMENTS).each do |segment|
-          build_segment_status = @build_status.segment_statuses.create(
-            state:'initialized',
-            percent:100,
-            segment:segment,
-            current_lat:current_sector.south,
-            current_lat_sector:current_sector.lat_sector
-          )
-          BuildQualityMapSegmentJob.perform_later(build_segment_status)
-          current_sector = current_sector.next_lat_sector
-        end
-        current_sector = current_sector.prev_lat_sector
-        @build_status.update!(
+      current_sector = @south_west_sector
+      until((count = @build_status.segment_statuses.count) >= NUM_SEGMENTS)
+        build_segment_status = @build_status.segment_statuses.create(
+          state:'initialized',
+          percent:100,
+          segment:count+1,
           current_lat:current_sector.south,
           current_lat_sector:current_sector.lat_sector
         )
+        BuildQualityMapSegmentJob.perform_later(build_segment_status)
+        current_sector = current_sector.next_lat_sector
       end
+      current_sector = current_sector.prev_lat_sector
+      @build_status.update!(
+        current_lat:current_sector.south,
+        current_lat_sector:current_sector.lat_sector
+      )
     end
 
     # in case its different due to an old build and a change in num_segments
@@ -83,8 +82,22 @@ class BuildQualityMapJob < ApplicationJob
       )
     end
 
+    unless job_retry
+      HerokuWorkersService.new(NUM_SEGMENTS*2+1).start
+    end
+
     GoogleWorkersService.new.stop
     return if error_found
+
+    # HerokuWorkersService.new(NUM_SHRINK_SEGMENTS+1).start
+    # until((count = @build_status.segment_statuses.count) >= NUM_SHRINK_SEGMENTS)
+    #   build_segment_status = @build_status.segment_statuses.create(
+    #     state:'waiting-shrink',
+    #     segment:count+1,
+    #     percent:0
+    #   )
+    #   BuildQualityMapSegmentJob.perform_later(build_segment_status)
+    # end
 
     (0...@south_west_sector.zoom).reverse_each do |zoom|
       @south_west_sector = @south_west_sector.zoom_out

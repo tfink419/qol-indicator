@@ -1,12 +1,12 @@
 class ParkActivitiesMapPoint < MapPoint
   TRANSIT_TYPE_MAP = [
     [nil, nil], # shouldn't be used
-    ['walking', 8],
-    ['walking', 16],
-    ['walking', 24],
-    ['cycling', 8],
-    ['cycling', 16],
-    ['cycling', 24]
+    ['walking', 6],
+    ['walking', 12],
+    ['walking', 18],
+    ['cycling', 6],
+    ['cycling', 12],
+    ['cycling', 18]
   ]
   LOW = 0
   HIGH = 12.5
