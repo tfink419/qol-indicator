@@ -43,7 +43,7 @@ class FetchIsochrone
   end 
 
   def get_geos_from_mapbox_and_union(travel_type, distance)
-    isochrones = nil
+    isochrones = []
     @isochronable.nodes.each do |node|
       with_retries(max_tries: 20, base_sleep_seconds: 15, max_sleep_seconds: 60) {
         isochrones << Mapbox::Isochrone.isochrone(travel_type, "#{node[0]},#{node[1]}", {contours_minutes: [distance], generalize: 25, polygons:true})
