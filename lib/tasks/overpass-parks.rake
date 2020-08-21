@@ -51,6 +51,7 @@ task "overpass:parks" => :environment do
       transit_type_high:Park::NUM_TRANSIT_TYPES,
       point_type:'ParkActivitiesMapPoint'
     )
+    HerokuWorkersService.new.start
     BuildQualityMapJob.perform_later(build_status)
   end
 end

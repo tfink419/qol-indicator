@@ -16,7 +16,12 @@ class FetchIsochrone
     (transit_type_low..transit_type_high).each do |transit_type|
       travel_type, distance = @transit_type_map[transit_type]
       if @isochronable.isochrone_polygons.where(travel_type:travel_type, distance:distance).none?
-        geo = get_geo_from_mapbox(travel_type, distance)
+        case @ischronable.class.name
+        when "GroceryStore"
+          geo = get_geo_from_mapbox(travel_type, distance)
+        when "Park"
+          geo = get_geos_from_mapbox_and_union(travel_type, distance)
+        end
         unless geo.nil?
           isochrones << {travel_type:travel_type, distance:distance, geometry:geo}
         end
