@@ -7,7 +7,7 @@ task "overpass:parks" => :environment do
   north = -9999
   east = -9999
   i = 0
-  Park.import [:name, :openstreetmap_id, :lat, :lng, :nodes], parks.map do |place|
+  Park.import [:name, :openstreetmap_id, :lat, :long, :nodes], parks.map do |place|
     puts "Park #{i += 1}"
     if place["type"] == "way"
       nodes = place["nodes"].map { |node| [node["lon"], node["lat"]]}
