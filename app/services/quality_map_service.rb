@@ -44,7 +44,7 @@ class QualityMapService
       image_data << [
         ParkActivitiesMapPoint::LOW,
         ParkActivitiesMapPoint::HIGH,
-        normalized_grocery_store_ratio,
+        normalized_park_ratio,
         ParkActivitiesMapPoint::SCALE,
         false, # dont invert
         Park::QUALITY_CALC_METHOD,
