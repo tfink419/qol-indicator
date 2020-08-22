@@ -5,6 +5,8 @@ class BuildQualityMapSegmentJob < ApplicationJob
   queue_as :build_quality_map_segment
   sidekiq_options retry: 0
 
+  LONG_PERFORM_CHUNK_SIZE = 16
+
   def perform(build_status)
     return unless build_status
     return if build_status.state == 'complete'
@@ -106,83 +108,91 @@ class BuildQualityMapSegmentJob < ApplicationJob
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           dic_ids = []
-          (transit_type_low..transit_type_high).each do |transit_type|
-            if point_type == 'GroceryStoreFoodQuantityMapPoint'
-              travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
-            end
-            next unless PolygonQuery.new(polygon_class, { # Dont check for every tag
-              name:parent_class.name,
-              table_name:parent_class.table_name,
-              query:'all'
-            }, parent_class_id, quality_column_name).
-              any_near_bounds_with_parent?(
-                current_sector.south,
-                current_sector.west,
-                current_sector.north,
-                current_sector.east,
-                travel_type,
-                distance)
-            (0..num_tags).each do |tag_num|
-              next if num_tags != 0 && tag_num == num_tags
-              tag_query.all_calcs_in_tag(tag_num).each do |tag_calc_num|
-                if num_tags == 0
-                  parent_query = {
-                    name:parent_class.name,
-                    table_name:parent_class.table_name,
-                    query:'all'
-                  }
-                else
-                  parent_query = TagQuery.new(parent_class).query(tag_calc_num, true)
-                end
-                poly_query_service = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name)
-                
-                if poly_query_service.
-                    any_near_bounds_with_parent?(
+          count = 0
+          while count < LONG_PERFORM_CHUNK_SIZE && current_sector.lng_sector <= @north_east_sector.lng_sector
+            (transit_type_low..transit_type_high).each do |transit_type|
+              if point_type == 'GroceryStoreFoodQuantityMapPoint'
+                travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+              end
+              next unless PolygonQuery.new(polygon_class, { # Dont check for every tag
+                name:parent_class.name,
+                table_name:parent_class.table_name,
+                query:'all'
+              }, parent_class_id, quality_column_name).
+                any_near_bounds_with_parent?(
+                  current_sector.south,
+                  current_sector.west,
+                  current_sector.north,
+                  current_sector.east,
+                  travel_type,
+                  distance)
+              (0..num_tags).each do |tag_num|
+                next if num_tags != 0 && tag_num == num_tags
+                tag_query.all_calcs_in_tag(tag_num).each do |tag_calc_num|
+                  if num_tags == 0
+                    parent_query = {
+                      name:parent_class.name,
+                      table_name:parent_class.table_name,
+                      query:'all'
+                    }
+                  else
+                    parent_query = TagQuery.new(parent_class).query(tag_calc_num, true)
+                  end
+                  poly_query_service = PolygonQuery.new(polygon_class, parent_query, parent_class_id, quality_column_name)
+                  
+                  if poly_query_service.
+                      any_near_bounds_with_parent?(
+                        current_sector.south,
+                        current_sector.west,
+                        current_sector.north,
+                        current_sector.east,
+                        travel_type,
+                        distance)
+                    polygon_query = poly_query_service.
+                    all_near_bounds_with_parent(
                       current_sector.south,
                       current_sector.west,
                       current_sector.north,
                       current_sector.east,
                       travel_type,
-                      distance)
-                  polygon_query = poly_query_service.
-                  all_near_bounds_with_parent(
-                    current_sector.south,
-                    current_sector.west,
-                    current_sector.north,
-                    current_sector.east,
-                    travel_type,
-                    distance,
-                    true # Raw
-                  )
-                  # skip to next block if none found
-                  added_params = extra_params.map do |param|
-                    case param
-                    when :transit_type
-                      transit_type
-                    when :tags
-                      tag_calc_num
+                      distance,
+                      true # Raw
+                    )
+                    # skip to next block if none found
+                    added_params = extra_params.map do |param|
+                      case param
+                      when :transit_type
+                        transit_type
+                      when :tags
+                        tag_calc_num
+                      end
                     end
+                    url = dis.presigned_url_put(
+                      added_params,
+                      current_sector.lat_sector,
+                      current_sector.lng_sector
+                    )
+                    
+                    dic_ids << dic.queue(
+                      current_sector.south_step,
+                      current_sector.west_step,
+                      MapPoint::STEP_INVERT,
+                      DataImageService::DATA_CHUNK_SIZE,
+                      point_class::SCALE,
+                      parent_class::QUALITY_CALC_METHOD,
+                      parent_class::QUALITY_CALC_VALUE,
+                      url,
+                      polygon_query
+                    )
                   end
-                  url = dis.presigned_url_put(
-                    added_params,
-                    current_sector.lat_sector,
-                    current_sector.lng_sector
-                  )
-                  
-                  dic_ids << dic.queue(
-                    current_sector.south_step,
-                    current_sector.west_step,
-                    MapPoint::STEP_INVERT,
-                    DataImageService::DATA_CHUNK_SIZE,
-                    point_class::SCALE,
-                    parent_class::QUALITY_CALC_METHOD,
-                    parent_class::QUALITY_CALC_VALUE,
-                    url,
-                    polygon_query
-                  )
                 end
               end
             end
+            current_sector = current_sector.next_lng_sector
+            @lng_sector = current_sector.lng_sector
+            build_status.update!(
+              percent:calc_grocery_store_quality_map_point_percent
+            )
           end
           dic_ids.each do |id|
             begin
@@ -196,11 +206,6 @@ class BuildQualityMapSegmentJob < ApplicationJob
               }
             end
           end
-          current_sector = current_sector.next_lng_sector
-          @lng_sector = current_sector.lng_sector
-          build_status.update!(
-            percent:calc_grocery_store_quality_map_point_percent
-          )
         end
         @lat_sector = build_status.parent_status.reload.current_lat_sector.to_i+1
         break unless @lat_sector <= @north_east_sector.lat_sector # essentially while lat <= north_east_int[0]
