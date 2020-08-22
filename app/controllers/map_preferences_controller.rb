@@ -26,6 +26,6 @@ class MapPreferencesController < ApplicationController
 
   def map_preference_params
     params.require(:map_preferences).permit(:grocery_store_transit_type,:census_tract_poverty_low,
-    :census_tract_poverty_high,:grocery_store_ratio,:census_tract_poverty_ratio, :grocery_store_tags)
+    :census_tract_poverty_high,:grocery_store_ratio,:census_tract_poverty_ratio, :grocery_store_tags, :park_ratio, :park_transit_type)
   end
 end
