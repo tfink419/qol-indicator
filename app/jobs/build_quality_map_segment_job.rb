@@ -110,6 +110,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
           dic_ids = []
           count = 0
           while count < LONG_PERFORM_CHUNK_SIZE && current_sector.lng_sector <= @north_east_sector.lng_sector
+            count += 1
             (transit_type_low..transit_type_high).each do |transit_type|
               if point_type == 'GroceryStoreFoodQuantityMapPoint'
                 travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
