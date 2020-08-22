@@ -45,6 +45,26 @@ export default ({data}) => (
           </Table>
         </React.Fragment>
       )}
+      { data.data.parks && (
+        <React.Fragment>
+          <Table aria-label="Parks" size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Park</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                data.data.parks.map((park, ind) => (
+                  <TableRow key={ind}>
+                    <TableCell>{park.name}</TableCell>
+                  </TableRow>
+                ))
+              }
+            </TableBody>
+          </Table>
+        </React.Fragment>
+      )}
       { data.data.census_tract && (
         <React.Fragment>
           <Typography variant='h6'>

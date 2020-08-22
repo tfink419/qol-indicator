@@ -33,6 +33,30 @@ class QualityService
         data[:grocery_stores] = GroceryStore.where(id:results[1]).select(:name, :address, :food_quantity)
       end
     end
+    if normalized_park_ratio > 0
+      parent_query = {
+        name:Park.name,
+        table_name:Park.table_name,
+        query:'all'
+      }
+      travel_type, distance = ParkActivitiesMapPoint::TRANSIT_TYPE_MAP[@map_preferences["park_transit_type"]]
+      polygons = PolygonQuery.new(IsochronePolygon, parent_query, 'isochronable_id', 'num_activities')\
+      .all_near_point_with_parent_and_ids(@lat, @long, travel_type, distance)
+      # skip to next block if none found
+      unless polygons.blank?
+        results = QualityMapImage.quality_of_point(@lat, @long, polygons, Park::QUALITY_CALC_METHOD, Park::QUALITY_CALC_VALUE)
+        inner_quality = results[0]
+        if inner_quality < ParkActivitiesMapPoint::LOW
+          inner_quality = ParkActivitiesMapPoint::LOW
+        elsif inner_quality > ParkActivitiesMapPoint::HIGH
+          inner_quality = ParkActivitiesMapPoint::HIGH
+        end
+        inner_quality -= ParkActivitiesMapPoint::LOW
+        inner_quality = 100.to_f/(ParkActivitiesMapPoint::HIGH-ParkActivitiesMapPoint::LOW)*inner_quality
+        quality += inner_quality*normalized_park_ratio
+        data[:parks] = Park.where(id:results[1]).select(:name, :num_activities)
+      end
+    end
     # inverted
     if normalized_census_tract_poverty_ratio > 0
       parent_query = {
