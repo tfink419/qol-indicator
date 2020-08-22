@@ -253,7 +253,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
       )
       puts "Starting lat_sector #{@lat_sector}"
       
-      while true # see towards bottom of loop
+      while  @lat_sector <= @north_east_sector.lat_sector
         puts "Zoom: #{zoom}, Lat Sector: #{@lat_sector}"
         dis = DataImageService.new(point_class::SHORT_NAME, zoom)
         dis_zoomed = DataImageService.new(point_class::SHORT_NAME, zoom+1)
