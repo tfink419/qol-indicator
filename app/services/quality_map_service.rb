@@ -10,8 +10,10 @@ class QualityMapService
     sum = 0
     sum += @map_preferences["grocery_store_ratio"]
     sum += @map_preferences["census_tract_poverty_ratio"]
+    sum += @map_preferences["park_ratio"]
     normalized_grocery_store_ratio = @map_preferences["grocery_store_ratio"]/sum.to_f
     normalized_census_tract_poverty_ratio = @map_preferences["census_tract_poverty_ratio"]/sum.to_f
+    normalized_park_ratio = @map_preferences["park_ratio"]/sum.to_f
     images = []
     image_data = []
     if normalized_grocery_store_ratio > 0
@@ -20,7 +22,7 @@ class QualityMapService
         GroceryStoreFoodQuantityMapPoint::HIGH,
         normalized_grocery_store_ratio,
         GroceryStoreFoodQuantityMapPoint::SCALE,
-        false, # invert
+        false, # dont invert
         GroceryStore::QUALITY_CALC_METHOD,
         GroceryStore::QUALITY_CALC_VALUE
       ]
@@ -37,6 +39,24 @@ class QualityMapService
           new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom).
           load(extra_params, @lat_sector, @lng_sector)
       }.filter{ |image| !image.nil? }
+    end
+    if normalized_park_ratio > 0
+      image_data << [
+        ParkActivitiesMapPoint::LOW,
+        ParkActivitiesMapPoint::HIGH,
+        normalized_grocery_store_ratio,
+        ParkActivitiesMapPoint::SCALE,
+        false, # dont invert
+        Park::QUALITY_CALC_METHOD,
+        Park::QUALITY_CALC_VALUE
+      ]
+      extra_params = [
+        @map_preferences["park_transit_type"]
+      ]
+      
+      images << [DataImageService.
+          new(ParkActivitiesMapPoint::SHORT_NAME, @zoom).
+          load(extra_params, @lat_sector, @lng_sector)].filter{ |image| !image.nil? }
     end
     if normalized_census_tract_poverty_ratio > 0
       image_data << [

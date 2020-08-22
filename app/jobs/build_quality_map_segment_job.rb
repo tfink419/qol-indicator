@@ -34,10 +34,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
       quality_column_name = "food_quantity"
       extra_params = [:transit_type, :tags]
       num_tags = GroceryStore::TAG_GROUPS.length
-      isochronable_count = segment_part = (parent_class.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
+      isochronable_count = segment_part = (parent_class.count/BuildQualityMapJob::NUM_SEGMENTS).ceil
       segment_low = (segment-1)*segment_part
       segment_low += 1 unless segment == 1
-      segment_low = segment_low.round
       isochrone_type = true
     when 'CensusTractPovertyMapPoint'
       point_class = CensusTractPovertyMapPoint
@@ -56,10 +55,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
       quality_column_name = "num_activities"
       extra_params = [:transit_type]
       num_tags = 0
-      isochronable_count = segment_part = (parent_class.count/BuildQualityMapJob::NUM_SEGMENTS).floor(1)
+      isochronable_count = segment_part = (parent_class.count/BuildQualityMapJob::NUM_SEGMENTS).ceil
       segment_low = (segment-1)*segment_part
       segment_low += 1 unless segment == 1
-      segment_low = segment_low.round
       isochrone_type = true
     else
       raise InvalidPointType
@@ -74,7 +72,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
         build_status.update!(percent:0, state:'isochrones')
         puts 'Isochrones State...'
         before = Time.now
-        parent_class.offset(segment_low).limit(segment_part.round).find_each do |isochronable|
+        parent_class.offset(segment_low).limit(segment_part).find_each do |isochronable|
           current += 1
           if Time.now-before > 5
             before = Time.now

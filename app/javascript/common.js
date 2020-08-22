@@ -42,7 +42,9 @@ export const defaultPreferences = {
   census_tract_poverty_low:5,
   census_tract_poverty_high:40,
   grocery_store_ratio:50,
-  census_tract_poverty_ratio:50
+  census_tract_poverty_ratio:50,
+  park_transit_type:2,
+  park_ratio:50
 };
 
 let infoWindowId = 0;

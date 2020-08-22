@@ -6,7 +6,9 @@ class MapPreferences < ApplicationRecord
   validates :census_tract_poverty_high, :presence => true, :inclusion => 0..100
   validates :grocery_store_ratio, :presence => true, :inclusion => 0..100
   validates :census_tract_poverty_ratio, :presence => true, :inclusion => 0..100
-  validates :grocery_store_tags, :presence => true, :inclusion => 0..GroceryStore::TAG_GROUPS_CALC_SIZE
+  validates :grocery_store_tags, :presence => true, :inclusion => 0...GroceryStore::TAG_GROUPS_CALC_SIZE
+  validates :park_transit_type, :presence => true, :inclusion => 1..Park::NUM_TRANSIT_TYPES
+  validates :park_ratio, :presence => true, :inclusion => 0..100
 
 
   def public_attributes 
@@ -16,7 +18,9 @@ class MapPreferences < ApplicationRecord
       census_tract_poverty_high: census_tract_poverty_high,
       grocery_store_ratio: grocery_store_ratio,
       census_tract_poverty_ratio: census_tract_poverty_ratio,
-      grocery_store_tags: grocery_store_tags
+      grocery_store_tags: grocery_store_tags,
+      park_transit_type: park_transit_type,
+      park_ratio: park_ratio
     }
   end
 end

@@ -24,7 +24,7 @@ class FetchIsochrone
           geo = get_geos_from_mapbox_and_union(travel_type, distance)
         end
         unless geo.nil?
-          isochrones << {travel_type:travel_type, distance:distance, geometry:geo}
+          isochrones << {travel_type:travel_type, distance:distance, geometry:geo.map{|polygon| polygon.map {|polygon_or_hole| polygon_or_hole.map {|coords| coords.map { |coord| coord.to_f.round(5)}}}}}
         end
       end
     end

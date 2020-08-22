@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_21_205048) do
+ActiveRecord::Schema.define(version: 2020_08_22_023001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,8 @@ ActiveRecord::Schema.define(version: 2020_08_21_205048) do
     t.integer "census_tract_poverty_ratio", default: 50
     t.integer "grocery_store_ratio", default: 50
     t.integer "grocery_store_tags", default: 1
+    t.integer "park_ratio", default: 50
+    t.integer "park_transit_type", default: 2
     t.index ["user_id"], name: "index_map_preferences_on_user_id"
   end
 

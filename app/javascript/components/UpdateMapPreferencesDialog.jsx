@@ -9,7 +9,7 @@ import { flashMessage } from '../actions/messages'
 import { updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences } from '../actions/map-preferences'
 import { getMapPreferences, putMapPreferences } from '../fetch';
 
-const transitTypeMarks = [
+const groceryStoreTransitTypeMarks = [
   {
     value: 1,
     label: 'Walking',
@@ -23,15 +23,31 @@ const transitTypeMarks = [
     label: 'Driving',
   }
 ];  
+const parkTransitTypeMarks = [
+  {
+    value: 1,
+    label: 'Walking',
+  },
+  {
+    value: 4,
+    label: 'Biking',
+  }
+];  
 
 const useStyles = makeStyles({
   cancelButton: {
     color: 'green'
   },
-  groceryStoreQualityMarkLabel:{
+  transitTypeSlider:{
     marginLeft:'12.5%'
   }
 });
+
+const totalRatio = (mapPreferences) => (
+  mapPreferences.grocery_store_ratio +
+  mapPreferences.census_tract_poverty_ratio +
+  mapPreferences.park_ratio
+)
 
 const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences}) => {
   const classes = useStyles();
@@ -115,6 +131,7 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
                       min={0}
                       max={100}
                       valueLabelDisplay="auto"
+                      valueLabelFormat={(val) => val+"/"+totalRatio(mapPreferences.preferences)}
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -122,14 +139,14 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
                     Proximity (minutes)
                   </Typography>
                   <Slider
-                    classes={{markLabel:classes.groceryStoreQualityMarkLabel}}
+                    classes={{markLabel:classes.transitTypeSlider}}
                     value={mapPreferences.preferences.grocery_store_transit_type}
                     onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, grocery_store_transit_type:val })}
                     step={1}
                     min={1}
                     max={9}
                     valueLabelDisplay="auto"
-                    marks={transitTypeMarks}
+                    marks={groceryStoreTransitTypeMarks}
                     valueLabelFormat={(val) => ((val-1)%3+1)*8}
                   />
                 </Grid>
@@ -176,6 +193,82 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
           </ExpansionPanel>
           <ExpansionPanel>
             <ExpansionPanelSummary>
+              <Typography>Park</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Ratio
+                  </Typography>
+                  <Slider
+                      value={mapPreferences.preferences.park_ratio}
+                      onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, park_ratio:val })}
+                      step={1}
+                      min={0}
+                      max={100}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(val) => val+"/"+totalRatio(mapPreferences.preferences)}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Proximity (minutes)
+                  </Typography>
+                  <Slider
+                    classes={{markLabel:classes.transitTypeSlider}}
+                    value={mapPreferences.preferences.park_transit_type}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, park_transit_type:val })}
+                    step={1}
+                    min={1}
+                    max={6}
+                    valueLabelDisplay="auto"
+                    marks={parkTransitTypeMarks}
+                    valueLabelFormat={(val) => ((val-1)%3+1)*6}
+                  />
+                </Grid>
+              </Grid>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel>
+            <ExpansionPanelSummary>
+              <Typography>Poverty Percent</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Ratio
+                  </Typography>
+                  <Slider
+                      value={mapPreferences.preferences.census_tract_poverty_ratio}
+                      onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, census_tract_poverty_ratio:val })}
+                      step={1}
+                      min={0}
+                      max={100}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(val) => val+"/"+totalRatio(mapPreferences.preferences)}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Percent Range
+                  </Typography>
+                  <Slider
+                    value={[mapPreferences.preferences.census_tract_poverty_low, mapPreferences.preferences.census_tract_poverty_high]}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, census_tract_poverty_low:val[0], census_tract_poverty_high:val[1] })}
+                    step={1}
+                    min={0}
+                    max={100}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(val) => val+"%"}
+                  />
+                </Grid>
+              </Grid>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+          <ExpansionPanel>
+            <ExpansionPanelSummary>
               <Typography>Ratios</Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
@@ -193,6 +286,23 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
                     min={0}
                     max={100}
                     valueLabelDisplay="auto"
+                    valueLabelFormat={(val) => val+"/"+totalRatio(mapPreferences.preferences)}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>
+                    Park
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Slider
+                    value={mapPreferences.preferences.park_ratio}
+                    onChange={(e, val) => tempUpdateMapPreferences({ ...mapPreferences.preferences, park_ratio:val })}
+                    step={1}
+                    min={0}
+                    max={100}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(val) => val+"/"+totalRatio(mapPreferences.preferences)}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -208,6 +318,7 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
                     min={0}
                     max={100}
                     valueLabelDisplay="auto"
+                    valueLabelFormat={(val) => val+"/"+totalRatio(mapPreferences.preferences)}
                   />
                 </Grid>
               </Grid>
