@@ -9,8 +9,10 @@ class QualityService
     sum = 0
     sum += @map_preferences["grocery_store_ratio"]
     sum += @map_preferences["census_tract_poverty_ratio"]
+    sum += @map_preferences["park_ratio"]
     normalized_grocery_store_ratio = @map_preferences["grocery_store_ratio"]/sum.to_f
     normalized_census_tract_poverty_ratio = @map_preferences["census_tract_poverty_ratio"]/sum.to_f
+    normalized_park_ratio = @map_preferences["park_ratio"]/sum.to_f
     quality = 0
     data = {}
     if normalized_grocery_store_ratio > 0
