@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { CircularProgress, IconButton, makeStyles } from '@material-ui/core/';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -30,7 +29,7 @@ const useStyles = makeStyles({
   }
 });
 
-const GroceryStorePopup = ({data, user, onGroceryStoreChange}) => {
+export default ({data, onGroceryStoreChange, isAdminPanel}) => {
   const classes = useStyles();
   let [currentDialogOpen, setCurrentDialogOpen] = React.useState(null);
 
@@ -48,7 +47,7 @@ const GroceryStorePopup = ({data, user, onGroceryStoreChange}) => {
         {data.grocery_store.address} <br/>
         {cityZipPrint(data.grocery_store.city, data.grocery_store.state, data.grocery_store.zip)}
         <br />
-        {user.is_admin &&
+        {isAdminPanel &&
           <React.Fragment>
             <IconButton onClick={() => setCurrentDialogOpen('update')}>
               <EditIcon className={classes.editIcon} />
@@ -66,9 +65,3 @@ const GroceryStorePopup = ({data, user, onGroceryStoreChange}) => {
       <CircularProgress/>
     )
 }
-
-const mapStateToProps = state => ({
-  user: state.user
-})
-
-export default connect(mapStateToProps) (GroceryStorePopup);

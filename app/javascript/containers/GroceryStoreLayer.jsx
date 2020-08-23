@@ -14,7 +14,7 @@ const MAX_STORES_TO_HOLD = 10000;
 
 const ICON_BASE_URL = 'https://my-qoli-icons.s3-us-west-1.amazonaws.com/';
 
-const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpen, infoWindowLoaded, infoWindows }) => {
+const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpen, infoWindowLoaded, isAdminPanel }) => {
   const groceryStores = React.useRef([]);
   const justRetrievedGroceryStores = React.useRef([]);
   const prevMapPreferences = React.useRef(mapPreferences.preferences);
@@ -27,18 +27,6 @@ const GroceryStoreLayer = ({ map, currentLocation, mapPreferences, infoWindowOpe
     });
     groceryStores.current = [];
   }
-
-  const onGroceryStoreChange = (id) => {
-    justRetrievedGroceryStores.current = justRetrievedGroceryStores.current.filter(groceryStore => groceryStore != id);
-    groceryStores.current = groceryStores.current.filter(groceryStore => {
-      if(groceryStore.groceryStore[0] == id) {
-        groceryStore.marker.setMap(null);
-        return false;
-      }
-      return true;
-    });
-    loadMapData(map, currentLocation)
-  };
 
   const loadMapData = React.useRef(_.throttle((map, currentLocation, mapPreferences) => {
     if(!map) {

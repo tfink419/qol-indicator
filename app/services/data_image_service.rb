@@ -33,7 +33,7 @@ class DataImageService
       puts "Saving: '#{file_path}'"
       dir = "#{Rails.root}/quality_map_image_data/#{file_path[0...file_path.rindex('/')]}"
       FileUtils.mkdir_p dir
-      File.open(file_path, 'wb') { |f| f.write(data) }
+      File.open("#{Rails.root}/quality_map_image_data/#{file_path}", 'wb') { |f| f.write(data) }
     end
   end
 
@@ -45,6 +45,7 @@ class DataImageService
         key: file_path, 
       }).body.read rescue nil
     else
+      file_path = "#{Rails.root}/quality_map_image_data/#{file_path}"
       puts "Retrieving: '#{file_path}'"
       File.read(file_path) if(File.exist?(file_path))
     end

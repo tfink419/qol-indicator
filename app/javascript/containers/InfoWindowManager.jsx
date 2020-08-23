@@ -50,7 +50,7 @@ const InfoWindowManager = ({map, infoWindows}) => {
       </div>
       <div ref={groceryStorePopupRef}>
         {infoWindows.activeInfoWindow.type == 'grocery-store' &&
-          <GroceryStorePopup data={infoWindows.activeInfoWindow.data}/> /* onGroceryStoreChange={onGroceryStoreChange}/> */
+          <GroceryStorePopup data={infoWindows.activeInfoWindow.data} isAdminPanel={isAdminPanel} /> /* onGroceryStoreChange={onGroceryStoreChange}/> */
         }
       </div>
     </React.Fragment>

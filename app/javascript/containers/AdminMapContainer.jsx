@@ -3,6 +3,6 @@ import MapContainer from "./MapContainer";
 
 export default () => {
   return (
-    <MapContainer />
+    <MapContainer isAdminPanel={true}/>
   )
 }

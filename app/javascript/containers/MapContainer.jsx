@@ -12,6 +12,8 @@ import GroceryStoreLayer from './GroceryStoreLayer'
 import MapLegend from "../components/MapLegend";
 import MapSearchBox from "../components/MapSearchBox";
 import { paramify } from '../fetch'
+import { useHistory } from "react-router-dom";
+import { Button } from "@material-ui/core";
 
 const loader = new Loader({
   apiKey: GOOGLE_WEB_KEY,
@@ -29,6 +31,9 @@ const useStyles = makeStyles({
     bottom: 0,
     width: 'calc(100vw - 48px)',
     maxWidth: '1232px'
+  },
+  mapPreferencesButton: {
+    backgroundColor:'white'
   }
 });
 
@@ -39,11 +44,13 @@ const startLocation = {
   northEast:[39.765, -104.927]
 }
 
-const MapContainer = ({mapPreferences, user, updateMapPreferences}) => {
+const MapContainer = ({mapPreferences, user, updateMapPreferences, isAdminPanel}) => {
   const classes = useStyles();
+  const history = useHistory();
   let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
   const currentLocationRef = React.useRef(currentLocation);
   const mapPreferencesRef = React.useRef(mapPreferences);
+  const mapPreferencesButtonRef = React.useRef(null);
   let [map, setMap] = React.useState(null);
   const mapRef = React.useState(map);
   const mapContainer = React.useRef(null);
@@ -89,6 +96,7 @@ const MapContainer = ({mapPreferences, user, updateMapPreferences}) => {
       let _map = new window.google.maps.Map(mapContainer.current, mapOptions);
       setMap(mapRef.current = _map);
       _map.addListener('bounds_changed', () => handleMapMove());
+      _map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(mapPreferencesButtonRef.current);
     })
   }
 
@@ -103,8 +111,11 @@ const MapContainer = ({mapPreferences, user, updateMapPreferences}) => {
       <QualityMapLayer map={map} mapPreferences={mapPreferences} currentLocation={currentLocation} />
       <GroceryStoreLayer map={map} currentLocation={currentLocation} mapPreferences={mapPreferences} />
       <MapSearchBox map={map} />
-      { !user.is_admin && <MapLegend map={map}/> }
-      <InfoWindowManager map={map} />
+      { !isAdminPanel && <MapLegend map={map}/> }
+      <InfoWindowManager map={map} isAdminPanel={isAdminPanel} />
+      <Button classes={{root:classes.mapPreferencesButton}} variant="contained" ref={mapPreferencesButtonRef} component="a" href="/map/preferences" onClick={(e) => { e.preventDefault(); history.push('/map/preferences')}}>
+        Map Settings
+      </Button>
     </div>
   )};
     
