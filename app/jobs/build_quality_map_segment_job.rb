@@ -112,8 +112,9 @@ class BuildQualityMapSegmentJob < ApplicationJob
           while count < LONG_PERFORM_CHUNK_SIZE && current_sector.lng_sector <= @north_east_sector.lng_sector
             count += 1
             (transit_type_low..transit_type_high).each do |transit_type|
-              if point_type == 'GroceryStoreFoodQuantityMapPoint'
-                travel_type, distance = GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP[transit_type]
+              case point_type
+              when 'GroceryStoreFoodQuantityMapPoint', 'ParkActivitiesMapPoint'
+                travel_type, distance = point_class::TRANSIT_TYPE_MAP[transit_type]
               end
               next unless PolygonQuery.new(polygon_class, { # Dont check for every tag
                 name:parent_class.name,

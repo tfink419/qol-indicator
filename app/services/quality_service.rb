@@ -23,16 +23,18 @@ class QualityService
       # skip to next block if none found
       unless polygons.blank?
         results = QualityMapImage.quality_of_point(@lat, @long, polygons, GroceryStore::QUALITY_CALC_METHOD, GroceryStore::QUALITY_CALC_VALUE)
-        inner_quality = results[0]
-        if inner_quality < GroceryStoreFoodQuantityMapPoint::LOW
-          inner_quality = GroceryStoreFoodQuantityMapPoint::LOW
-        elsif inner_quality > GroceryStoreFoodQuantityMapPoint::HIGH
-          inner_quality = GroceryStoreFoodQuantityMapPoint::HIGH
+        if results[1].length > 0
+          inner_quality = results[0]
+          if inner_quality < GroceryStoreFoodQuantityMapPoint::LOW
+            inner_quality = GroceryStoreFoodQuantityMapPoint::LOW
+          elsif inner_quality > GroceryStoreFoodQuantityMapPoint::HIGH
+            inner_quality = GroceryStoreFoodQuantityMapPoint::HIGH
+          end
+          inner_quality -= GroceryStoreFoodQuantityMapPoint::LOW
+          inner_quality = 100.to_f/(GroceryStoreFoodQuantityMapPoint::HIGH-GroceryStoreFoodQuantityMapPoint::LOW)*inner_quality
+          quality += inner_quality*normalized_grocery_store_ratio
+          data[:grocery_stores] = GroceryStore.where(id:results[1]).select(:name, :address, :food_quantity)
         end
-        inner_quality -= GroceryStoreFoodQuantityMapPoint::LOW
-        inner_quality = 100.to_f/(GroceryStoreFoodQuantityMapPoint::HIGH-GroceryStoreFoodQuantityMapPoint::LOW)*inner_quality
-        quality += inner_quality*normalized_grocery_store_ratio
-        data[:grocery_stores] = GroceryStore.where(id:results[1]).select(:name, :address, :food_quantity)
       end
     end
     if normalized_park_ratio > 0
@@ -47,16 +49,18 @@ class QualityService
       # skip to next block if none found
       unless polygons.blank?
         results = QualityMapImage.quality_of_point(@lat, @long, polygons, Park::QUALITY_CALC_METHOD, Park::QUALITY_CALC_VALUE)
-        inner_quality = results[0]
-        if inner_quality < ParkActivitiesMapPoint::LOW
-          inner_quality = ParkActivitiesMapPoint::LOW
-        elsif inner_quality > ParkActivitiesMapPoint::HIGH
-          inner_quality = ParkActivitiesMapPoint::HIGH
+        if results[1].length > 0
+          inner_quality = results[0]
+          if inner_quality < ParkActivitiesMapPoint::LOW
+            inner_quality = ParkActivitiesMapPoint::LOW
+          elsif inner_quality > ParkActivitiesMapPoint::HIGH
+            inner_quality = ParkActivitiesMapPoint::HIGH
+          end
+          inner_quality -= ParkActivitiesMapPoint::LOW
+          inner_quality = 100.to_f/(ParkActivitiesMapPoint::HIGH-ParkActivitiesMapPoint::LOW)*inner_quality
+          quality += inner_quality*normalized_park_ratio
+          data[:parks] = Park.where(id:results[1]).select(:name, :num_activities)
         end
-        inner_quality -= ParkActivitiesMapPoint::LOW
-        inner_quality = 100.to_f/(ParkActivitiesMapPoint::HIGH-ParkActivitiesMapPoint::LOW)*inner_quality
-        quality += inner_quality*normalized_park_ratio
-        data[:parks] = Park.where(id:results[1]).select(:name, :num_activities)
       end
     end
     # inverted
@@ -83,7 +87,9 @@ class QualityService
       inner_quality = @map_preferences["census_tract_poverty_high"]-inner_quality
       inner_quality = 100.to_f/(@map_preferences["census_tract_poverty_high"]-@map_preferences["census_tract_poverty_low"])*inner_quality
       quality += inner_quality*normalized_census_tract_poverty_ratio
-      data[:census_tract] = CensusTract.find(results[1][0])&.public_attributes if results
+      if results[1].length > 0
+        data[:census_tract] = CensusTract.find(results[1][0])&.public_attributes if results
+      end
     end
     [quality.round(2), data]
   end
