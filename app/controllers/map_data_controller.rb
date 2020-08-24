@@ -16,8 +16,7 @@ class MapDataController < ApplicationController
     
     isochrones = []
 
-    map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
-    map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
+    map_preferences = load_map_preferences
 
     zoom = params[:zoom].to_i
 
@@ -35,8 +34,7 @@ class MapDataController < ApplicationController
     south_west = JSON.parse(params[:south_west])
     north_east = JSON.parse(params[:north_east])
 
-    map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
-    map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
+    map_preferences = load_map_preferences
 
     grocery_stores = CenterQuery.new(TagQuery.new(GroceryStore).query(map_preferences["grocery_store_tags"])).where_in_coordinate_range(south_west, north_east)\
     .limit(10000)\
@@ -58,8 +56,7 @@ class MapDataController < ApplicationController
       }, status: 400
     end
 
-    map_preferences = JSON.parse(params[:map_preferences]) if params[:map_preferences]
-    map_preferences ||= MapPreferences.find_by_user_id(session[:user_id])
+    map_preferences = load_map_preferences
     quality, data = QualityService.new(lat, long, map_preferences).get_quality_data
     render :json => {
       status: 0,
@@ -70,4 +67,9 @@ class MapDataController < ApplicationController
     }
   end
 
+  private
+
+  def load_map_preferences
+    MapPreferences.find_by_user_id(session[:user_id]).as_json.merge(JSON.parse(params[:map_preferences]).to_h)
+  end
 end
