@@ -112,10 +112,11 @@ const MapContainer = ({mapPreferences, user, updateMapPreferences, isAdminPanel}
       <GroceryStoreLayer map={map} currentLocation={currentLocation} mapPreferences={mapPreferences} />
       <MapSearchBox map={map} />
       { !isAdminPanel && <MapLegend map={map}/> }
-      <InfoWindowManager map={map} isAdminPanel={isAdminPanel} />
       <Button classes={{root:classes.mapPreferencesButton}} variant="contained" ref={mapPreferencesButtonRef} component="a" href="/map/preferences" onClick={(e) => { e.preventDefault(); history.push('/map/preferences')}}>
         Map Settings
       </Button>
+      {/* InfoWindowManager needs to be last in the div */}
+      <InfoWindowManager map={map} isAdminPanel={isAdminPanel} />
     </div>
   )};
     

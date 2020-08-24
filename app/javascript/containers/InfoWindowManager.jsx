@@ -5,7 +5,7 @@ import _ from 'lodash';
 import PointDataPopup from '../components/PointDataPopup'
 import GroceryStorePopup from '../components/GroceryStorePopup'
 
-const InfoWindowManager = ({map, infoWindows}) => {
+const InfoWindowManager = ({map, infoWindows, isAdminPanel}) => {
   let [currentInfoWindow, setCurrentInfoWindow] = React.useState(null);
   const pointDataPopupRef = React.useRef(null);
   const groceryStorePopupRef = React.useRef(null);
