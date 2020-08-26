@@ -41,8 +41,8 @@ const TopBar = ({user, userLogout}) => {
     <CssBaseline />
     <Toolbar>
       <Typography className={classes.root}>Welcome <strong>{user.first_name + ' ' + user.last_name}</strong></Typography>
-      <Hidden mdUp><Typography className={classes.root} variant="h6">myQOLi</Typography></Hidden>
-      <Hidden smDown><Typography className={classes.flexGrowABit} variant="h6">myQOLi</Typography></Hidden>
+      <Hidden mdUp><Typography className={classes.root} variant="h6">PitaMap</Typography></Hidden>
+      <Hidden smDown><Typography className={classes.flexGrowABit} variant="h6">PitaMap</Typography></Hidden>
       <Hidden smDown><Typography className={classes.root} variant="subtitle1">My Quality of Life Index</Typography></Hidden>
       <div>
         <IconButton aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleMenu} color="inherit">

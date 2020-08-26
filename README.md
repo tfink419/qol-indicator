@@ -1,4 +1,4 @@
-# myQOLi
+# PitaMap
 ## My Quality of Life Indicator
 
 ### About

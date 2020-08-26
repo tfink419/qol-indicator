@@ -41,7 +41,7 @@ const AdminBar = ({user, userLogout}) => {
   <AppBar position="static" className={classes.appBar}>
     <Toolbar>
       <div className={classes.root}>
-        <Typography><strong>myQOLi Admin</strong></Typography>
+        <Typography><strong>PitaMap Admin</strong></Typography>
       </div>
       <div>
         <IconButton aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleMenu} color="inherit">

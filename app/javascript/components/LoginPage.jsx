@@ -8,7 +8,7 @@ import LoginForm from "../containers/LoginForm";
 export default () => (
   <Container component="main" maxWidth="xs">
     <Typography variant="h3">
-      myQOLi Login
+      PitaMap Login
     </Typography>
     <LoginForm />
     <FlashNotice />

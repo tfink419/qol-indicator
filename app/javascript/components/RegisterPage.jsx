@@ -9,7 +9,7 @@ const preventDefault = (event) => event.preventDefault();
 export default () => (
   <Container component="main" maxWidth="xs">
     <Typography variant="h4">
-      myQOLi Register User
+      PitaMap Register User
     </Typography>
     <RegisterForm />
     <FlashNotice />
