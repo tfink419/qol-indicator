@@ -20,6 +20,10 @@ class Park < ApplicationRecord
     where(['parks.name ILIKE ? ', search_query])
   }
 
+  def quality_previously_changed?
+    num_activities_previously_changed?
+  end
+
   QUALITY_CALC_METHOD = 'LogExpSum'
   QUALITY_CALC_VALUE = 1.4
 
