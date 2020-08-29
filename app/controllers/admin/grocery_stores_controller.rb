@@ -32,7 +32,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore = GroceryStore.new(grocery_store_params)
     Geocode.new(gstore).attempt_geocode_if_needed
     if gstore.save
-      IsochronableChanged.new(gstore, GroceryStoreFoodQuantityPoint::TRANSIT_TYPE_MAP).record
+      IsochronableChanged.new(gstore, GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP).record
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
@@ -44,7 +44,7 @@ class Admin::GroceryStoresController < ApplicationController
 
   def destroy
     gstore = GroceryStore.find(params[:id])
-    IsochronableChanged.new(gstore, GroceryStoreFoodQuantityPoint::TRANSIT_TYPE_MAP).record(true)
+    IsochronableChanged.new(gstore, GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP).record(true)
     gstore.destroy!
 
     render :json => { 
@@ -58,7 +58,7 @@ class Admin::GroceryStoresController < ApplicationController
     gstore.assign_attributes(grocery_store_params)
     Geocode.new(gstore).attempt_geocode_if_needed
     if gstore.save
-      IsochronableChanged.new(gstore, GroceryStoreFoodQuantityPoint::TRANSIT_TYPE_MAP).record
+      IsochronableChanged.new(gstore, GroceryStoreFoodQuantityMapPoint::TRANSIT_TYPE_MAP).record
       render :json =>  {
         :status => 0,
         :grocery_store => gstore
