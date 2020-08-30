@@ -21,7 +21,7 @@ class QualityMapService
     if normalized_grocery_store_ratio > 0
       current_ind = ind
       ind += 1
-      image_data[current_ind] [
+      image_data[current_ind] = [
         GroceryStoreFoodQuantityMapPoint::LOW,
         GroceryStoreFoodQuantityMapPoint::HIGH,
         normalized_grocery_store_ratio,
@@ -52,7 +52,7 @@ class QualityMapService
     if normalized_park_ratio > 0
       current_ind = ind
       ind += 1
-      image_data[current_ind] [
+      image_data[current_ind] = [
         ParkActivitiesMapPoint::LOW,
         ParkActivitiesMapPoint::HIGH,
         normalized_park_ratio,
