@@ -16,8 +16,12 @@ class QualityMapService
     normalized_park_ratio = @map_preferences["park_ratio"]/sum.to_f
     images = []
     image_data = []
+    threads = []
+    ind = 0
     if normalized_grocery_store_ratio > 0
-      image_data << [
+      current_ind = ind
+      ind += 1
+      image_data[current_ind] [
         GroceryStoreFoodQuantityMapPoint::LOW,
         GroceryStoreFoodQuantityMapPoint::HIGH,
         normalized_grocery_store_ratio,
@@ -30,18 +34,25 @@ class QualityMapService
         @map_preferences["grocery_store_transit_type"],
         0
       ]
-      
-      images << TagQuery.new(GroceryStore).
+      images[current_ind] = []
+      TagQuery.new(GroceryStore).
       breakup_calc_num(@map_preferences["grocery_store_tags"]).
-      map { |tag_calc|
+      each do |tag_calc|
         extra_params[1] = tag_calc
-        DataImageService.
-          new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom).
-          load(extra_params, @lat_sector, @lng_sector)
-      }.filter{ |image| !image.nil? }
+        threads << Thread.new(current_ind, extra_params, DataImageService.
+            new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom)) do |thread_ind, thread_params, dis|
+          Rails.application.executor.wrap do
+            image = dis.
+                load(thread_params, @lat_sector, @lng_sector)
+            images[thread_ind] << image if image
+          end
+        end
+      end
     end
     if normalized_park_ratio > 0
-      image_data << [
+      current_ind = ind
+      ind += 1
+      image_data[current_ind] [
         ParkActivitiesMapPoint::LOW,
         ParkActivitiesMapPoint::HIGH,
         normalized_park_ratio,
@@ -54,12 +65,18 @@ class QualityMapService
         @map_preferences["park_transit_type"]
       ]
       
-      images << [DataImageService.
-          new(ParkActivitiesMapPoint::SHORT_NAME, @zoom).
-          load(extra_params, @lat_sector, @lng_sector)].filter{ |image| !image.nil? }
+      threads << Thread.new(current_ind, DataImageService.
+          new(ParkActivitiesMapPoint::SHORT_NAME, @zoom)) do |thread_ind, dis|
+        Rails.application.executor.wrap do
+          images[thread_ind] = [dis.
+              load(extra_params, @lat_sector, @lng_sector)].filter{ |image| !image.nil? }
+        end
+      end
     end
     if normalized_census_tract_poverty_ratio > 0
-      image_data << [
+      current_ind = ind
+      ind += 1
+      image_data[current_ind] = [
         @map_preferences["census_tract_poverty_low"],
         @map_preferences["census_tract_poverty_high"],
         normalized_census_tract_poverty_ratio,
@@ -68,10 +85,15 @@ class QualityMapService
         CensusTract::QUALITY_CALC_METHOD,
         CensusTract::QUALITY_CALC_VALUE
       ]
-      images << [DataImageService.
-                new(CensusTractPovertyMapPoint::SHORT_NAME, @zoom).
-                load([], @lat_sector, @lng_sector)].filter{ |image| !image.nil? }
+      threads << Thread.new(current_ind, DataImageService.
+          new(CensusTractPovertyMapPoint::SHORT_NAME, @zoom)) do |thread_ind, dis|
+        Rails.application.executor.wrap do
+          images[thread_ind] = [dis.
+              load([], @lat_sector, @lng_sector)].filter{ |image| !image.nil? }
+        end
+      end
     end
+    threads.each(&:join)
     im = QualityMapImage.colorized_quality_image(DataImageService::DATA_CHUNK_SIZE, images, image_data)
     im
   end
