@@ -5,7 +5,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
   queue_as :build_quality_map_segment
   sidekiq_options retry: 0
 
-  LONG_PERFORM_CHUNK_SIZE = 16
+  DATA_IMAGE_CUDA_CUTOFF = 256
 
   def perform(build_status)
     return unless build_status
@@ -108,9 +108,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
         puts "Lat Sector: #{@lat_sector}"
         while current_sector.lng_sector <= @north_east_sector.lng_sector
           dic_ids = []
-          count = 0
-          while count < LONG_PERFORM_CHUNK_SIZE && current_sector.lng_sector <= @north_east_sector.lng_sector
-            count += 1
+          while dic_ids.length < DATA_IMAGE_CUDA_CUTOFF && current_sector.lng_sector <= @north_east_sector.lng_sector
             (transit_type_low..transit_type_high).each do |transit_type|
               case point_type
               when 'GroceryStoreFoodQuantityMapPoint', 'ParkActivitiesMapPoint'

@@ -14,7 +14,8 @@ class StartPointRebuild
         south_west: south_west,
         north_east: north_east,
         transit_type_low: transit_type,
-        transit_type_high: transit_type
+        transit_type_high: transit_type,
+        point_type:scheduled_job.point_type
       )
       BuildQualityMapJob.set(wait: ((transit_type-1)*15).seconds).perform_later(job_status)
     end
