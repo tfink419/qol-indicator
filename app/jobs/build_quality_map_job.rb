@@ -139,7 +139,7 @@ class BuildQualityMapJob < ApplicationJob
     @build_status.update!(error: "#{err.message}:\n#{err.backtrace}")
   ensure
     if @actually_ran
-      HerokuWorkersService.new.stop if BuildQualityMapStatus.most_recent
+      HerokuWorkersService.new.stop unless BuildQualityMapStatus.most_recent
       GoogleWorkersService.new.stop
     end
   end
