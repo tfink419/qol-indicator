@@ -5,7 +5,7 @@ class BuildQualityMapSegmentJob < ApplicationJob
   queue_as :build_quality_map_segment
   sidekiq_options retry: 0
 
-  DATA_IMAGE_CUDA_CUTOFF = 256
+  DATA_IMAGE_CUDA_CUTOFF = 64
 
   def perform(build_status)
     return unless build_status

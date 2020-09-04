@@ -39,7 +39,7 @@ class QualityMapService
       breakup_calc_num(@map_preferences["grocery_store_tags"]).
       each do |tag_calc|
         extra_params[1] = tag_calc
-        threads << Thread.new(current_ind, extra_params, DataImageService.
+        threads << Thread.new(current_ind, extra_params.clone, DataImageService.
             new(GroceryStoreFoodQuantityMapPoint::SHORT_NAME, @zoom)) do |thread_ind, thread_params, dis|
           Rails.application.executor.wrap do
             image = dis.
