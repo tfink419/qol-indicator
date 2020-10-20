@@ -11,7 +11,6 @@ class TagQuery
       else
         return @record_type.where(id:nil)
       end
-    end
     when @record_type::TAG_GROUPS_ALL_NUM
       if raw
         return { table_name:@record_type.table_name, name:@record_type.name, query:'all' }
