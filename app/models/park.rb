@@ -27,6 +27,8 @@ class Park < ApplicationRecord
   QUALITY_CALC_METHOD = 'LogExpSum'
   QUALITY_CALC_VALUE = 1.4
 
+  TAG_GROUPS_ALL_NUM = 1
+
   TAG_GROUPS = []
 
   def public_attributes

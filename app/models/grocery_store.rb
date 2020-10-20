@@ -57,6 +57,8 @@ class GroceryStore < ApplicationRecord
     false # Other categories (not in categories above)
   ]
 
+  TAG_GROUPS_ALL_NUM = (2**(TAG_GROUPS.length)-1) - 1 # Outside parenthesis is each modifier tag
+
   TAG_GROUPS_CALC_SIZE = 2**(TAG_GROUPS.length)-1
 
   # Has to ignore required

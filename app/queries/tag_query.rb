@@ -4,14 +4,15 @@ class TagQuery
   end
 
   def query(tag_calc_num, raw=false)
-    if tag_calc_num == 0
+    case tag_calc_num
+    when 0
       if raw
         return { table_name:@record_type.table_name, name:@record_type.name, query:'none' }
       else
         return @record_type.where(id:nil)
       end
     end
-    if tag_calc_num == @record_type::TAG_GROUPS_CALC_SIZE
+    when @record_type::TAG_GROUPS_ALL_NUM
       if raw
         return { table_name:@record_type.table_name, name:@record_type.name, query:'all' }
       else
