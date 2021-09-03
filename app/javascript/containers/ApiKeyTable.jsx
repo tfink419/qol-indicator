@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableContainer, TablePagination, TableSort
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddCircle';
 
-import { getAdminApiKeys, deleteAdminApiKey, createAdminApiKey } from '../fetch'
+import { getAdminApiKeys, deleteAdminApiKey } from '../fetch'
 import { loadedApiKeys, clearApiKeys, updateApiKeysOrderDir, updateApiKeysOrder, updateApiKeysPage, updateApiKeysRowsPerPage } from '../actions/admin'
 
 import CreateApiKeyDialog from '../components/CreateApiKeyDialog'
