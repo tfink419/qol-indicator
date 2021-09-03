@@ -74,7 +74,7 @@ function ApiKeyTable({apiKeys, loadedApiKeys, updateApiKeysOrder, updateApiKeysO
   const oppositeDir = () => (orderDir === 'asc') ? 'desc' : 'asc';
 
   const flipOrderDir = () => {
-    updateApiKeysOrderDir((orderDir === 'asc') ? 'desc' : 'asc');
+    updateApiKeysOrderDir(oppositeDir());
   }
 
   const handleClickSort = (key) => {
