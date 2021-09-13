@@ -9,8 +9,8 @@ RUN apt-get -q clean
 WORKDIR /usr/src/app
 COPY Gemfile* ./
 RUN gem install bundler -v 2.1.4
-ARG GITHUB_TOKEN
-ENV GITHUB_TOKEN $GITHUB_TOKEN
+ARG BUNDLE_GITHUB__COM
+ENV BUNDLE_GITHUB__COM $BUNDLE_GITHUB__COM
 RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
