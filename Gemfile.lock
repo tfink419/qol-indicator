@@ -1,5 +1,5 @@
 GIT
-  remote: https://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:x-oauth-basic@github.com/tfink419/quality_map_image.git
+  remote: https://github.com/tfink419/quality_map_image.git
   revision: 64006e004a732c9ca8f8a1de53177c903c58c750
   specs:
     quality_map_image (0.7.11)
