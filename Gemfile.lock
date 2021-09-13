@@ -1,5 +1,5 @@
 GIT
-  remote: https://73ffea6d2717db8d148ae94727a2da6073e9aded:x-oauth-basic@github.com/tfink419/quality_map_image.git
+  remote: https://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:x-oauth-basic@github.com/tfink419/quality_map_image.git
   revision: 64006e004a732c9ca8f8a1de53177c903c58c750
   specs:
     quality_map_image (0.7.11)
@@ -190,6 +190,8 @@ GEM
     public_suffix (4.0.5)
     puma (3.12.6)
     rack (2.2.3)
+    rack-attack (6.5.0)
+      rack (>= 1.0, < 3)
     rack-proxy (0.6.5)
       rack
     rack-test (1.1.0)
@@ -237,8 +239,8 @@ GEM
     retriable (3.1.2)
     retries (0.0.5)
     ruby-hmac (0.4.0)
-    ruby-vips (2.0.17)
-      ffi (~> 1.9)
+    ruby-vips (2.1.3)
+      ffi (~> 1.12)
     ruby_clipper (6.2.1.5.2)
     ruby_dep (1.5.0)
     rubyzip (2.3.0)
@@ -314,6 +316,7 @@ DEPENDENCIES
   platform-api
   puma (~> 3.11)
   quality_map_image!
+  rack-attack
   rails (~> 5.2.4, >= 5.2.4.3)
   retries
   ruby_clipper (~> 6.2.1)

@@ -8,7 +8,10 @@ export const tempUpdateMapPreferences = (mapPreferences) => ({
   mapPreferences
 })
 
-export const resetMapPreferences = (mapPreferences) => ({
-  type:'RESET_MAP_PREFERENCES',
-  mapPreferences
+export const resetMapPreferences = () => ({
+  type:'RESET_MAP_PREFERENCES'
+})
+
+export const setDefaultMapPreferences = () => ({
+  type:'SET_DEFAULT_MAP_PREFERENCES'
 })

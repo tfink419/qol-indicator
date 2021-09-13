@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   rescue_from StandardError do |err|
     $stderr.print err
     $stderr.print err.backtrace
-    render :json => { 
+    render :json => {
       :status => 500,
       :error => 'Unknown error occurred',
       :error_details => err

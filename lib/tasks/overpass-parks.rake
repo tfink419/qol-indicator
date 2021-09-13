@@ -39,7 +39,7 @@ task "overpass:parks" => :environment do
   end), on_duplicate_key_ignore: true)
 
   unless south == 9999
-    # Rebuild all points in the range of added grocery stores
+    # Rebuild all points in the range of added parks
     south_west = [(south-0.3).floor(1), (west-0.3).floor(1)]
     north_east = [(north+0.3).ceil(1), (east+0.3).ceil(1)]
     build_status = BuildQualityMapStatus.create(

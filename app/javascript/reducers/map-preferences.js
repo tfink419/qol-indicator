@@ -18,6 +18,12 @@ const mapPreferences = (state = { preferences:defaultPreferences, loaded:false},
         ...state,
         preferences:state.original
       }
+    case 'SET_DEFAULT_MAP_PREFERENCES':
+      return {
+        ...state,
+        preferences:defaultPreferences,
+        original:defaultPreferences
+      }
     case 'USER_LOGOUT':
       return {
         preferences:defaultPreferences,

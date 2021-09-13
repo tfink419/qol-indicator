@@ -81,3 +81,5 @@ gem 'aws-sdk-s3'
 gem 'google-api-client', '~> 0.43'
 
 gem 'googleauth'
+
+gem 'rack-attack'

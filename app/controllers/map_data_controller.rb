@@ -2,7 +2,6 @@ require 'json'
 # require 'httplog'
 
 class MapDataController < ApplicationController
-  before_action :confirm_logged_in
   def get_quality_map_image
     lat_sector = JSON.parse(params[:lat_sector])
     lng_sector = JSON.parse(params[:lng_sector])
@@ -70,6 +69,6 @@ class MapDataController < ApplicationController
   private
 
   def load_map_preferences
-    MapPreferences.find_by_user_id(session[:user_id]).as_json.merge(JSON.parse(params[:map_preferences]).to_h)
+    (MapPreferences.find_by_user_id(session[:user_id]) || {}).as_json.merge(JSON.parse(params[:map_preferences]).to_h)
   end
 end

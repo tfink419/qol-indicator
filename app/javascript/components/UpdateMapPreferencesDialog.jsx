@@ -6,7 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, FormCo
 Slider, CircularProgress, Typography, ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core/';
 
 import { flashMessage } from '../actions/messages'
-import { updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences } from '../actions/map-preferences'
+import { updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences, setDefaultMapPreferences } from '../actions/map-preferences'
 import { getMapPreferences, putMapPreferences } from '../fetch';
 
 const groceryStoreTransitTypeMarks = [
@@ -49,16 +49,33 @@ const totalRatio = (mapPreferences) => (
   mapPreferences.park_ratio
 )
 
-const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences}) => {
+const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences, user}) => {
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
   let [mapPreferenceErrors, setMapPreferenceErrors] = React.useState({})
 
   const loadMapPreferences = () => {
     if(!mapPreferences.loaded) {
-      getMapPreferences().then(response => {
-        updateMapPreferences(response.map_preferences)
-      })
+      if(user) {
+        getMapPreferences().then(response => {
+          updateMapPreferences(response.map_preferences)
+        })
+      }
+      else
+      {
+        let stored = sessionStorage.getItem('map_preferences')
+        if(stored) {
+          console.log('stored', stored)
+          try {
+            updateMapPreferences(JSON.parse(stored));
+          }
+          catch {
+            setDefaultMapPreferences();
+          }
+        }
+        else
+        setDefaultMapPreferences();
+      }
     }
     
   }
@@ -80,31 +97,39 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
   };
 
   const handleUpdate = () => {
-    setMapPreferenceErrors({});
-    setLoading(true)
-    putMapPreferences(mapPreferences.preferences)
-    .then(response => {
-      setLoading(false)
-      onClose(true);
-      flashMessage('info', response.message);
-      updateMapPreferences(response.map_preferences);
-    })
-    .catch(error => {
-      setLoading(false)
-      if(error.status == 401) 
-      {
-        flashMessage('error', error.message);
-        if(error.details) {
-          setMapPreferenceErrors(_.mapValues(error.details, (messages, key) => {
-            return messages.map(message => _.startCase(key) + " " +message).join("\n")
-          }));
+    if(user) {
+      setMapPreferenceErrors({});
+      setLoading(true)
+      putMapPreferences(mapPreferences.preferences)
+      .then(response => {
+        setLoading(false)
+        onClose(true);
+        flashMessage('info', response.message);
+        updateMapPreferences(response.map_preferences);
+      })
+      .catch(error => {
+        setLoading(false)
+        if(error.status == 401) 
+        {
+          flashMessage('error', error.message);
+          if(error.details) {
+            setMapPreferenceErrors(_.mapValues(error.details, (messages, key) => {
+              return messages.map(message => _.startCase(key) + " " +message).join("\n")
+            }));
+          }
         }
-      }
-      if(error.status == 403) 
-      {
-        flashMessage('error', error.message);
-      }
-    })
+        if(error.status == 403) 
+        {
+          flashMessage('error', error.message);
+        }
+      })
+    }
+    else {
+      updateMapPreferences(mapPreferences.preferences);
+      onClose(true);
+      flashMessage('info', 'Map Preferences Updated Sucessfully');
+      sessionStorage.setItem('map_preferences', JSON.stringify(mapPreferences.preferences))
+    }
   }
 
   React.useEffect(loadMapPreferences, [mapPreferences]);
@@ -340,7 +365,8 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
 }
 
 const mapStateToProps = state => ({
-  mapPreferences: state.mapPreferences
+  mapPreferences: state.mapPreferences,
+  user: state.user
 })
 
 const mapDispatchToProps = {

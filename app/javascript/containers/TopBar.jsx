@@ -33,14 +33,19 @@ const TopBar = ({user, userLogout}) => {
   const handleLogout = (event) => {
     event.preventDefault();
     userLogout();
-    window.location.href = 'logout';
+    history.push('/logout');
   }
 
   return (
   <AppBar position="static">
     <CssBaseline />
     <Toolbar>
-      <Typography className={classes.root}>Welcome <strong>{user.first_name + ' ' + user.last_name}</strong></Typography>
+      <Typography className={classes.root}>
+        Welcome
+        { user &&
+          <strong>{user.first_name + ' ' + user.last_name}</strong>
+        }
+      </Typography>
       <Hidden mdUp><Typography className={classes.root} variant="h6">PitaMap</Typography></Hidden>
       <Hidden smDown><Typography className={classes.flexGrowABit} variant="h6">PitaMap</Typography></Hidden>
       <Hidden smDown><Typography className={classes.root} variant="subtitle1">My Quality of Life Index</Typography></Hidden>
@@ -60,11 +65,19 @@ const TopBar = ({user, userLogout}) => {
           }}
           open={Boolean(anchorEl)} onClose={handleClose}
         >
-          <MenuItem component="a" href="/user" onClick={(e) => { e.preventDefault(); history.push('/user')}}>Profile</MenuItem>
-          { user.is_admin &&
+          { user &&
+            <MenuItem component="a" href="/user" onClick={(e) => { e.preventDefault(); history.push('/user')}}>Profile</MenuItem>
+          }
+          { user && user.is_admin &&
             <MenuItem component="a" href="/admin" onClick={(e) => { e.preventDefault(); history.push('/admin')}}>Admin Area</MenuItem>
           }
-          <MenuItem component="a" href="/logout" onClick={handleLogout}>Logout</MenuItem>
+          {
+            user
+            ?
+            <MenuItem component="a" href="/logout" onClick={handleLogout}>Logout</MenuItem>
+            :
+            <MenuItem component="a" href="/login" onClick={() => history.push('/login')}>Login/Create Account</MenuItem>
+          }
         </Menu>
       </div>
     </Toolbar>
