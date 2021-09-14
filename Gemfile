@@ -1,3 +1,4 @@
+source 'https://repo.fury.io/exULJfpVCBkqWsiVR3k3/me/' # Seriously? gemfury has no way to make this secure
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
@@ -66,7 +67,7 @@ gem 'httplog'
 # gem 'resque'
 gem 'sidekiq', '~> 6.1.0'
 
-gem 'quality_map_image', git: "https://github.com/tfink419/quality_map_image.git"
+gem 'quality_map_image'
 
 gem "retries"
 

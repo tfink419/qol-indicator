@@ -1,12 +1,5 @@
-GIT
-  remote: https://github.com/tfink419/quality_map_image.git
-  revision: 64006e004a732c9ca8f8a1de53177c903c58c750
-  specs:
-    quality_map_image (0.7.11)
-      gradient (~> 0.5.1)
-      ruby-vips
-
 GEM
+  remote: https://repo.fury.io/exULJfpVCBkqWsiVR3k3/me/
   remote: https://rubygems.org/
   specs:
     actioncable (5.2.6)
@@ -219,6 +212,9 @@ GEM
       rate_throttle_client (~> 0.1.0)
     public_suffix (4.0.6)
     puma (3.12.6)
+    quality_map_image (0.7.11)
+      gradient (~> 0.5.1)
+      ruby-vips
     racc (1.5.2)
     rack (2.2.3)
     rack-attack (6.5.0)
@@ -351,7 +347,7 @@ DEPENDENCIES
   pg (>= 0.18, < 2.0)
   platform-api
   puma (~> 3.11)
-  quality_map_image!
+  quality_map_image
   rack-attack
   rails (~> 5.2.4, >= 5.2.4.3)
   retries
