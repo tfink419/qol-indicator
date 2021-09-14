@@ -18,7 +18,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - BUNDLE_GITHUB__COM=${BUNDLE_GITHUB__COM}
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p $PORT -b '0.0.0.0'"
     volumes:
       - .:/usr/src/app
@@ -39,7 +39,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PORT: ${PORT}
-      BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -50,7 +49,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - BUNDLE_GITHUB__COM=${BUNDLE_GITHUB__COM}
     command: bundle exec sidekiq
     environment:
       URL: ${URL}
@@ -69,7 +68,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PORT: ${PORT}
-      BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}
     volumes:
       - .:/usr/src/app
     depends_on:
