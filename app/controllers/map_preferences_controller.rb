@@ -1,5 +1,5 @@
 class MapPreferencesController < ApplicationController
-  before_action :confirm_logged_in, except: show
+  before_action :confirm_logged_in, except: :show
   def show
     user = User.find(session[:user_id])
     user.create_map_preferences unless user.map_preferences
