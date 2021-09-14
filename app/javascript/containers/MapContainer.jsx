@@ -67,7 +67,7 @@ const MapContainer = ({mapPreferences, user, updateMapPreferences, isAdminPanel}
   }
   
   const loadMapPreferences = () => {
-    if(!mapPreferences.loaded) {
+    if(user && !mapPreferences.loaded) {
       getMapPreferences().then(response => {
         updateMapPreferences(response.map_preferences)
       })
