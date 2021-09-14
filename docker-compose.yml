@@ -39,6 +39,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PORT: ${PORT}
+      BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -68,6 +69,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PORT: ${PORT}
+      BUNDLE_GITHUB__COM: ${BUNDLE_GITHUB__COM}
     volumes:
       - .:/usr/src/app
     depends_on:
