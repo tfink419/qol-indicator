@@ -5,7 +5,7 @@ import LoginForm from "./LoginForm";
 
 export default ({onClose}) => (
   <Dialog open={true} onClose={onClose}>
-    <DialogTitle>Update Your Map Preferences</DialogTitle>
+    <DialogTitle>Login</DialogTitle>
     <DialogContent>
       <LoginForm onClose={onClose} />
     </DialogContent>
