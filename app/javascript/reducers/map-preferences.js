@@ -22,7 +22,8 @@ const mapPreferences = (state = { preferences:defaultPreferences, loaded:false},
       return {
         ...state,
         preferences:defaultPreferences,
-        original:defaultPreferences
+        original:defaultPreferences,
+        loaded: true
       }
     case 'USER_LOGIN':
       return {
