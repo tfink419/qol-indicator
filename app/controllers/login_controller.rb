@@ -28,7 +28,7 @@ class LoginController < ApplicationController
   def logout
     session[:user_id] = nil
     flash[:notice] = "Logged Out"
-    redirect_to(login_page_path)
+    redirect_to(root_path)
   end
 
   def attempt_register

@@ -6,7 +6,7 @@ import { userLogin } from '../actions/user'
 import { flashMessage } from '../actions/messages'
 import { postLogin } from "../fetch";
 
-const LoginForm = ({ userLogin, flashMessage }) => {
+const LoginForm = ({ userLogin, flashMessage, onClose }) => {
   let history = useHistory();
   let [username, setUsername] = React.useState('')
   let [password, setPassword] = React.useState('')
@@ -16,8 +16,8 @@ const LoginForm = ({ userLogin, flashMessage }) => {
     .then(response => {
       userLogin(response.user);
       flashMessage('info', 'You have been logged in.');
-      history.push('/')
-      
+      onClose();
+      history.push('/');
     })
     .catch(error => {
       if(error.status == 401) 
@@ -67,12 +67,12 @@ const LoginForm = ({ userLogin, flashMessage }) => {
       </Button>
       <Grid container>
         <Grid item xs>
-          <Link href="/forgot-password" onClick={(e) => {e.preventDefault(); history.push('/forgot-password')}} variant="body2">
+          <Link href="/forgot-password" onClick={(e) => {e.preventDefault(); onClose(); history.push('/forgot-password')}} variant="body2">
             Forgot password?
           </Link>
         </Grid>
         <Grid item>
-          <Link href="/register" onClick={(e) => {e.preventDefault(); history.push('/register')}} variant="body2">
+          <Link href="/register" onClick={(e) => {e.preventDefault(); onClose(); history.push('/register')}} variant="body2">
             Don't have an account? Sign Up
           </Link>
         </Grid>

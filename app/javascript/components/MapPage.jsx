@@ -7,6 +7,7 @@ import TopBar from "../containers/TopBar";
 import MapContainer from "../containers/MapContainer"
 import UpdateUserSelfDialog from "./UpdateUserSelfDialog";
 import UpdateMapPreferencesDialog from "./UpdateMapPreferencesDialog";
+import LoginDialog from "../containers/LoginDialog";
 
 export default ({match}) => {
   let history = useHistory();
@@ -21,6 +22,7 @@ export default ({match}) => {
     <Switch>
       <Route path={`/user`} exact component={() => (<UpdateUserSelfDialog onClose={handleCloseDialog}/> )}/>
       <Route path={`/map/preferences`} exact component={() => (<UpdateMapPreferencesDialog onClose={handleCloseDialog}/> )}/>
+      <Route path={`/login`} exact component={() => (<LoginDialog onClose={handleCloseDialog}/> )}/>
     </Switch>
   </Container>
 )};

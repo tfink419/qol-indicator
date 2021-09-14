@@ -130,6 +130,13 @@ const RegisterForm = ({ userLogin, flashMessage }) => {
       >
         Register
       </Button>
+      <Grid container>
+        <Grid item xs>
+          <Link href="/" onClick={(e) => {e.preventDefault(); history.push('/')}} variant="body2">
+            Back to Pitamap
+          </Link>
+        </Grid>
+      </Grid>
     </form>
   )
 }
