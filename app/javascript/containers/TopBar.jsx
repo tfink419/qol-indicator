@@ -76,7 +76,7 @@ const TopBar = ({user, userLogout}) => {
             ?
             <MenuItem component="a" href="/logout" onClick={handleLogout}>Logout</MenuItem>
             :
-            <MenuItem component="a" href="/login" onClick={() => history.push('/login')}>Login</MenuItem>
+            <MenuItem component="a" href="/login" onClick={(e) => { e.preventDefault(); history.push('/login')}}>Login</MenuItem>
           }
         </Menu>
       </div>
