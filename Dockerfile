@@ -4,8 +4,12 @@ RUN apt-get update -qq && apt-get install -y \
   libvips \
   libvips-dev \
   nodejs \
-  postgresql-client \
-  yarn
+  postgresql-client
+
+# Add Yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get install -y yarn
 
 # App
 WORKDIR /usr/src/app
@@ -14,7 +18,7 @@ RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
-RUN SECRET_KEY_BASE=doesntmatterrightnow RAILS_ENV=production NODE_ENV=production ASSETS_PRECOMPILE=true bundle exec rails assets:precompile
+RUN yarn install --frozen-lockfile
 COPY public/ ./
 
 # Start the main process.
