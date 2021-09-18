@@ -23,16 +23,14 @@
 /yarn-error.log
 
 /public/dev-assets
+/public/assets
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 /config/local_env.yml
 
-# Packs are needed for production
-# /public/packs
-/public/packs-test
-/public/packs-dev
+/public/packs*
 /node_modules
 /yarn-error.log
 yarn-debug.log*
