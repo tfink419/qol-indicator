@@ -5,7 +5,7 @@ RUN apt-get update -qq && apt-get install -y \
   libvips-dev \
   nodejs \
   postgresql-client \
-  yarn \
+  yarn
 
 # App
 WORKDIR /usr/src/app
