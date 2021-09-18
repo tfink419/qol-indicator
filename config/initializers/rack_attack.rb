@@ -27,7 +27,7 @@ class Rack::Attack
   #
   # Key: "rack::attack:#{Time.now.to_i/:period}:req/ip:#{req.ip}"
   throttle('req/ip', limit: 300, period: 5.minutes) do |req|
-    req.ip  unless req.path.start_with?('/assets') || req.path.start_with?('/map_data')
+    req.ip unless req.path.start_with?('/assets') || req.path.start_with?('/map_data')
   end
 
   throttle('/map_data/ip', limit: 300, period: 1.minute) do |req|
