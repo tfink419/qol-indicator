@@ -10,8 +10,9 @@ WORKDIR /usr/src/app
 COPY Gemfile* ./
 RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
-  bundle install && bundle exec rails assets:precompile
+  bundle install
 COPY . .
+RUN bundle exec rails assets:precompile
 
 # Start the main process.
 # CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "$PORT"]
