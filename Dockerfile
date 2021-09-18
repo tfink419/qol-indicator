@@ -18,8 +18,7 @@ RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
-RUN yarn install --frozen-lockfile
-COPY public/ ./
+RUN yarn install --frozen-lockfile --check-files
 
 # Start the main process.
 # CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "$PORT"]
