@@ -23,11 +23,12 @@ module QolIndicator
 
     config.active_job.queue_adapter = :inline
 
-    Mapbox.access_token = ENV["MAPBOX_TOKEN"]
-
-    Google::Maps.configure do |config|
-      config.authentication_mode = Google::Maps::Configuration::API_KEY
-      config.api_key = ENV["GOOGLE_SERVER_KEY"]
+    unless ENV['ASSETS_PRECOMPILE']
+      Mapbox.access_token = ENV["MAPBOX_TOKEN"]
+      Google::Maps.configure do |config|
+        config.authentication_mode = Google::Maps::Configuration::API_KEY
+        config.api_key = ENV["GOOGLE_SERVER_KEY"]
+      end
     end
 
     # Settings in config/environments/* take precedence over those specified here.
