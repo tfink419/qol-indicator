@@ -12,7 +12,7 @@ RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
-RUN yarn install
+RUN SECRET_KEY_BASE=doesntmatterrightnow RAILS_ENV=production NODE_ENV=production ASSETS_PRECOMPILE=true bundle exec rails assets:precompile
 COPY public/ ./
 
 # Start the main process.
