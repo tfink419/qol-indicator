@@ -4,6 +4,7 @@
     <title>PitaMap</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <meta name="GOOGLE_WEB_KEY" content="<%= ENV['GOOGLE_WEB_KEY'] %>">
 
     <%= javascript_tag "var FLASH_NOTICE = #{JSON.generate(flash[:notice])};" unless flash[:notice].blank? %>
     <%= javascript_tag "var FLASH_ERROR = #{JSON.generate(flash[:error])};" unless flash[:error].blank? %>

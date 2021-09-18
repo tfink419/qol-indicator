@@ -13,6 +13,7 @@ RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
 RUN bundle exec rails assets:precompile
+COPY public/ ./
 
 # Start the main process.
 # CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "$PORT"]

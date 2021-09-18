@@ -11,7 +11,7 @@ import QualityMapLayer from './QualityMapLayer'
 import GroceryStoreLayer from './GroceryStoreLayer'
 import MapLegend from "../components/MapLegend";
 import MapSearchBox from "../components/MapSearchBox";
-import { paramify } from '../fetch'
+import { GOOGLE_WEB_KEY } from '../metadata'
 import { useHistory } from "react-router-dom";
 import { Button } from "@material-ui/core";
 

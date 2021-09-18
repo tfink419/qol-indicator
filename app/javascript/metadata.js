@@ -1,0 +1,1 @@
+export const GOOGLE_WEB_KEY = document.querySelector('meta[name="GOOGLE_WEB_KEY"]').content
