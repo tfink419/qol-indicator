@@ -12,7 +12,7 @@ RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
-RUN yarn install --check-files
+RUN yarn install
 COPY public/ ./
 
 # Start the main process.
