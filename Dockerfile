@@ -1,9 +1,11 @@
 FROM ruby:2.6.5
 
-RUN apt-get update -qq && apt-get install -y nodejs postgresql-client yarn
-# lib vips
-RUN apt-get -y install libvips libvips-dev
-RUN apt-get -q clean
+RUN apt-get update -qq && apt-get install -y \
+  libvips \
+  libvips-dev \
+  nodejs \
+  postgresql-client \
+  yarn \
 
 # App
 WORKDIR /usr/src/app
