@@ -19,7 +19,7 @@ RUN bundle config set without 'development test' &&\
   bundle install
 COPY . .
 RUN yarn install --frozen-lockfile
-RUN SECRET_KEY_BASE=doesntmatterrightnow RAILS_ENV=production bundle exec rake assets:precompile
+RUN ASSETS_PRECOMPILE=true SECRET_KEY_BASE=doesntmatterrightnow RAILS_ENV=production bundle exec rails assets:precompile
 
 # Start the main process.
 # CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "$PORT"]
