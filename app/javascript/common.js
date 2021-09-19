@@ -50,3 +50,17 @@ export const defaultPreferences = {
 
 let infoWindowId = 0;
 export const incrementInfoWindowId = () => infoWindowId++
+
+export const getMapPreferencesLocal = (updateMapPreferences, setDefaultMapPreferences) => {
+  let stored = sessionStorage.getItem('map_preferences')
+  if(stored) {
+    try {
+      updateMapPreferences(JSON.parse(stored));
+    }
+    catch {
+      setDefaultMapPreferences();
+    }
+  }
+  else
+  setDefaultMapPreferences();
+}

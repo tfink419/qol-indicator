@@ -21,7 +21,9 @@ class QualityService
       polygons = PolygonQuery.new(IsochronePolygon, parent_query, 'isochronable_id', 'food_quantity')\
       .all_near_point_with_parent_and_ids(@lat, @long, travel_type, distance)
       # skip to next block if none found
-      unless polygons.blank?
+      if polygons.blank?
+        data[:grocery_stores] = []
+      else
         results = QualityMapImage.quality_of_point(@lat, @long, polygons, GroceryStore::QUALITY_CALC_METHOD, GroceryStore::QUALITY_CALC_VALUE)
         if results[1].length > 0
           inner_quality = results[0]
@@ -47,7 +49,9 @@ class QualityService
       polygons = PolygonQuery.new(IsochronePolygon, parent_query, 'isochronable_id', 'num_activities')\
       .all_near_point_with_parent_and_ids(@lat, @long, travel_type, distance)
       # skip to next block if none found
-      unless polygons.blank?
+      if polygons.blank?
+        data[:parks] = []
+      else
         results = QualityMapImage.quality_of_point(@lat, @long, polygons, Park::QUALITY_CALC_METHOD, Park::QUALITY_CALC_VALUE)
         if results[1].length > 0
           inner_quality = results[0]

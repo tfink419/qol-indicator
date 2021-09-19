@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { connect } from "react-redux";
 import { Loader } from '@googlemaps/js-api-loader';
 import { getMapPreferences } from '../fetch'
-import { updateMapPreferences } from "../actions/map-preferences";
+import { updateMapPreferences, setDefaultMapPreferences } from "../actions/map-preferences";
 
 import InfoWindowManager from './InfoWindowManager'
 import QualityMapLayer from './QualityMapLayer'
@@ -14,6 +14,7 @@ import MapSearchBox from "../components/MapSearchBox";
 import { GOOGLE_WEB_KEY } from '../metadata'
 import { useHistory } from "react-router-dom";
 import { Button } from "@material-ui/core";
+import { getMapPreferencesLocal } from '../common'
 
 const loader = new Loader({
   apiKey: GOOGLE_WEB_KEY,
@@ -44,7 +45,7 @@ const startLocation = {
   northEast:[39.765, -104.927]
 }
 
-const MapContainer = ({mapPreferences, user, updateMapPreferences, isAdminPanel}) => {
+const MapContainer = ({mapPreferences, user, updateMapPreferences, setDefaultMapPreferences, isAdminPanel}) => {
   const classes = useStyles();
   const history = useHistory();
   let [currentLocation, setCurrentLocation] = React.useState({...startLocation});
@@ -67,10 +68,15 @@ const MapContainer = ({mapPreferences, user, updateMapPreferences, isAdminPanel}
   }
   
   const loadMapPreferences = () => {
-    if(user && !mapPreferences.loaded) {
-      getMapPreferences().then(response => {
-        updateMapPreferences(response.map_preferences)
-      })
+    if(!mapPreferences.loaded) {
+      if(user) {
+        getMapPreferences().then(response => {
+          updateMapPreferences(response.map_preferences)
+        })
+      }
+      else {
+        getMapPreferencesLocal(updateMapPreferences, setDefaultMapPreferences);
+      }
     }
   }
 
@@ -126,7 +132,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-  updateMapPreferences
+  updateMapPreferences,
+  setDefaultMapPreferences
 }
 
 

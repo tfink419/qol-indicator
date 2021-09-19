@@ -7,6 +7,7 @@ Slider, CircularProgress, Typography, ExpansionPanel, ExpansionPanelSummary, Exp
 
 import { flashMessage } from '../actions/messages'
 import { updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences, setDefaultMapPreferences } from '../actions/map-preferences'
+import { getMapPreferencesLocal } from '../common'
 import { getMapPreferences, putMapPreferences } from '../fetch';
 
 const groceryStoreTransitTypeMarks = [
@@ -49,7 +50,7 @@ const totalRatio = (mapPreferences) => (
   mapPreferences.park_ratio
 )
 
-const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences, user}) => {
+const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, updateMapPreferences, tempUpdateMapPreferences, resetMapPreferences, setDefaultMapPreferences, user}) => {
   const classes = useStyles();
   let [loading, setLoading] = React.useState(false);
   let [mapPreferenceErrors, setMapPreferenceErrors] = React.useState({})
@@ -61,20 +62,8 @@ const UpdateMapPreferencesDialog = ({mapPreferences, onClose, flashMessage, upda
           updateMapPreferences(response.map_preferences)
         })
       }
-      else
-      {
-        let stored = sessionStorage.getItem('map_preferences')
-        if(stored) {
-          console.log('stored', stored)
-          try {
-            updateMapPreferences(JSON.parse(stored));
-          }
-          catch {
-            setDefaultMapPreferences();
-          }
-        }
-        else
-        setDefaultMapPreferences();
+      else {
+        getMapPreferencesLocal(updateMapPreferences, setDefaultMapPreferences);
       }
     }
     
@@ -373,7 +362,8 @@ const mapDispatchToProps = {
   flashMessage,
   updateMapPreferences,
   tempUpdateMapPreferences,
-  resetMapPreferences
+  resetMapPreferences,
+  setDefaultMapPreferences
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UpdateMapPreferencesDialog)

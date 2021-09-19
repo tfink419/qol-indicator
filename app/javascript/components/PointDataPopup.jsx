@@ -23,7 +23,8 @@ export default ({data}) => (
           </TableRow>
         </TableBody>
       </Table>
-      { data.data.grocery_stores && (
+      { data.data.grocery_stores && (data.data.grocery_stores.length > 0 ?
+      (
         <React.Fragment>
           <Table aria-label="Grocery Stores" size='small'>
             <TableHead>
@@ -44,8 +45,22 @@ export default ({data}) => (
             </TableBody>
           </Table>
         </React.Fragment>
-      )}
-      { data.data.parks && (
+      )
+      :
+      (
+        <React.Fragment>
+          <Table aria-label="No Grocery Stores" size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>No Grocery Stores</TableCell>
+              </TableRow>
+            </TableHead>
+          </Table>
+        </React.Fragment>
+      ))
+      }
+      { data.data.parks && (data.data.parks.length > 0 ?
+      (
         <React.Fragment>
           <Table aria-label="Parks" size='small'>
             <TableHead>
@@ -64,7 +79,19 @@ export default ({data}) => (
             </TableBody>
           </Table>
         </React.Fragment>
-      )}
+      )
+      :
+      (
+        <React.Fragment>
+          <Table aria-label="No Parks" size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>No Parks</TableCell>
+              </TableRow>
+            </TableHead>
+          </Table>
+        </React.Fragment>
+      ))}
       { data.data.census_tract && (
         <React.Fragment>
           <Typography variant='h6'>
