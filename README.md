@@ -11,13 +11,11 @@ This site was created as a demo for Snapdocs inc. It is based on a need that I h
 ### Future Goals
 - Incorporate other types of quality indicators
   - access to transit
-  - Median income
   - Job rates
   - Homeless populations
   - Crime rates
-- Get a report at a point/address
 - ad's 🤔
 - Tests would be good
 
-### How to compile assets for production
-`RAILS_ENV=development NODE_ENV=production bundle exec rails assets:precompile; bundle exec rails assets:fix-precompile`
+### QualityMapImage
+Long detailed discussion about how I handle images through libvips and CUDA as both data and visual representations
