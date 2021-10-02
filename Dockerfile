@@ -18,8 +18,8 @@ RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
   bundle install
 RUN yarn install --frozen-lockfile
-RUN SECRET_KEY_BASE=a RAILS_ENV=production bundle exec rails assets:precompile
 COPY . .
+RUN SECRET_KEY_BASE=a RAILS_ENV=production bundle exec rails assets:precompile
 
 # Start the main process.
 # CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "$PORT"]
