@@ -13,13 +13,13 @@ RUN apt-get update -qq && apt-get install -y yarn
 
 # App
 WORKDIR /usr/src/app
-COPY Gemfile* ./
+COPY Gemfile* package.json yarn.lock ./
 RUN gem install bundler -v 2.1.4
 RUN bundle config set without 'development test' &&\
   bundle install
-COPY . .
 RUN yarn install --frozen-lockfile
-RUN ASSETS_PRECOMPILE=true SECRET_KEY_BASE=doesntmatterrightnow RAILS_ENV=production bundle exec rails assets:precompile
+RUN SECRET_KEY_BASE=a RAILS_ENV=production bundle exec rails assets:precompile
+COPY . .
 
 # Start the main process.
 # CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "$PORT"]
