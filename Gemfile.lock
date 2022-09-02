@@ -1,6 +1,12 @@
 GEM
-  remote: https://rubygems.org/
   remote: https://repo.fury.io/exULJfpVCBkqWsiVR3k3/me/
+  specs:
+    quality_map_image (0.7.11)
+      gradient (~> 0.5.1)
+      ruby-vips
+
+GEM
+  remote: https://rubygems.org/
   specs:
     actioncable (5.2.6)
       actionpack (= 5.2.6)
@@ -198,11 +204,8 @@ GEM
       rate_throttle_client (~> 0.1.0)
     public_suffix (4.0.6)
     puma (3.12.6)
-    quality_map_image (0.7.11)
-      gradient (~> 0.5.1)
-      ruby-vips
     racc (1.5.2)
-    rack (2.2.3)
+    rack (2.2.4)
     rack-attack (6.5.0)
       rack (>= 1.0, < 3)
     rack-proxy (0.7.0)
