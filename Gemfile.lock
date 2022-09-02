@@ -203,7 +203,8 @@ GEM
       moneta (~> 1.0.0)
       rate_throttle_client (~> 0.1.0)
     public_suffix (4.0.6)
-    puma (3.12.6)
+    puma (4.3.12)
+      nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.4)
     rack-attack (6.5.0)
@@ -340,7 +341,7 @@ DEPENDENCIES
   mapbox-sdk (~> 2.3.0)
   pg (>= 0.18, < 2.0)
   platform-api
-  puma (~> 3.11)
+  puma (~> 4.3)
   quality_map_image!
   rack-attack
   rails (~> 5.2, >= 5.2.4)
