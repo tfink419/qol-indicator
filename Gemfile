@@ -62,7 +62,7 @@ gem 'ruby_clipper', '~> 6.2.1'
 gem 'httplog'
 
 # gem 'resque'
-gem 'sidekiq', '~> 6.4.0'
+gem 'sidekiq', '~> 7.0.8'
 
 gem "retries"
 
